@@ -1,0 +1,19 @@
+{
+  "name": "Bible Story Pals · Amiguitos de la Biblia",
+  "short_name": "Story Pals",
+  "description": "Bilingual Bible stories read aloud for pre-K and kindergarten, with gentle mini-games. No ads. Works offline.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#7cc6f2",
+  "theme_color": "#7cc6f2",
+  "lang": "en",
+  "categories": ["education", "kids", "games", "books"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
