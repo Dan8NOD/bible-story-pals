@@ -1,7 +1,9 @@
-// Narration (Web Speech API) and little synthesized sound effects (Web Audio).
-// No audio files are needed, which keeps the app tiny and fully offline.
+// Narration and little synthesized sound effects (Web Audio).
+// Narration plays recorded ElevenLabs clips from audio/ (made by tools/voices.mjs)
+// and falls back to the device's own text-to-speech for any line without a clip.
 
 import { store, langs } from './store.js';
+import { clipId } from './phrases.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
 const LOCALES = { en: ['en-US', 'en-GB', 'en'], es: ['es-MX', 'es-US', 'es-419', 'es-ES', 'es'] };
@@ -29,7 +31,43 @@ function voiceFor(lang) {
 export const onSpeaking = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 const emit = (on) => listeners.forEach((fn) => fn(on));
 
+/* ---------------- recorded clips ---------------- */
+
+let clips = { en: new Set(), es: new Set() };
+const clipsReady = typeof fetch === 'undefined' ? Promise.resolve() : fetch('audio/manifest.json')
+  .then((r) => (r.ok ? r.json() : null))
+  .then((m) => { if (m) clips = { en: new Set(m.clips?.en || []), es: new Set(m.clips?.es || []) }; })
+  .catch(() => { /* no recordings yet */ });
+
+// One reusable element: once unlocked by a tap, iOS lets it play later clips too.
+const player = typeof Audio !== 'undefined' ? new Audio() : null;
+let stopClip = null;
+
+function playClip(src, token) {
+  return new Promise((resolve) => {
+    if (token !== speakToken || !player) return resolve();
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(t);
+      player.onended = player.onerror = null;
+      stopClip = null;
+      resolve();
+    };
+    const t = setTimeout(finish, 20000);
+    stopClip = () => { player.pause(); finish(); };
+    player.onended = finish;
+    player.onerror = finish;
+    player.src = src;
+    player.play().catch(finish);
+  });
+}
+
 function sayOne(text, lang, token) {
+  const id = clipId(text);
+  if (clips[lang].has(id)) return playClip(`audio/${lang}/${id}.mp3`, token);
+  if (!synth) return new Promise((r) => setTimeout(r, 350));
   return new Promise((resolve) => {
     if (token !== speakToken) return resolve();
     const u = new SpeechSynthesisUtterance(text);
@@ -48,26 +86,37 @@ function sayOne(text, lang, token) {
   });
 }
 
-// Speak an { en, es } entry in the chosen language(s). Resolves when finished.
-export async function speak(entry, { force = false } = {}) {
-  const token = ++speakToken;
+function silence() {
   if (synth) synth.cancel();
-  if (!entry) return;
-  if (!synth || (!store.get('narration') && !force)) {
+  if (stopClip) stopClip();
+}
+
+// Speak an { en, es } entry, or a list of them, in the chosen language(s):
+// all English lines first, then all Spanish ones. Resolves when finished.
+export async function speak(entries, { force = false } = {}) {
+  const token = ++speakToken;
+  silence();
+  const list = [].concat(entries || []);
+  if (!list.length) return;
+  if (!store.get('narration') && !force) {
     await new Promise((r) => setTimeout(r, 350));
     return;
   }
+  await clipsReady;
+  if (token !== speakToken) return;
   emit(true);
   for (const lang of langs()) {
-    if (token !== speakToken) break;
-    await sayOne(entry[lang], lang, token);
+    for (const entry of list) {
+      if (token !== speakToken) return;
+      await sayOne(entry[lang], lang, token);
+    }
   }
   if (token === speakToken) emit(false);
 }
 
 export function stopSpeaking() {
   speakToken++;
-  if (synth) synth.cancel();
+  silence();
   emit(false);
 }
 
@@ -153,6 +202,11 @@ export function unlockAudio() {
       const u = new SpeechSynthesisUtterance(' ');
       u.volume = 0;
       synth.speak(u);
+    }
+    if (player && !player.src) {
+      // A tiny silent WAV, played inside the tap, unlocks the clip player on iOS.
+      player.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+      player.play().catch(() => {});
     }
     window.removeEventListener('pointerdown', unlock, true);
   };

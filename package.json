@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "python3 -m http.server 8080",
-    "test": "node tests/play-through.mjs",
+    "test": "node tests/play-through.mjs && node tests/voices.test.mjs",
+    "test:voices": "node tests/voices.test.mjs",
+    "voices": "node tools/voices.mjs",
     "icons": "node tools/make-icons.mjs"
   },
   "devDependencies": {

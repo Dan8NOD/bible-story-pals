@@ -30,3 +30,6 @@ export const PRAISE = [
 ];
 
 export const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+const cap = (w) => w[0].toUpperCase() + w.slice(1);
+export const countWord = (n) => ({ en: `${cap(COUNT.en[n - 1])}!`, es: `¡${cap(COUNT.es[n - 1])}!` });

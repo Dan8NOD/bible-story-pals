@@ -72,6 +72,31 @@ Before submitting:
 - Google Play: target the **Designed for Families** program, ages 5 & under / 6–8, with content rating "Everyone".
 - Apple: Kids Category, ages 5 & under. Privacy "nutrition label": **Data Not Collected**.
 
+## Voices (ElevenLabs)
+
+Narration plays recorded ElevenLabs clips from `audio/` when they exist, and the device's own voice for any line
+that hasn't been recorded yet. Clips are named by a hash of their text, so editing a line just falls back to the
+device voice until it is recorded again.
+
+```bash
+export ELEVENLABS_API_KEY=...                  # elevenlabs.io → Profile → API keys
+node tools/voices.mjs --list-voices            # pick a warm storyteller voice for each language
+export ELEVENLABS_VOICE_EN=<id> ELEVENLABS_VOICE_ES=<id>
+node tools/voices.mjs --dry-run --budget 499   # what it would record, and the cost
+node tools/voices.mjs --budget 499             # record (never spends more than the budget)
+```
+
+Then bump `VERSION` in `sw.js` and commit `audio/`. Running it again continues where it stopped and never pays for
+a line twice. Lines are recorded in priority order: the whole Creation story first, then shared lines (praise and
+counting), then the other stories.
+
+| Model | Credits/character | First story (EN + ES) | All 8 stories |
+|---|---|---|---|
+| `eleven_flash_v2_5` (default) | 0.5 | ~500 | ~3,000 |
+| `eleven_multilingual_v2` (`--model`) | 1 | ~1,000 | ~5,900 |
+
+`npm run test:voices` checks the script against a fake ElevenLabs server, so it costs no credits.
+
 ## Donations
 
 Set `DONATE_URL` in `js/config.js` to your Ko-fi, Buy Me a Coffee, PayPal.me or Stripe payment link. A bilingual
