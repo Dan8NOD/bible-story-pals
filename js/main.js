@@ -256,7 +256,7 @@ function rewardScreen(story) {
   app.querySelector('[data-act=next]').addEventListener('click', () => go(`#/story/${nextStory.id}/0`));
   sfx.tada();
   const praise = pick(PRAISE);
-  speak({ en: `${praise.en} ${story.lesson.en}`, es: `${praise.es} ${story.lesson.es}` });
+  speak([praise, story.lesson]);
 }
 
 /* ---------------- grown-ups ---------------- */

@@ -3,11 +3,9 @@
 
 import { ART, bg, place } from './art.js';
 import { speak, sfx } from './audio.js';
-import { COUNT, PRAISE, UI, pick } from './i18n.js';
+import { PRAISE, UI, pick, countWord } from './i18n.js';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
-const cap = (w) => w[0].toUpperCase() + w.slice(1);
-export const countWord = (n) => ({ en: `${cap(COUNT.en[n - 1])}!`, es: `¡${cap(COUNT.es[n - 1])}!` });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function shuffle(a) {
