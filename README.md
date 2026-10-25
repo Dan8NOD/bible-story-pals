@@ -12,8 +12,14 @@ that practices early-learning skills. No one can lose; wrong taps just wiggle.
 | 4 | David the Brave · David el Valiente | Pick five smooth stones | Counting to 5 |
 | 5 | Jonah and the Big Fish · Jonás y el Gran Pez | "Pop the red bubble!" | Colors |
 | 6 | Daniel and the Lions · Daniel y los Leones | Tap each lion to put it to sleep | Counting |
-| 7 | Jesus Feeds Everyone · Jesús Alimenta a Todos | Put 5 loaves and 2 fish in the basket | Counting to 7 |
-| 8 | Baby Jesus Is Born · Nace el Niño Jesús | Tap stars 1-2-3-4-5 to light the way | Number recognition |
+| 7 | Baby Jesus Is Born · Nace el Niño Jesús | Tap stars 1-2-3-4-5 to light the way | Number recognition |
+| 8 | Jesus Is Baptized · El Bautismo de Jesús | Memory match: God the Father, Jesus, the Holy Spirit | Memory, the Trinity |
+| 9 | Jesus Calms the Storm · Jesús Calma la Tormenta | Tap the storm clouds to calm the sea | Counting |
+| 10 | Jesus Feeds Everyone · Jesús Alimenta a Todos | Put 5 loaves and 2 fish in the basket | Counting to 7 |
+| 11 | The Lost Sheep · La Oveja Perdida | Hide-and-seek behind the bushes | Searching, persistence |
+
+**The Trinity** appears together in the baptism story, as Matthew 3:16–17 describes it: Jesus, the Holy Spirit as
+a dove, and the Father as a voice from heaven. The Father is drawn as light pouring down, never as a person.
 
 Finishing a story earns a gold star on the home screen.
 
@@ -90,10 +96,10 @@ Then bump `VERSION` in `sw.js` and commit `audio/`. Running it again continues w
 a line twice. Lines are recorded in priority order: the whole Creation story first, then shared lines (praise and
 counting), then the other stories.
 
-| Model | Credits/character | First story (EN + ES) | All 8 stories |
+| Model | Credits/character | First story (EN + ES) | All 11 stories |
 |---|---|---|---|
-| `eleven_flash_v2_5` (default) | 0.5 | ~500 | ~3,000 |
-| `eleven_multilingual_v2` (`--model`) | 1 | ~1,000 | ~5,900 |
+| `eleven_flash_v2_5` (default) | 0.5 | ~500 | ~4,000 |
+| `eleven_multilingual_v2` (`--model`) | 1 | ~1,000 | ~7,900 |
 
 `npm run test:voices` checks the script against a fake ElevenLabs server, so it costs no credits.
 
@@ -131,7 +137,7 @@ Add the new file names to `sw.js` if you add files, and bump `VERSION` there whe
 
 ## Roadmap ideas
 
-- More stories: Adam & Eve's garden, Joseph's coat (colors), Jesus calms the storm, Zacchaeus, the Good Samaritan, the Lost Sheep (counting/hide-and-seek), Easter morning.
+- More stories: Adam & Eve's garden, Joseph's coat (colors), Zacchaeus, the Good Samaritan, Easter morning.
 - Recorded human narration (EN + ES) as an optional upgrade over device voices.
 - Sing-along songs ("This Little Light of Mine" / "Esta lucecita").
 - Coloring pages generated from the same SVG art.
@@ -143,8 +149,8 @@ Add the new file names to `sw.js` if you add files, and bump `VERSION` there whe
 index.html            app shell
 css/style.css         all styles + animations
 js/main.js            screens: home, story, game, reward, grown-ups
-js/stories.js         the 8 stories (bilingual text, scenes, game configs)
-js/games.js           mini-game engine (collect / prompt / steer)
+js/stories.js         the 11 stories (bilingual text, scenes, game configs)
+js/games.js           mini-game engine (collect / prompt / steer / memory / seek)
 js/art.js             SVG characters, animals, props, backgrounds
 js/audio.js           narration (Web Speech) + synthesized sound effects (Web Audio)
 js/i18n.js, store.js  UI words, settings & progress

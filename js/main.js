@@ -299,6 +299,9 @@ const REFS = {
   daniel: 'Daniel 6',
   loaves: 'John 6:1–14 · Juan 6:1–14',
   nativity: 'Luke 2:1–20 · Lucas 2:1–20',
+  baptism: 'Matthew 3:13–17 · Mateo 3:13–17',
+  storm: 'Mark 4:35–41 · Marcos 4:35–41',
+  sheep: 'Luke 15:3–7 · Lucas 15:3–7',
 };
 
 const PARENT_TEXT = {

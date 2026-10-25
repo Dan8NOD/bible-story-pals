@@ -30,6 +30,9 @@ export function allPhrases() {
     add(s.game.prompt);
     (s.game.items || []).forEach((it) => add(it.word));
     (s.game.rounds || []).forEach((r) => add(r.say));
+    (s.game.pairs || []).forEach((pr) => add(pr.say));
+    add(s.game.notHere);
+    add(s.game.found);
     add(s.lesson);
   };
   const shared = () => {
