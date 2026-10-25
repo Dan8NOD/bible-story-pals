@@ -1,8 +1,8 @@
 // Offline support: cache the whole (tiny) app on install, serve cache-first.
-const VERSION = 'bsp-v1';
+const VERSION = 'bsp-v2';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css', 'fonts/baloo2-latin.woff2',
-  'js/main.js', 'js/art.js', 'js/audio.js', 'js/games.js', 'js/i18n.js', 'js/store.js', 'js/stories.js',
+  'js/main.js', 'js/art.js', 'js/audio.js', 'js/games.js', 'js/i18n.js', 'js/store.js', 'js/stories.js', 'js/config.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-180.png',
 ];
 

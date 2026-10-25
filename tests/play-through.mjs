@@ -61,7 +61,8 @@ for (const id of ids) {
   const deadline = Date.now() + 90000;
   while ((await hash()) === `#/play/${id}`) {
     if (Date.now() > deadline) throw new Error(`${id}: game did not finish`);
-    const want = await page.locator('.stage-svg').getAttribute('data-want');
+    // Read without waiting: the game may finish and swap to the reward screen at any moment.
+    const want = await page.evaluate(() => document.querySelector('.stage-svg')?.dataset.want ?? null);
     if (want) {
       // Prompt game: tap the item the game is asking for.
       const target = await page.evaluate(() => {
@@ -74,7 +75,7 @@ for (const id of ids) {
       });
       if (target) await page.mouse.click(target.x, target.y);
       await page.waitForTimeout(300);
-    } else if (await page.locator('#basket').count()) {
+    } else if (await page.evaluate(() => !!document.querySelector('#basket'))) {
       // Steer game: chase the nearest flower.
       const t = await page.evaluate(() => {
         const svgEl = document.querySelector('.stage-svg');
@@ -117,6 +118,14 @@ await page.click('.card[data-id=noah]');
 await page.waitForSelector('.caption .line');
 if ((await page.locator('.caption .line').count()) !== 2) throw new Error('both-language captions missing');
 await shot('zz-both-languages');
+
+// Grown-ups area opens after the 3-second hold.
+await page.goto(`${base}#/`);
+await page.waitForSelector('#parents');
+await page.click('#parents');
+await page.locator('.gate .hold').dispatchEvent('pointerdown');
+await page.waitForSelector('.parents h2', { timeout: 6000 });
+await shot('zz-parents');
 
 // Phone sizes.
 for (const [w, h, name] of [[844, 390, 'phone-landscape'], [390, 844, 'phone-portrait']]) {

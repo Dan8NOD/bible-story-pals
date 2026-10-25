@@ -72,6 +72,14 @@ Before submitting:
 - Google Play: target the **Designed for Families** program, ages 5 & under / 6–8, with content rating "Everyone".
 - Apple: Kids Category, ages 5 & under. Privacy "nutrition label": **Data Not Collected**.
 
+## Donations
+
+Set `DONATE_URL` in `js/config.js` to your Ko-fi, Buy Me a Coffee, PayPal.me or Stripe payment link. A bilingual
+"Support" section with a **Donate** button then appears in the grown-ups area, behind the hold-to-open gate, so
+children can't reach it. It stays hidden inside the native App Store / Google Play builds: Apple and Google don't
+allow external donation links in apps (except registered nonprofits). Use in-app "tip" purchases there if you want
+in-app support later.
+
 ## Getting downloads (App Store Optimization)
 
 - **Title:** `Bible Story Pals: Kids Bible` / Spanish listing `Amiguitos de la Biblia: Biblia para niños`.

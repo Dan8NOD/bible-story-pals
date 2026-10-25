@@ -80,6 +80,7 @@ button {
   transition: transform 0.12s;
 }
 .big-btn svg { width: 36px; height: 36px; }
+a.big-btn { text-decoration: none; color: var(--ink); }
 .big-btn.green { background: #7bd389; box-shadow: 0 6px 0 #43a047; }
 
 /* ---------- home ---------- */

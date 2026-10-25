@@ -4,6 +4,7 @@ import { speak, stopSpeaking, sfx, onSpeaking, unlockAudio } from './audio.js';
 import { store, langs } from './store.js';
 import { UI, PRAISE, pick } from './i18n.js';
 import { startGame } from './games.js';
+import { DONATE_URL } from './config.js';
 
 const app = document.getElementById('app');
 
@@ -305,6 +306,9 @@ const PARENT_TEXT = {
     title: 'For grown-ups',
     about: 'Bible Story Pals is a bilingual (English & Spanish) Bible story game for children ages 3–6. Every story is read aloud, so no reading is needed. Each story ends with a gentle mini-game that practices counting, colors, numbers and new words.',
     privacy: 'Privacy: no ads, no in-app purchases, no accounts, no tracking. Nothing your child does leaves this device. After the first visit it works offline.',
+    supportTitle: 'Support Bible Story Pals',
+    support: 'This game is free with no ads. If it blesses your family, a gift helps us make more stories.',
+    donate: 'Donate',
     tipsTitle: 'Tips',
     tips: [
       'Choose “EN + ES” to hear every page in both languages.',
@@ -319,6 +323,9 @@ const PARENT_TEXT = {
     title: 'Para adultos',
     about: 'Amiguitos de la Biblia es un juego bilingüe (español e inglés) de historias bíblicas para niños de 3 a 6 años. Todas las historias se leen en voz alta, así que no hace falta saber leer. Cada historia termina con un minijuego que practica contar, los colores, los números y palabras nuevas.',
     privacy: 'Privacidad: sin anuncios, sin compras dentro de la app, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo. Después de la primera visita funciona sin internet.',
+    supportTitle: 'Apoye a Amiguitos de la Biblia',
+    support: 'Este juego es gratis y sin anuncios. Si bendice a su familia, una ofrenda nos ayuda a crear más historias.',
+    donate: 'Donar',
     tipsTitle: 'Consejos',
     tips: [
       'Elija “EN + ES” para escuchar cada página en los dos idiomas.',
@@ -331,8 +338,12 @@ const PARENT_TEXT = {
   },
 };
 
+// Store apps (Capacitor) must not link out to donations; only the website shows it.
+const isNativeApp = () => !!window.Capacitor?.isNativePlatform?.();
+
 function parentsScreen() {
   const P = PARENT_TEXT[langs()[0]];
+  const showDonate = DONATE_URL && !isNativeApp();
   const toggle = (key, label) => `<div class="setting"><span>${esc(label)}</span><button class="toggle" role="switch" data-key="${key}" aria-checked="${!!store.get(key)}" aria-label="${esc(label)}"></button></div>`;
   const lang = store.get('lang');
   app.innerHTML = `<main class="parents"><div class="inner">
@@ -340,6 +351,8 @@ function parentsScreen() {
     <h2>${esc(P.title)}</h2>
     <p>${esc(P.about)}</p>
     <p><strong>${esc(P.privacy)}</strong></p>
+    ${showDonate ? `<h3>${esc(P.supportTitle)}</h3><p>${esc(P.support)}</p>
+      <p><a class="big-btn green" href="${esc(DONATE_URL)}" target="_blank" rel="noopener">${esc(P.donate)}</a></p>` : ''}
     <h3>${esc(P.settings)}</h3>
     ${toggle('narration', P.narration)}
     ${toggle('sfx', P.sfx)}
