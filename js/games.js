@@ -291,10 +291,162 @@ function steerGame(cfg, ctx) {
   requestAnimationFrame(frame);
 }
 
+/* ---------------- memory: flip cards to find pairs ---------------- */
+
+function memoryGame(cfg, ctx) {
+  const { svg } = ctx;
+  const cards = shuffle([...cfg.pairs, ...cfg.pairs]);
+  const cols = Math.ceil(cards.length / 2);
+  const W = 170, H = 210, GAP = 34;
+  const x0 = 500 - ((cols - 1) * (W + GAP)) / 2;
+  const back = `<rect x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" rx="22" fill="#5c9ded" stroke="#4a3326" stroke-width="4"/>` +
+    `<g transform="scale(.7)">${ART.star({ color: '#fff59d' })}</g>`;
+  const front = (c) => `<rect x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" rx="22" fill="#fffdf5" stroke="#4a3326" stroke-width="4"/>` +
+    `<g transform="translate(0 ${c.y || 0}) scale(${c.s || 1})">${ART[c.art](c.opts || {})}</g>`;
+  svg.innerHTML = bg(cfg.bg) + cards.map((c, i) => {
+    const x = x0 + (i % cols) * (W + GAP), y = i < cols ? 175 : 420;
+    return `<g class="tap item" data-i="${i}" data-key="${c.key}" transform="translate(${x} ${y})"><g class="flip">${back}</g></g>`;
+  }).join('');
+
+  const els = [...svg.querySelectorAll('.item')];
+  let open = [];
+  let matched = 0;
+  let locked = false;
+  const total = cfg.pairs.length;
+  ctx.counter(0, total);
+
+  // The pair the game "wants" next (used by the automated test, harmless otherwise).
+  const setWant = () => {
+    const next = open.length ? cards[+open[0].dataset.i] : cards.find((c, i) => !els[i].classList.contains('gone'));
+    if (next) svg.dataset.want = next.key;
+  };
+  setWant();
+
+  const flip = async (el, html) => {
+    const inner = el.querySelector('.flip');
+    await tween(110, (t) => inner.setAttribute('transform', `scale(${1 - t} 1)`));
+    inner.innerHTML = html;
+    await tween(110, (t) => inner.setAttribute('transform', `scale(${t} 1)`));
+  };
+
+  els.forEach((el) => {
+    el.addEventListener('pointerdown', async (e) => {
+      e.preventDefault();
+      if (locked || el.classList.contains('gone')) return;
+      const card = cards[+el.dataset.i];
+      el.classList.add('gone');
+      sfx.tap();
+      open.push(el);
+      if (open.length === 2) locked = true;
+      await flip(el, front(card));
+      if (open.length < 2) { setWant(); return; }
+      const [a, b] = open;
+      if (a.dataset.key === b.dataset.key) {
+        open = [];
+        matched++;
+        ctx.counter(matched, total);
+        sfx.ding();
+        [a, b].forEach((x) => replay(x.querySelector('.flip'), 'a-pop'));
+        locked = false;
+        setWant();
+        await speak(card.say);
+        if (matched === total && ctx.alive()) {
+          await speak(pick(PRAISE));
+          if (ctx.alive()) ctx.done();
+        }
+        return;
+      }
+      await sleep(700);
+      if (!ctx.alive()) return;
+      sfx.boing();
+      await Promise.all([a, b].map((x) => flip(x, back)));
+      a.classList.remove('gone');
+      b.classList.remove('gone');
+      open = [];
+      locked = false;
+      setWant();
+    });
+  });
+}
+
+/* ---------------- seek: find what's hiding behind the bushes ---------------- */
+
+function seekGame(cfg, ctx) {
+  const { svg } = ctx;
+  const decor = (cfg.decor || []).map((d) => place(...d)).join('');
+  svg.innerHTML = bg(cfg.bg) + decor + cfg.spots.map(([x, y], i) =>
+    `<g class="tap item" data-i="${i}" transform="translate(${x} ${y})">` +
+    `<circle r="70" fill="transparent"/><g class="peek" style="opacity:0"></g><g class="shake">${ART.bush()}</g></g>`).join('');
+  const els = [...svg.querySelectorAll('.item')];
+  let round = 0;
+  let hideAt = -1;
+  let busy = false;
+  ctx.counter(0, cfg.finds);
+
+  const hide = () => {
+    let next;
+    do { next = Math.floor(Math.random() * els.length); } while (next === hideAt);
+    hideAt = next;
+    els.forEach((el, i) => {
+      el.dataset.key = i === hideAt ? 'sheep' : 'empty';
+      el.dataset.decoy = cfg.decoys[Math.floor(Math.random() * cfg.decoys.length)];
+      const peek = el.querySelector('.peek');
+      peek.style.opacity = '0';
+      peek.removeAttribute('transform');
+    });
+    svg.dataset.want = 'sheep';
+  };
+
+  const peekUp = async (el, art) => {
+    const peek = el.querySelector('.peek');
+    peek.innerHTML = `<g transform="scale(.7)">${ART[art]({})}</g>`;
+    peek.style.opacity = '1';
+    await tween(260, (t) => peek.setAttribute('transform', `translate(0 ${-88 * ease(t)})`));
+  };
+  const peekDown = async (el) => {
+    const peek = el.querySelector('.peek');
+    await tween(220, (t) => peek.setAttribute('transform', `translate(0 ${-88 * (1 - t)})`));
+    peek.style.opacity = '0';
+  };
+
+  els.forEach((el) => {
+    el.addEventListener('pointerdown', async (e) => {
+      e.preventDefault();
+      if (busy) return;
+      busy = true;
+      replay(el.querySelector('.shake'), 'a-wiggle');
+      if (el.dataset.key !== 'sheep') {
+        sfx.boing();
+        await peekUp(el, el.dataset.decoy);
+        speak(cfg.notHere);
+        await sleep(650);
+        await peekDown(el);
+        busy = false;
+        return;
+      }
+      sfx.tada();
+      round++;
+      ctx.counter(round, cfg.finds);
+      await peekUp(el, 'sheep');
+      await speak(cfg.found);
+      if (!ctx.alive()) return;
+      if (round >= cfg.finds) { ctx.done(); return; }
+      await sleep(400);
+      await peekDown(el);
+      hide();
+      speak(cfg.prompt);
+      busy = false;
+    });
+  });
+  hide();
+}
+
 export function startGame(cfg, ctx) {
   if (cfg.type === 'collect') return collectGame(cfg, ctx);
   if (cfg.type === 'prompt') return promptGame(cfg, ctx);
   if (cfg.type === 'steer') return steerGame(cfg, ctx);
+  if (cfg.type === 'memory') return memoryGame(cfg, ctx);
+  if (cfg.type === 'seek') return seekGame(cfg, ctx);
   throw new Error(`Unknown game type ${cfg.type}`);
 }
 

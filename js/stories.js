@@ -13,10 +13,18 @@ const MOM = { scarf: '#ab47bc', robe: '#ce93d8' };
 const PRINCESS = { crown: true, robe: '#f8bbd0', hair: '#212121', sash: '#ffd54f' };
 const KID = (robe, hair = '#3e2723') => ({ robe, hair });
 
+const JOHN = { robe: '#a1887f', sash: '#6d4c41', hair: '#3e2723', beard: '#3e2723' };
+const SHEPHERD = { robe: '#4db6ac', sash: '#ffcc80', hair: '#6d4c41', beard: '#6d4c41', staff: true };
+const FRIEND = { robe: '#ffb74d', hair: '#4e342e', beard: '#4e342e' };
+const FRIEND2 = { robe: '#90caf9', hair: '#212121' };
+// River water drawn over people's legs so they look like they're standing in the Jordan.
+const IN_RIVER = { svg: '<rect x="-3000" y="466" width="7000" height="64" fill="#4fa3e0" opacity=".92"/><path d="M-3000 466 H4000" stroke="#81c4f0" stroke-width="6"/>' };
+const DOVE = { color: '#ffffff' };
+
 const NIGHT_HALF = { svg: '<rect x="500" y="-3000" width="3500" height="3452" fill="#1d2b5c"/>' };
 const rainCloud = { rain: true, color: '#cfd8dc' };
 
-export const STORIES = [
+const ALL = [
   {
     id: 'creation',
     color: '#ffd54f',
@@ -361,6 +369,122 @@ export const STORIES = [
       ],
     },
   },
+
+  {
+    id: 'baptism',
+    color: '#b3e5fc',
+    title: { en: 'Jesus Is Baptized', es: 'El Bautismo de Jesús' },
+    lesson: { en: 'God the Father, Jesus the Son, and the Holy Spirit love you!', es: '¡Dios Padre, Jesús el Hijo y el Espíritu Santo te aman!' },
+    cover: 2,
+    pages: [
+      {
+        text: { en: 'John baptized people in the Jordan River.', es: 'Juan bautizaba a la gente en el río Jordán.' },
+        scene: { bg: 'river', items: [['person', 140, 318, 1, { robe: '#ef9a9a', scarf: '#ffcc80' }, 'bob'], ['person', 250, 322, 0.95, { robe: '#a5d6a7', hair: '#212121' }, 'bob'], ['person', 580, 410, 1.3, { ...JOHN, arms: 'up' }, ''], ['raw', 0, 0, 1, IN_RIVER], ['reeds', 880, 410, 1.2, {}, 'sway'], ['sun', 860, 100, 0.9, {}, '']] },
+      },
+      {
+        text: { en: 'Jesus came to the river and asked John to baptize Him.', es: 'Jesús llegó al río y le pidió a Juan que lo bautizara.' },
+        scene: { bg: 'river', items: [['person', 420, 405, 1.35, JESUS, ''], ['person', 610, 410, 1.3, JOHN, ''], ['raw', 0, 0, 1, IN_RIVER], ['reeds', 160, 410, 1.3, {}, 'sway'], ['bird', 820, 150, 0.5, {}, 'drift']] },
+      },
+      {
+        text: { en: 'When Jesus came up out of the water, the Holy Spirit came down like a dove.', es: 'Cuando Jesús salió del agua, el Espíritu Santo descendió como una paloma.' },
+        scene: { bg: 'river', items: [['heavenLight', 470, 20, 1, { h: 380 }], ['cloud', 470, 40, 1.3, {}, ''], ['bird', 470, 190, 1, DOVE, 'bob'], ['person', 470, 405, 1.35, { ...JESUS, arms: 'up' }, ''], ['person', 680, 410, 1.25, { ...JOHN, mood: 'open' }, ''], ['raw', 0, 0, 1, IN_RIVER]] },
+      },
+      {
+        text: { en: "A voice from heaven said, 'This is my Son, whom I love!'", es: "Una voz del cielo dijo: '¡Este es mi Hijo amado!'" },
+        scene: { bg: 'river', items: [['heavenLight', 500, 20, 1, { h: 400 }], ['cloud', 500, 40, 1.4, {}, ''], ['sparkle', 360, 120, 0.6, {}, 'twinkle'], ['sparkle', 640, 110, 0.7, {}, 'twinkle'], ['bird', 500, 200, 0.9, DOVE, 'bob'], ['person', 500, 405, 1.35, { ...JESUS, arms: 'up' }, ''], ['heart', 620, 300, 0.6, {}, 'pulse'], ['raw', 0, 0, 1, IN_RIVER]] },
+      },
+    ],
+    game: {
+      type: 'memory',
+      bg: 'river',
+      prompt: { en: 'Find the matching pairs!', es: '¡Encuentra las parejas!' },
+      pairs: [
+        { key: 'father', art: 'sparkle', s: 1.1, say: { en: 'God the Father', es: 'Dios Padre' } },
+        { key: 'son', art: 'person', opts: JESUS, s: 0.85, y: 6, say: { en: "Jesus, God's Son", es: 'Jesús, el Hijo de Dios' } },
+        { key: 'spirit', art: 'bird', opts: DOVE, s: 1.2, say: { en: 'The Holy Spirit', es: 'El Espíritu Santo' } },
+      ],
+    },
+  },
+  {
+    id: 'storm',
+    color: '#90a4ae',
+    title: { en: 'Jesus Calms the Storm', es: 'Jesús Calma la Tormenta' },
+    lesson: { en: 'When we are scared, Jesus is with us.', es: 'Cuando tenemos miedo, Jesús está con nosotros.' },
+    cover: 3,
+    pages: [
+      {
+        text: { en: 'Jesus and His friends got into a boat to cross the lake.', es: 'Jesús y sus amigos subieron a una barca para cruzar el lago.' },
+        scene: { bg: 'sea', items: [['person', 398, 312, 0.8, JESUS, ''], ['person', 598, 316, 0.75, FRIEND, ''], ['boat', 500, 360, 1.6, {}, 'rock'], ['sun', 160, 110, 0.9, {}, ''], ['bird', 760, 150, 0.5, {}, 'drift']] },
+      },
+      {
+        text: { en: 'Jesus was very tired, so He fell asleep.', es: 'Jesús estaba muy cansado y se quedó dormido.' },
+        scene: { bg: 'sea', items: [['person', 398, 314, 0.8, { ...JESUS, mood: 'sleep', arms: 'pray' }, ''], ['person', 598, 316, 0.75, FRIEND2, ''], ['boat', 500, 360, 1.6, {}, 'rock'], ['moon', 830, 110, 0.7, {}, '']] },
+      },
+      {
+        text: { en: 'Whoosh! A big storm came. The friends were scared!', es: '¡Fuuu! Vino una gran tormenta. ¡Los amigos tenían miedo!' },
+        scene: { bg: 'storm', items: [['cloud', 230, 90, 1.4, { rain: true, color: '#90a4ae' }, 'drift'], ['cloud', 760, 80, 1.5, { rain: true, color: '#90a4ae' }, 'drift'], ['person', 398, 314, 0.8, { ...JESUS, mood: 'sleep', arms: 'pray' }, ''], ['person', 598, 314, 0.75, { ...FRIEND, mood: 'open', arms: 'up' }, 'hop'], ['boat', 500, 360, 1.6, {}, 'rock'], ['waves', 300, 420, 1, { color: '#5aa8e6', w: 700 }, 'drift'], ['waves', 700, 470, 1, { color: '#5aa8e6', w: 700 }, 'drift']] },
+      },
+      {
+        text: { en: "Jesus said, 'Quiet! Be still!' The wind stopped, and the sea was calm.", es: "Jesús dijo: '¡Calla! ¡Quédate quieto!' El viento se detuvo y el mar se calmó." },
+        scene: { bg: 'sea', items: [['sun', 820, 110, 1, {}, ''], ['rainbow', 500, 330, 3.4], ['person', 398, 312, 0.8, { ...JESUS, arms: 'up' }, ''], ['person', 598, 316, 0.75, { ...FRIEND, arms: 'up' }, 'hop'], ['boat', 500, 360, 1.6], ['heart', 300, 200, 0.5, {}, 'pulse']] },
+      },
+    ],
+    game: {
+      type: 'collect',
+      mode: 'transform',
+      bg: 'storm',
+      prompt: { en: 'Tap the storm clouds to calm the storm!', es: '¡Toca las nubes de tormenta para calmar la tormenta!' },
+      decor: [['person', 398, 412, 0.8, { ...JESUS, arms: 'up' }, ''], ['person', 598, 416, 0.75, FRIEND, ''], ['boat', 500, 460, 1.6, {}, 'rock'], ['waves', 500, 540, 1, { color: '#5aa8e6', w: 900 }, 'drift']],
+      items: [
+        { art: 'cloud', x: 130, y: 110, s: 1, opts: { rain: true, color: '#78909c' }, after: { rain: false, color: '#ffffff' }, anim: 'drift' },
+        { art: 'cloud', x: 360, y: 80, s: 1, opts: { rain: true, color: '#78909c' }, after: { rain: false, color: '#ffffff' }, anim: 'drift' },
+        { art: 'cloud', x: 620, y: 90, s: 1, opts: { rain: true, color: '#78909c' }, after: { rain: false, color: '#ffffff' }, anim: 'drift' },
+        { art: 'cloud', x: 860, y: 120, s: 1, opts: { rain: true, color: '#78909c' }, after: { rain: false, color: '#ffffff' }, anim: 'drift' },
+        { art: 'cloud', x: 240, y: 260, s: 0.9, opts: { rain: true, color: '#78909c' }, after: { rain: false, color: '#ffffff' }, anim: 'drift' },
+        { art: 'cloud', x: 770, y: 270, s: 0.9, opts: { rain: true, color: '#78909c' }, after: { rain: false, color: '#ffffff' }, anim: 'drift' },
+      ],
+    },
+  },
+  {
+    id: 'sheep',
+    color: '#c5e1a5',
+    title: { en: 'The Lost Sheep', es: 'La Oveja Perdida' },
+    lesson: { en: 'Jesus is our Good Shepherd. He always looks for you!', es: 'Jesús es nuestro Buen Pastor. ¡Él siempre te busca!' },
+    cover: 3,
+    pages: [
+      {
+        text: { en: 'A shepherd had one hundred sheep. He loved every one of them.', es: 'Un pastor tenía cien ovejas. Las amaba a todas.' },
+        scene: { bg: 'day', items: [['person', 180, 400, 1.3, SHEPHERD, ''], ['sheep', 380, 430, 0.8, {}, 'hop'], ['sheep', 500, 450, 0.75, {}, 'bob'], ['sheep', 620, 425, 0.8, {}, 'hop'], ['sheep', 740, 455, 0.75, {}, 'bob'], ['sheep', 860, 430, 0.8, {}, 'hop'], ['sun', 860, 100, 0.9, {}, ''], ['cloud', 420, 110, 0.8, {}, 'drift']] },
+      },
+      {
+        text: { en: 'One little sheep wandered away and got lost.', es: 'Una ovejita se alejó y se perdió.' },
+        scene: { bg: 'day', items: [['tree', 700, 390, 1.4, {}, 'sway'], ['bush', 560, 450, 1.1], ['sheep', 880, 440, 0.6, {}, 'hop'], ['person', 120, 420, 0.9, SHEPHERD, ''], ['sheep', 240, 455, 0.55, {}, 'bob'], ['sheep', 310, 450, 0.55, {}, 'bob'], ['cloud', 400, 100, 0.9, {}, 'drift']] },
+      },
+      {
+        text: { en: 'The shepherd looked and looked, behind the rocks and under the trees.', es: 'El pastor buscó y buscó, detrás de las rocas y debajo de los árboles.' },
+        scene: { bg: 'day', items: [['rock', 200, 460, 1.1], ['tree', 800, 390, 1.5, {}, 'sway'], ['bush', 640, 460, 1], ['person', 430, 400, 1.3, { ...SHEPHERD, arms: 'up', mood: 'open' }, 'hop'], ['sun', 120, 100, 0.8, {}, '']] },
+      },
+      {
+        text: { en: 'He found it! He carried it home, and everyone celebrated!', es: '¡La encontró! La llevó a casa, ¡y todos celebraron!' },
+        scene: { bg: 'day', items: [['person', 430, 400, 1.4, { ...SHEPHERD, arms: 'hold' }, ''], ['sheep', 432, 432, 0.6, {}, 'bob'], ['person', 650, 410, 1, FRIEND2, 'hop'], ['person', 760, 415, 0.95, { scarf: '#f48fb1', robe: '#f8bbd0', arms: 'up' }, 'hop'], ['heart', 430, 180, 0.8, {}, 'pulse'], ['sheep', 220, 455, 0.6, {}, 'hop']] },
+      },
+    ],
+    game: {
+      type: 'seek',
+      bg: 'day',
+      finds: 3,
+      prompt: { en: 'Where is the little sheep? Tap the bushes to look!', es: '¿Dónde está la ovejita? ¡Toca los arbustos para buscar!' },
+      notHere: { en: 'Not here! Keep looking!', es: '¡Aquí no! ¡Sigue buscando!' },
+      found: { en: 'You found the sheep!', es: '¡Encontraste la oveja!' },
+      decoys: ['bunny', 'bird'],
+      decor: [['person', 90, 410, 1, SHEPHERD, ''], ['sun', 900, 90, 0.8, {}, ''], ['cloud', 500, 90, 0.8, {}, 'drift']],
+      spots: [[270, 375], [510, 355], [750, 375], [310, 510], [550, 520], [800, 510]],
+    },
+  },
 ];
+
+// Bible order on the home screen.
+const ORDER = ['creation', 'noah', 'moses', 'david', 'jonah', 'daniel', 'nativity', 'baptism', 'storm', 'loaves', 'sheep'];
+export const STORIES = ORDER.map((id) => ALL.find((s) => s.id === id));
 
 export const byId = (id) => STORIES.find((s) => s.id === id);

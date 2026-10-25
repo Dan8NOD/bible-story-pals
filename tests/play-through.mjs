@@ -43,7 +43,7 @@ await page.waitForTimeout(600);
 await shot('00-home');
 
 const ids = await page.$$eval('.card', (cs) => cs.map((c) => c.dataset.id));
-if (ids.length !== 8) throw new Error(`expected 8 stories, got ${ids.length}`);
+if (ids.length !== 11) throw new Error(`expected 11 stories, got ${ids.length}`);
 
 for (const id of ids) {
   await page.goto(`${base}#/`);
@@ -108,7 +108,7 @@ for (const id of ids) {
 await page.goto(`${base}#/`);
 await page.waitForSelector('.card');
 const stars = await page.locator('.star-count span').textContent();
-if (stars !== '8/8') throw new Error(`expected 8/8 stars, got ${stars}`);
+if (stars !== `${ids.length}/${ids.length}`) throw new Error(`expected all stars, got ${stars}`);
 
 // Language switching updates titles.
 await page.click('.chip[data-lang=es]');

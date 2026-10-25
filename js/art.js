@@ -333,6 +333,27 @@ export const bubble = (o = {}) => {
 
 export const heart = (o = {}) => wrap(`<path d="M0 30 C-50 0 -30 -40 0 -18 C30 -40 50 0 0 30 Z" fill="${o.color || '#ef5350'}"/>`);
 
+export function bush(o = {}) {
+  const { color = '#43a047' } = o;
+  let out = '';
+  [[-36, 12, 24], [-14, -4, 28], [14, -8, 30], [38, 10, 24]].forEach(([x, y, r]) => {
+    out += `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}"/>`;
+  });
+  out += `<path d="M-58 30 Q-62 10 -40 6 L40 6 Q62 10 58 30 Z" fill="${color}"/>`;
+  out += `<ellipse cx="0" cy="12" rx="44" ry="18" fill="${color}" stroke="none"/>`;
+  out += `<circle cx="-20" cy="2" r="4" fill="#e53935" stroke="none"/><circle cx="18" cy="-10" r="4" fill="#e53935" stroke="none"/><circle cx="30" cy="16" r="4" fill="#e53935" stroke="none"/>`;
+  return wrap(out);
+}
+
+// Light pouring down from heaven: how the game shows God the Father, who is
+// heard as a voice and never drawn as a person. Origin is the top of the beam.
+export function heavenLight(o = {}) {
+  const { h = 420 } = o;
+  return `<g class="a-twinkle" style="animation-duration:5s">` +
+    `<path d="M-40 0 L40 0 L170 ${h} L-170 ${h} Z" fill="#fff59d" opacity=".35"/>` +
+    `<path d="M-18 0 L18 0 L70 ${h} L-70 ${h} Z" fill="#fffde7" opacity=".55"/></g>`;
+}
+
 /* ---------------- objects & places ---------------- */
 
 export function ark() {
@@ -487,7 +508,7 @@ export function bg(kind) {
 const raw = (o) => o.svg;
 
 export const ART = {
-  raw, person, angel, baby, lion, elephant, giraffe, sheep, bunny, bird, fish, bigFish, sun, moon, star,
+  raw, bush, heavenLight, person, angel, baby, lion, elephant, giraffe, sheep, bunny, bird, fish, bigFish, sun, moon, star,
   sparkle, cloud, rainbow, tree, palm, flower, lily, grass, reeds, rock, stone, bubble, heart, ark,
   boat, basket, basketBoat, bread, bag, stable, manger, cave, city, hammer, waves,
 };
