@@ -301,7 +301,9 @@ const REFS = {
   nativity: 'Luke 2:1–20 · Lucas 2:1–20',
   baptism: 'Matthew 3:13–17 · Mateo 3:13–17',
   storm: 'Mark 4:35–41 · Marcos 4:35–41',
+  samaritan: 'Luke 10:25–37 · Lucas 10:25–37',
   sheep: 'Luke 15:3–7 · Lucas 15:3–7',
+  zacchaeus: 'Luke 19:1–10 · Lucas 19:1–10',
 };
 
 const PARENT_TEXT = {
