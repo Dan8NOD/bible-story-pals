@@ -481,10 +481,55 @@ const ALL = [
       spots: [[270, 375], [510, 355], [750, 375], [310, 510], [550, 520], [800, 510]],
     },
   },
+
+  {
+    id: 'psalm23',
+    color: '#dcedc8',
+    title: { en: 'God Is My Shepherd', es: 'Dios Es Mi Pastor' },
+    lesson: { en: 'God is my shepherd. I am safe with Him.', es: 'Dios es mi pastor. Con Él estoy seguro.' },
+    cover: 1,
+    pages: [
+      {
+        text: { en: 'A shepherd watches over his sheep, day and night. God is like that shepherd.', es: 'Un pastor cuida a sus ovejas de día y de noche. Dios es como ese pastor.' },
+        scene: { bg: 'day', items: [['person', 230, 400, 1.3, SHEPHERD, ''], ['sheep', 470, 445, 0.8, {}, 'bob'], ['glow', 630, 440, 1.3, {}, 'pulse'], ['sheep', 630, 450, 0.7, {}, 'hop'], ['sheep', 790, 440, 0.8, {}, 'bob'], ['sun', 860, 100, 0.9, {}, '']] },
+      },
+      {
+        text: { en: 'He takes his sheep to green grass and still water. They have all they need.', es: 'Él lleva a sus ovejas al pasto verde y al agua tranquila. Tienen todo lo que necesitan.' },
+        scene: { bg: 'river', items: [['person', 170, 325, 1.1, SHEPHERD, ''], ['sheep', 420, 360, 0.75, {}, 'bob'], ['sheep', 580, 365, 0.7, {}, 'bob'], ['grass', 300, 570, 1.6], ['grass', 640, 575, 1.4], ['flower', 820, 560, 0.9, {}, 'sway'], ['sun', 860, 100, 0.9, {}, '']] },
+      },
+      {
+        text: { en: "Even when it is dark, the shepherd's light is there, so the little sheep is not afraid.", es: 'Aunque esté oscuro, la luz del pastor está ahí, y la ovejita no tiene miedo.' },
+        scene: { bg: 'night', items: [['glow', 560, 430, 2.6, { color: '#ffb300', strength: 2 }, 'pulse'], ['person', 420, 400, 1.3, SHEPHERD, ''], ['lantern', 454, 448, 0.8, {}, 'sway'], ['sheep', 590, 450, 0.8, {}, 'bob'], ['moon', 850, 110, 0.7, {}, '']] },
+      },
+      {
+        text: { en: "The cup is full! God's goodness follows the little sheep all the way home.", es: '¡La copa está llena! La bondad de Dios sigue a la ovejita hasta su casa.' },
+        scene: { bg: 'day', items: [['stable', 820, 400, 1.2], ['rock', 230, 480, 0.9], ['cup', 230, 425, 0.9], ['glow', 520, 440, 1.8, {}, 'pulse'], ['sheep', 480, 455, 0.7, {}, 'hop'], ['person', 570, 440, 0.85, KID('#f48fb1'), 'hop'], ['heart', 520, 300, 0.6, {}, 'pulse'], ['sun', 120, 100, 0.8, {}, '']] },
+      },
+    ],
+    game: {
+      type: 'prompt',
+      bg: 'day',
+      keep: true,
+      connect: true,
+      decor: [['raw', 0, 0, 1, { svg: '<path d="M90 470 Q160 420 230 430 T420 470 T600 420 T790 390" fill="none" stroke="#fff8e1" stroke-width="16" stroke-linecap="round" stroke-dasharray="2 30"/>' }], ['glow', 90, 450, 1.1, {}, 'pulse'], ['sheep', 90, 455, 0.65, {}, 'bob'], ['person', 900, 400, 1.2, { ...SHEPHERD, arms: 'up' }, '']],
+      items: [
+        { key: 'grass', art: 'grass', x: 230, y: 430, s: 2.4, anim: 'pulse' },
+        { key: 'water', art: 'pond', x: 420, y: 475, s: 1.2, anim: 'pulse' },
+        { key: 'cup', art: 'cup', x: 600, y: 420, s: 1.1, anim: 'pulse' },
+        { key: 'hand', art: 'hand', x: 790, y: 380, s: 1.1, anim: 'pulse' },
+      ],
+      rounds: [
+        { key: 'grass', say: { en: 'Grass', es: 'Pasto' } },
+        { key: 'water', say: { en: 'Water', es: 'Agua' } },
+        { key: 'cup', say: { en: 'Cup', es: 'Copa' } },
+        { key: 'hand', say: { en: "The shepherd's hand", es: 'La mano del pastor' } },
+      ],
+    },
+  },
 ];
 
 // Bible order on the home screen.
-const ORDER = ['creation', 'noah', 'moses', 'david', 'jonah', 'daniel', 'nativity', 'baptism', 'storm', 'loaves', 'sheep'];
+const ORDER = ['creation', 'noah', 'moses', 'david', 'psalm23', 'jonah', 'daniel', 'nativity', 'baptism', 'storm', 'loaves', 'sheep'];
 export const STORIES = ORDER.map((id) => ALL.find((s) => s.id === id));
 
 export const byId = (id) => STORIES.find((s) => s.id === id);
