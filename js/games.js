@@ -94,7 +94,7 @@ function collectGame(cfg, ctx) {
       } else {
         sfx.whoosh();
         sfx.count(got);
-        speak(countWord(got));
+        speak(it.word || countWord(got));
         const [tx, ty] = cfg.targetPoint;
         const s0 = it.s || 1;
         await tween(650, (t) => {
@@ -373,10 +373,13 @@ function memoryGame(cfg, ctx) {
 
 function seekGame(cfg, ctx) {
   const { svg } = ctx;
+  // What hides (default: the lost sheep) and what it hides behind (default: bushes).
+  const hidden = cfg.hide || { art: 'sheep' };
+  const cover = cfg.cover || { art: 'bush' };
   const decor = (cfg.decor || []).map((d) => place(...d)).join('');
   svg.innerHTML = bg(cfg.bg) + decor + cfg.spots.map(([x, y], i) =>
     `<g class="tap item" data-i="${i}" transform="translate(${x} ${y})">` +
-    `<circle r="70" fill="transparent"/><g class="peek" style="opacity:0"></g><g class="shake">${ART.bush()}</g></g>`).join('');
+    `<circle r="70" fill="transparent"/><g class="peek" style="opacity:0"></g><g class="shake">${ART[cover.art](cover.opts || {})}</g></g>`).join('');
   const els = [...svg.querySelectorAll('.item')];
   let round = 0;
   let hideAt = -1;
@@ -388,18 +391,18 @@ function seekGame(cfg, ctx) {
     do { next = Math.floor(Math.random() * els.length); } while (next === hideAt);
     hideAt = next;
     els.forEach((el, i) => {
-      el.dataset.key = i === hideAt ? 'sheep' : 'empty';
+      el.dataset.key = i === hideAt ? 'target' : 'empty';
       el.dataset.decoy = cfg.decoys[Math.floor(Math.random() * cfg.decoys.length)];
       const peek = el.querySelector('.peek');
       peek.style.opacity = '0';
       peek.removeAttribute('transform');
     });
-    svg.dataset.want = 'sheep';
+    svg.dataset.want = 'target';
   };
 
-  const peekUp = async (el, art) => {
+  const peekUp = async (el, who) => {
     const peek = el.querySelector('.peek');
-    peek.innerHTML = `<g transform="scale(.7)">${ART[art]({})}</g>`;
+    peek.innerHTML = `<g transform="scale(${who.s || 0.7})">${ART[who.art](who.opts || {})}</g>`;
     peek.style.opacity = '1';
     await tween(260, (t) => peek.setAttribute('transform', `translate(0 ${-88 * ease(t)})`));
   };
@@ -415,9 +418,9 @@ function seekGame(cfg, ctx) {
       if (busy) return;
       busy = true;
       replay(el.querySelector('.shake'), 'a-wiggle');
-      if (el.dataset.key !== 'sheep') {
+      if (el.dataset.key !== 'target') {
         sfx.boing();
-        await peekUp(el, el.dataset.decoy);
+        await peekUp(el, { art: el.dataset.decoy });
         speak(cfg.notHere);
         await sleep(650);
         await peekDown(el);
@@ -427,7 +430,7 @@ function seekGame(cfg, ctx) {
       sfx.tada();
       round++;
       ctx.counter(round, cfg.finds);
-      await peekUp(el, 'sheep');
+      await peekUp(el, hidden);
       await speak(cfg.found);
       if (!ctx.alive()) return;
       if (round >= cfg.finds) { ctx.done(); return; }
