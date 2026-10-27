@@ -20,6 +20,12 @@ const FRIEND2 = { robe: '#90caf9', hair: '#212121' };
 // River water drawn over people's legs so they look like they're standing in the Jordan.
 const IN_RIVER = { svg: '<rect x="-3000" y="466" width="7000" height="64" fill="#4fa3e0" opacity=".92"/><path d="M-3000 466 H4000" stroke="#81c4f0" stroke-width="6"/>' };
 const DOVE = { color: '#ffffff' };
+const HURT_MAN = { robe: '#bcaaa4', hair: '#4e342e', beard: '#4e342e' };
+const PRIEST = { robe: '#ffffff', sash: '#7e57c2', hair: '#9e9e9e', beard: '#bdbdbd', scarf: '#ede7f6' };
+const SAMARITAN = { robe: '#26a69a', sash: '#ffca28', hair: '#212121', beard: '#212121' };
+const ZACC = { robe: '#ffb300', sash: '#6d4c41', hair: '#3e2723', beard: '#3e2723' };
+// Jesus and Zacchaeus at the sycamore-fig tree: a big tree with leafy clumps to hide in.
+const BIG_TREE = ['tree', 500, 400, 3.4];
 
 const NIGHT_HALF = { svg: '<rect x="500" y="-3000" width="3500" height="3452" fill="#1d2b5c"/>' };
 const rainCloud = { rain: true, color: '#cfd8dc' };
@@ -481,10 +487,93 @@ const ALL = [
       spots: [[270, 375], [510, 355], [750, 375], [310, 510], [550, 520], [800, 510]],
     },
   },
+
+  {
+    id: 'samaritan',
+    color: '#ffe0b2',
+    title: { en: 'The Good Samaritan', es: 'El Buen Samaritano' },
+    lesson: { en: 'Be kind to everyone, just like the Good Samaritan!', es: '¡Sé amable con todos, como el Buen Samaritano!' },
+    cover: 2,
+    pages: [
+      {
+        text: { en: 'Jesus told a story. A man was walking down a road when robbers hurt him.', es: 'Jesús contó una historia. Un hombre iba por un camino cuando unos ladrones lo lastimaron.' },
+        scene: { bg: 'desert', items: [['rock', 180, 455, 1.2], ['palm', 860, 360, 1.4, {}, 'sway'], ['lying', 500, 455, 1.1, HURT_MAN], ['sun', 760, 100, 0.8, {}, '']] },
+      },
+      {
+        text: { en: 'A priest came by, but he did not stop to help.', es: 'Pasó un sacerdote, pero no se detuvo a ayudar.' },
+        scene: { bg: 'desert', items: [['lying', 380, 455, 1.1, HURT_MAN], ['person', 760, 395, 1.3, PRIEST, 'hop'], ['palm', 120, 360, 1.3, {}, 'sway']] },
+      },
+      {
+        text: { en: 'Then a Samaritan came with his donkey. He stopped and helped the hurt man!', es: 'Luego llegó un samaritano con su burro. ¡Se detuvo y ayudó al hombre herido!' },
+        scene: { bg: 'desert', items: [['donkey', 760, 420, 1.3, {}, 'bob'], ['lying', 400, 455, 1.1, HURT_MAN], ['person', 560, 400, 1.3, { ...SAMARITAN, arms: 'hold' }, ''], ['bandage', 470, 400, 0.6, {}, 'bob'], ['heart', 500, 220, 0.7, {}, 'pulse']] },
+      },
+      {
+        text: { en: 'He took the man to an inn and paid for everything he needed.', es: 'Llevó al hombre a un mesón y pagó todo lo que necesitaba.' },
+        scene: { bg: 'desert', items: [['city', 760, 380, 1.3], ['donkey', 330, 420, 1.3, {}, 'bob'], ['person', 320, 340, 0.85, { ...HURT_MAN, arms: 'up' }, ''], ['person', 520, 400, 1.3, SAMARITAN, 'hop']] },
+      },
+      {
+        text: { en: "Jesus said, 'Go and do the same. Love your neighbor!'", es: "Jesús dijo: 'Ve y haz lo mismo. ¡Ama a tu prójimo!'" },
+        scene: { bg: 'day', items: [['person', 500, 380, 1.6, { ...JESUS, arms: 'up' }, ''], ['person', 260, 440, 0.9, KID('#ef9a9a'), 'hop'], ['person', 740, 440, 0.9, KID('#90caf9', '#212121'), 'hop'], ['heart', 360, 200, 0.6, {}, 'pulse'], ['heart', 640, 210, 0.6, {}, 'pulse'], ['sun', 860, 100, 0.9, {}, '']] },
+      },
+    ],
+    game: {
+      type: 'collect',
+      mode: 'fly',
+      bg: 'desert',
+      prompt: { en: 'Help the hurt man! Give him the bandage, water, bread and blanket.', es: '¡Ayuda al hombre herido! Dale la venda, el agua, el pan y la cobija.' },
+      decor: [['donkey', 860, 430, 1.1, {}, 'bob'], ['person', 680, 400, 1.2, { ...SAMARITAN, arms: 'up' }, '']],
+      target: ['lying', 440, 470, 1.1, HURT_MAN],
+      targetPoint: [440, 460],
+      items: [
+        { art: 'bandage', x: 150, y: 150, s: 1.1, anim: 'bob', word: { en: 'Bandage!', es: '¡Venda!' } },
+        { art: 'jar', x: 360, y: 130, s: 1.1, anim: 'bob', word: { en: 'Water!', es: '¡Agua!' } },
+        { art: 'bread', x: 580, y: 140, s: 1.2, anim: 'bob', word: { en: 'Bread!', es: '¡Pan!' } },
+        { art: 'blanket', x: 820, y: 170, s: 1.1, anim: 'bob', word: { en: 'Blanket!', es: '¡Cobija!' } },
+      ],
+    },
+  },
+  {
+    id: 'zacchaeus',
+    color: '#c8e6c9',
+    title: { en: 'Zacchaeus Climbs a Tree', es: 'Zaqueo Sube a un Árbol' },
+    lesson: { en: 'Jesus loves you and wants to be your friend!', es: '¡Jesús te ama y quiere ser tu amigo!' },
+    cover: 2,
+    pages: [
+      {
+        text: { en: 'Zacchaeus was a very short man. He wanted to see Jesus, but the crowd was too big!', es: 'Zaqueo era un hombre muy bajito. ¡Quería ver a Jesús, pero había mucha gente!' },
+        scene: { bg: 'day', items: [['person', 300, 420, 1.2, { robe: '#90caf9', beard: '#6d4c41' }, ''], ['person', 420, 415, 1.25, { scarf: '#ffcc80', robe: '#ffe082' }, ''], ['person', 540, 420, 1.2, { robe: '#a5d6a7', hair: '#212121' }, ''], ['person', 680, 440, 0.8, { ...ZACC, arms: 'up', mood: 'open' }, 'hop'], ['sun', 860, 100, 0.9, {}, '']] },
+      },
+      {
+        text: { en: 'So he ran ahead and climbed up a tall tree.', es: 'Así que corrió adelante y se subió a un árbol alto.' },
+        scene: { bg: 'day', items: [BIG_TREE, ['person', 560, 255, 0.75, { ...ZACC, arms: 'up' }, 'bob'], ['fig', 430, 260, 0.5], ['fig', 585, 215, 0.5], ['bird', 820, 140, 0.5, {}, 'drift']] },
+      },
+      {
+        text: { en: "Jesus stopped, looked up and said, 'Zacchaeus, come down! I'm going to your house today.'", es: "Jesús se detuvo, miró hacia arriba y dijo: 'Zaqueo, ¡baja! Hoy iré a tu casa.'" },
+        scene: { bg: 'day', items: [BIG_TREE, ['person', 560, 255, 0.75, { ...ZACC, mood: 'open', arms: 'up' }, 'bob'], ['person', 250, 400, 1.4, { ...JESUS, arms: 'up' }, ''], ['fig', 430, 220, 0.5], ['heart', 400, 300, 0.5, {}, 'pulse']] },
+      },
+      {
+        text: { en: 'Zacchaeus was so happy! He said sorry and gave back even more than he took.', es: '¡Zaqueo estaba muy feliz! Pidió perdón y devolvió aún más de lo que había tomado.' },
+        scene: { bg: 'day', items: [['city', 800, 390, 1.1], ['person', 360, 380, 1.5, JESUS, ''], ['person', 540, 430, 1, { ...ZACC, arms: 'up' }, 'hop'], ['heart', 450, 200, 0.8, {}, 'pulse'], ['person', 680, 440, 0.85, KID('#ef9a9a'), 'hop']] },
+      },
+    ],
+    game: {
+      type: 'seek',
+      bg: 'day',
+      finds: 3,
+      prompt: { en: 'Where is Zacchaeus? Tap the leaves to find him!', es: '¿Dónde está Zaqueo? ¡Toca las hojas para encontrarlo!' },
+      notHere: { en: 'Not here! Keep looking!', es: '¡Aquí no! ¡Sigue buscando!' },
+      found: { en: 'You found Zacchaeus!', es: '¡Encontraste a Zaqueo!' },
+      hide: { art: 'person', opts: { ...ZACC, arms: 'up' }, s: 0.55 },
+      cover: { art: 'bush', opts: { color: '#558b2f' } },
+      decoys: ['bird', 'fig'],
+      decor: [['tree', 500, 470, 4.2], ['person', 120, 440, 1.1, { ...JESUS, arms: 'up' }, '']],
+      spots: [[400, 265], [510, 240], [620, 270], [395, 375], [505, 355], [615, 380]],
+    },
+  },
 ];
 
 // Bible order on the home screen.
-const ORDER = ['creation', 'noah', 'moses', 'david', 'jonah', 'daniel', 'nativity', 'baptism', 'storm', 'loaves', 'sheep'];
+const ORDER = ['creation', 'noah', 'moses', 'david', 'jonah', 'daniel', 'nativity', 'baptism', 'storm', 'loaves', 'samaritan', 'sheep', 'zacchaeus'];
 export const STORIES = ORDER.map((id) => ALL.find((s) => s.id === id));
 
 export const byId = (id) => STORIES.find((s) => s.id === id);

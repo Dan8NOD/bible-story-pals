@@ -43,7 +43,7 @@ await page.waitForTimeout(600);
 await shot('00-home');
 
 const ids = await page.$$eval('.card', (cs) => cs.map((c) => c.dataset.id));
-if (ids.length !== 11) throw new Error(`expected 11 stories, got ${ids.length}`);
+if (ids.length !== 13) throw new Error(`expected 13 stories, got ${ids.length}`);
 
 for (const id of ids) {
   await page.goto(`${base}#/`);

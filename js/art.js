@@ -354,6 +354,50 @@ export function heavenLight(o = {}) {
     `<path d="M-18 0 L18 0 L70 ${h} L-70 ${h} Z" fill="#fffde7" opacity=".55"/></g>`;
 }
 
+export function donkey() {
+  return wrap(
+    `<path d="M-30 18 L-32 50 M-14 22 L-14 50 M16 22 L16 50 M32 18 L34 50" fill="none" stroke-width="9"/>` +
+    `<path d="M-30 18 L-32 50 M-14 22 L-14 50 M16 22 L16 50 M32 18 L34 50" fill="none" stroke="#9e9e9e" stroke-width="4"/>` +
+    `<path d="M-44 0 Q-56 10 -56 28" fill="none"/><ellipse cx="-56" cy="31" rx="5" ry="7" fill="#616161"/>` +
+    `<ellipse cx="0" cy="6" rx="46" ry="24" fill="#9e9e9e"/>` +
+    `<rect x="-14" y="-16" width="28" height="28" rx="6" fill="#8d6e63"/>` +
+    `<path d="M28 -4 L42 -38 L60 -32 L46 6 Z" fill="#9e9e9e"/>` +
+    `<ellipse cx="46" cy="-62" rx="5" ry="16" fill="#9e9e9e" transform="rotate(-18 46 -62)"/>` +
+    `<ellipse cx="58" cy="-62" rx="5" ry="16" fill="#9e9e9e" transform="rotate(12 58 -62)"/>` +
+    `<ellipse cx="60" cy="-38" rx="19" ry="13" fill="#9e9e9e" transform="rotate(25 60 -38)"/>` +
+    `<ellipse cx="72" cy="-28" rx="10" ry="8" fill="#d7ccc8"/>` +
+    `<circle cx="56" cy="-42" r="3" fill="${INK}" stroke="none"/>`,
+  );
+}
+
+export function bandage() {
+  return wrap(`<path d="M-30 12 Q-44 22 -54 14" fill="none" stroke="#fff" stroke-width="10"/>` +
+    `<rect x="-30" y="-20" width="44" height="40" rx="9" fill="#ffffff"/>` +
+    `<ellipse cx="14" cy="0" rx="11" ry="20" fill="#f5f5f5"/><ellipse cx="14" cy="0" rx="4" ry="8" fill="#e0e0e0"/>`);
+}
+
+export function jar() {
+  return wrap(`<path d="M-16 -28 L16 -28 L13 -18 Q34 0 22 30 L-22 30 Q-34 0 -13 -18 Z" fill="#d38b5d"/>` +
+    `<rect x="-19" y="-36" width="38" height="9" rx="3" fill="#b86f45"/>` +
+    `<path d="M-16 4 Q0 10 16 4" fill="none" stroke="#fff" opacity=".6"/>` +
+    `<path d="M0 -58 Q-8 -46 0 -42 Q8 -46 0 -58 Z" fill="#64b5f6"/>`);
+}
+
+export function blanket() {
+  return wrap(`<rect x="-36" y="-22" width="72" height="44" rx="9" fill="#7986cb"/>` +
+    `<path d="M-36 -8 H36 M-36 8 H36" fill="none" stroke="#c5cae9" stroke-width="6"/>`);
+}
+
+export function fig() {
+  return wrap(`<path d="M0 -26 Q4 -34 12 -36" fill="none" stroke="#6d4c41"/>` +
+    `<ellipse cx="12" cy="-34" rx="10" ry="5" fill="#66bb6a" transform="rotate(-20 12 -34)"/>` +
+    `<path d="M0 -24 Q-22 -6 -18 12 Q-12 26 0 26 Q12 26 18 12 Q22 -6 0 -24 Z" fill="#8e44ad"/>` +
+    `<ellipse cx="-7" cy="0" rx="4" ry="7" fill="#fff" opacity=".35" stroke="none"/>`);
+}
+
+// Someone lying on the ground (the hurt man in the Good Samaritan story).
+export const lying = (o = {}) => `<g transform="rotate(-80)">${person({ mood: 'sleep', ...o })}</g>`;
+
 /* ---------------- objects & places ---------------- */
 
 export function ark() {
@@ -508,7 +552,7 @@ export function bg(kind) {
 const raw = (o) => o.svg;
 
 export const ART = {
-  raw, bush, heavenLight, person, angel, baby, lion, elephant, giraffe, sheep, bunny, bird, fish, bigFish, sun, moon, star,
+  raw, bush, heavenLight, donkey, bandage, jar, blanket, fig, lying, person, angel, baby, lion, elephant, giraffe, sheep, bunny, bird, fish, bigFish, sun, moon, star,
   sparkle, cloud, rainbow, tree, palm, flower, lily, grass, reeds, rock, stone, bubble, heart, ark,
   boat, basket, basketBoat, bread, bag, stable, manger, cave, city, hammer, waves,
 };
