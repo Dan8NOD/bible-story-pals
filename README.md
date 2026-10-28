@@ -10,13 +10,14 @@ that practices early-learning skills. No one can lose; wrong taps just wiggle.
 | 2 | Noah's Big Boat · El Gran Barco de Noé | Tap the animals into the ark, two by two | Counting to 8 |
 | 3 | Baby Moses · El Bebé Moisés | Steer the basket down the river, catch flowers | Fine motor, counting |
 | 4 | David the Brave · David el Valiente | Pick five smooth stones | Counting to 5 |
-| 5 | Jonah and the Big Fish · Jonás y el Gran Pez | "Pop the red bubble!" | Colors |
-| 6 | Daniel and the Lions · Daniel y los Leones | Tap each lion to put it to sleep | Counting |
-| 7 | Baby Jesus Is Born · Nace el Niño Jesús | Tap stars 1-2-3-4-5 to light the way | Number recognition |
-| 8 | Jesus Is Baptized · El Bautismo de Jesús | Memory match: God the Father, Jesus, the Holy Spirit | Memory, the Trinity |
-| 9 | Jesus Calms the Storm · Jesús Calma la Tormenta | Tap the storm clouds to calm the sea | Counting |
-| 10 | Jesus Feeds Everyone · Jesús Alimenta a Todos | Put 5 loaves and 2 fish in the basket | Counting to 7 |
-| 11 | The Lost Sheep · La Oveja Perdida | Hide-and-seek behind the bushes | Searching, persistence |
+| 5 | God Is My Shepherd · Dios Es Mi Pastor (Psalm 23) | Tap the path home: grass, water, cup, the shepherd's hand | Order, counting to 4 |
+| 6 | Jonah and the Big Fish · Jonás y el Gran Pez | "Pop the red bubble!" | Colors |
+| 7 | Daniel and the Lions · Daniel y los Leones | Tap each lion to put it to sleep | Counting |
+| 8 | Baby Jesus Is Born · Nace el Niño Jesús | Tap stars 1-2-3-4-5 to light the way | Number recognition |
+| 9 | Jesus Is Baptized · El Bautismo de Jesús | Memory match: God the Father, Jesus, the Holy Spirit | Memory, the Trinity |
+| 10 | Jesus Calms the Storm · Jesús Calma la Tormenta | Tap the storm clouds to calm the sea | Counting |
+| 11 | Jesus Feeds Everyone · Jesús Alimenta a Todos | Put 5 loaves and 2 fish in the basket | Counting to 7 |
+| 12 | The Lost Sheep · La Oveja Perdida | Hide-and-seek behind the bushes | Searching, persistence |
 
 **The Trinity** appears together in the baptism story, as Matthew 3:16–17 describes it: Jesus, the Holy Spirit as
 a dove, and the Father as a voice from heaven. The Father is drawn as light pouring down, never as a person.

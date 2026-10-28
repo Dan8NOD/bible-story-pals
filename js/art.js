@@ -354,6 +354,45 @@ export function heavenLight(o = {}) {
     `<path d="M-18 0 L18 0 L70 ${h} L-70 ${h} Z" fill="#fffde7" opacity=".55"/></g>`;
 }
 
+// A soft warm glow around someone who is kept safe (Psalm 23). Protection, not magic.
+export const glow = (o = {}) => {
+  const c = o.color || '#ffb74d';
+  const k = o.strength || 1;  // stronger on dark pages so it stays warm, not gray
+  return `<g><circle r="64" fill="${c}" opacity="${0.16 * k}"/><circle r="48" fill="${c}" opacity="${0.18 * k}"/><circle r="32" fill="#ffe0b2" opacity="${0.22 * k}"/></g>`;
+};
+
+export function lantern() {
+  return wrap(`<path d="M-9 -38 Q0 -50 9 -38" fill="none"/>` +
+    `<rect x="-14" y="-30" width="28" height="36" rx="6" fill="#ffe082"/>` +
+    `<ellipse cx="0" cy="-12" rx="5" ry="9" fill="#ff9800" stroke="none"/>` +
+    `<rect x="-17" y="-36" width="34" height="7" rx="3" fill="#8d6e63"/><rect x="-17" y="5" width="34" height="7" rx="3" fill="#8d6e63"/>`);
+}
+
+export function cup() {
+  return wrap(`<path d="M0 6 L0 30" stroke-width="8"/><ellipse cx="0" cy="33" rx="20" ry="6" fill="#ffd54f"/>` +
+    `<path d="M-28 -28 L28 -28 Q26 6 0 10 Q-26 6 -28 -28 Z" fill="#ffd54f"/>` +
+    `<ellipse cx="0" cy="-28" rx="28" ry="8" fill="#64b5f6"/>` +
+    `<path d="M24 -26 Q32 -16 28 -8 Q24 -14 24 -26 Z" fill="#64b5f6"/>`);
+}
+
+export function pond() {
+  return wrap(`<ellipse cx="0" cy="0" rx="54" ry="22" fill="#4fa3e0"/>` +
+    `<path d="M-30 -4 q8 -6 16 0 M6 6 q8 -6 16 0" fill="none" stroke="#bfe3fb"/>` +
+    `<path d="M44 -8 Q46 -34 40 -50 M52 -6 Q56 -28 58 -44" fill="none" stroke="#558b2f" stroke-width="4"/>`);
+}
+
+// The shepherd's open hand, reaching for the one who was missing.
+export function hand(o = {}) {
+  const { skin = '#e9b98a', sleeve = '#4db6ac' } = o;
+  return wrap(`<rect x="-24" y="-44" width="11" height="40" rx="5.5" fill="${skin}"/>` +
+    `<rect x="-11" y="-52" width="11" height="48" rx="5.5" fill="${skin}"/>` +
+    `<rect x="2" y="-50" width="11" height="46" rx="5.5" fill="${skin}"/>` +
+    `<rect x="15" y="-42" width="11" height="38" rx="5.5" fill="${skin}"/>` +
+    `<rect x="-44" y="-10" width="12" height="32" rx="6" fill="${skin}" transform="rotate(-45 -38 6)"/>` +
+    `<rect x="-26" y="-12" width="52" height="42" rx="16" fill="${skin}"/>` +
+    `<rect x="-28" y="26" width="56" height="22" rx="6" fill="${sleeve}"/>`);
+}
+
 /* ---------------- objects & places ---------------- */
 
 export function ark() {
@@ -508,7 +547,7 @@ export function bg(kind) {
 const raw = (o) => o.svg;
 
 export const ART = {
-  raw, bush, heavenLight, person, angel, baby, lion, elephant, giraffe, sheep, bunny, bird, fish, bigFish, sun, moon, star,
+  raw, bush, heavenLight, glow, lantern, cup, pond, hand, person, angel, baby, lion, elephant, giraffe, sheep, bunny, bird, fish, bigFish, sun, moon, star,
   sparkle, cloud, rainbow, tree, palm, flower, lily, grass, reeds, rock, stone, bubble, heart, ark,
   boat, basket, basketBoat, bread, bag, stable, manger, cave, city, hammer, waves,
 };

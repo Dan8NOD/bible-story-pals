@@ -295,6 +295,7 @@ const REFS = {
   noah: 'Genesis 6–9 · Génesis 6–9',
   moses: 'Exodus 2 · Éxodo 2',
   david: '1 Samuel 17',
+  psalm23: 'Psalm 23 · Salmo 23',
   jonah: 'Jonah 1–3 · Jonás 1–3',
   daniel: 'Daniel 6',
   loaves: 'John 6:1–14 · Juan 6:1–14',
