@@ -1,11 +1,17 @@
 // Narration and little synthesized sound effects (Web Audio).
 // Narration plays recorded ElevenLabs clips from audio/ (made by tools/voices.mjs)
 // and falls back to the device's own text-to-speech for any line without a clip.
+// Inside the iOS app that fallback is the native voice (@capacitor-community/
+// text-to-speech), which is steadier than the WebView's speechSynthesis.
 
 import { store, langs } from './store.js';
 import { clipId } from './phrases.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
+// There is no bundler to pull in @capacitor/core, so talk to the native bridge
+// directly; nativePromise is what @capacitor/core's plugin proxies call.
+const cap = typeof window !== 'undefined' ? window.Capacitor : null;
+const nativeTTS = !!(cap?.isNativePlatform?.() && cap.PluginHeaders?.some((h) => h.name === 'TextToSpeech'));
 const LOCALES = { en: ['en-US', 'en-GB', 'en'], es: ['es-MX', 'es-US', 'es-419', 'es-ES', 'es'] };
 const NICE = /(Samantha|Paulina|Monica|Mónica|Google|Siri|Natural|Enhanced|Premium)/i;
 let voices = [];
@@ -64,9 +70,24 @@ function playClip(src, token) {
   });
 }
 
-function sayOne(text, lang, token) {
+async function sayOne(text, lang, token) {
   const id = clipId(text);
   if (clips[lang].has(id)) return playClip(`audio/${lang}/${id}.mp3`, token);
+  if (nativeTTS && await sayNative(text, lang, token)) return;
+  return sayWeb(text, lang, token);
+}
+
+// Resolves true once the native voice has finished (or was cut off), false if it failed.
+function sayNative(text, lang, token) {
+  if (token !== speakToken) return Promise.resolve(true);
+  const said = cap.nativePromise('TextToSpeech', 'speak', { text, lang: LOCALES[lang][0], rate: 0.9, pitch: 1.1, volume: 1, category: 'playback' })
+    .then(() => true, () => false);
+  // Never hang the game if the plugin never answers.
+  const timeout = new Promise((r) => setTimeout(() => r(true), 2000 + text.length * 120));
+  return Promise.race([said, timeout]);
+}
+
+function sayWeb(text, lang, token) {
   if (!synth) return new Promise((r) => setTimeout(r, 350));
   return new Promise((resolve) => {
     if (token !== speakToken) return resolve();
@@ -88,6 +109,7 @@ function sayOne(text, lang, token) {
 
 function silence() {
   if (synth) synth.cancel();
+  if (nativeTTS) cap.nativePromise('TextToSpeech', 'stop', {}).catch(() => {});
   if (stopClip) stopClip();
 }
 

@@ -63,19 +63,23 @@ Turn it on once under **Settings → Pages → Source: GitHub Actions**. (Pages 
 on a free plan, make the repo public or upload the folder to Netlify, Cloudflare Pages or Vercel.)
 It must be served over HTTPS for offline/install to work.
 
-**App Store and Google Play (where the downloads are):** wrap the same files with [Capacitor](https://capacitorjs.com):
+**iOS (App Store / TestFlight):** the Capacitor project lives in `ios/` (bundle ID `com.dancruz.biblestorypals`,
+iPad and iPhone, landscape only, version in Xcode's General tab). After changing the game:
 
 ```bash
-npm i @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios
-npx cap init "Bible Story Pals" com.yourname.biblestorypals --web-dir .
-npx cap add android && npx cap add ios
-npx cap sync && npx cap open android   # or: npx cap open ios
+npm install
+npm run ios        # copies the game into www/ and syncs it into ios/
+npm run ios:open   # opens Xcode: pick your team under Signing, Any iOS Device, Product → Archive
 ```
 
+Inside the app, lines without a recorded clip are read by `@capacitor-community/text-to-speech` (the native iOS
+voice) instead of the WebView's speech API, the Donate button stays hidden, and the service worker is off.
+`ios/App/App/PrivacyInfo.xcprivacy` declares no tracking and no data collected. `npm run icons` also redraws the
+1024×1024 app icon and the launch image from the game art.
+
+**Google Play:** add Android the same way (`npm i @capacitor/android && npx cap add android`).
+
 Before submitting:
-- Lock orientation to landscape in the native projects if you prefer (the web version supports both).
-- For best narration inside native apps, consider adding `@capacitor-community/text-to-speech`.
-  It uses the same OS voices and is more reliable than the WebView's speech API on some Android devices.
 - Google Play: target the **Designed for Families** program, ages 5 & under / 6–8, with content rating "Everyone".
 - Apple: Kids Category, ages 5 & under. Privacy "nutrition label": **Data Not Collected**.
 
