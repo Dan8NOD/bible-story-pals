@@ -38,16 +38,16 @@ const shot = async (name) => { if (shots) await page.screenshot({ path: join(sho
 const hash = () => page.evaluate(() => location.hash);
 
 await page.goto(base);
-await page.waitForSelector('.card');
+await page.waitForSelector('.stop');
 await page.waitForTimeout(600);
 await shot('00-home');
 
-const ids = await page.$$eval('.card', (cs) => cs.map((c) => c.dataset.id));
+const ids = await page.$$eval('.stop', (cs) => cs.map((c) => c.dataset.id));
 if (ids.length !== 12) throw new Error(`expected 12 stories, got ${ids.length}`);
 
 for (const id of ids) {
   await page.goto(`${base}#/`);
-  await page.click(`.card[data-id="${id}"]`);
+  await page.click(`.stop[data-id="${id}"]`);
   let p = 0;
   while ((await hash()).startsWith('#/story/')) {
     await page.waitForTimeout(250);
@@ -106,7 +106,7 @@ for (const id of ids) {
 }
 
 await page.goto(`${base}#/`);
-await page.waitForSelector('.card');
+await page.waitForSelector('.stop');
 const stars = await page.locator('.star-count span').textContent();
 if (stars !== `${ids.length}/${ids.length}`) throw new Error(`expected all stars, got ${stars}`);
 
@@ -114,7 +114,7 @@ if (stars !== `${ids.length}/${ids.length}`) throw new Error(`expected all stars
 await page.click('.chip[data-lang=es]');
 if (!(await page.locator('.brand h1').textContent()).startsWith('Amiguitos')) throw new Error('Spanish title missing');
 await page.click('.chip[data-lang=both]');
-await page.click('.card[data-id=noah]');
+await page.click('.stop[data-id=noah]');
 await page.waitForSelector('.caption .line');
 if ((await page.locator('.caption .line').count()) !== 2) throw new Error('both-language captions missing');
 await shot('zz-both-languages');

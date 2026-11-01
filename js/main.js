@@ -2,9 +2,10 @@ import { STORIES, byId } from './stories.js';
 import { sceneSVG, place, ART, INK } from './art.js';
 import { speak, stopSpeaking, sfx, onSpeaking, unlockAudio } from './audio.js';
 import { store, langs } from './store.js';
-import { UI, PRAISE, pick } from './i18n.js';
+import { UI, PRAISE, COUNT, pick } from './i18n.js';
 import { startGame } from './games.js';
 import { DONATE_URL } from './config.js';
+import { paywalled, canPlay, freeLeft, passLeft, passUntil, priceLabel, refresh, loadPrice, buy, restore, startClock, FREE_MINUTES, PASS_HOURS } from './pass.js';
 
 const app = document.getElementById('app');
 
@@ -52,6 +53,8 @@ function route() {
   document.documentElement.lang = langs()[0];
   const parts = current.replace(/^#\/?/, '').split('/');
   const story = byId(parts[1]);
+  // Out of play time: the story waits behind the grown-up screen, and opens once a pass is bought.
+  if ((parts[0] === 'story' || parts[0] === 'play') && story && !canPlay()) return passScreen();
   if (parts[0] === 'story' && story) return storyScreen(story, Math.max(0, Math.min(story.pages.length - 1, +parts[2] || 0)));
   if (parts[0] === 'play' && story) return gameScreen(story);
   if (parts[0] === 'yay' && story) return rewardScreen(story);
@@ -82,17 +85,129 @@ function wireSound(root) {
   });
 }
 
-/* ---------------- home ---------------- */
+/* ---------------- home: island map ---------------- */
+// Stories sit on a path that snakes across an island: 4 stops per row on wide
+// screens, 2 per row on portrait phones. Both maps are drawn and CSS shows the
+// one that fits, so rotating the device needs no re-render.
+const LAYOUTS = {
+  wide: { cols: 4, w: 1000, x0: 140, dx: 240, y0: 160, dy: 250 },
+  tall: { cols: 2, w: 600, x0: 165, dx: 270, y0: 195, dy: 275 },
+};
+const PAL = { robe: '#f48fb1', hair: '#5d4037', sash: '#ffd54f' };
+const r = Math.round;
+const pct = (v, total) => `${((v / total) * 100).toFixed(2)}%`;
+
+function mapLayout({ cols, w, x0, dx, y0, dy }, n) {
+  const rows = Math.ceil(n / cols);
+  const pts = Array.from({ length: n }, (_, i) => {
+    const row = Math.floor(i / cols);
+    const col = row % 2 ? cols - 1 - (i % cols) : i % cols;
+    return [x0 + col * dx, y0 + row * dy + (col % 2 ? 14 : -6)];
+  });
+  return { w, h: y0 + (rows - 1) * dy + 180, pts };
+}
+
+// Catmull-Rom curve through the points, written as cubic Béziers.
+function smooth(pts, closed = false) {
+  const n = pts.length;
+  const at = (i) => (closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))]);
+  let d = `M${at(0).map(r).join(' ')}`;
+  for (let i = 0; i < (closed ? n : n - 1); i++) {
+    const [p0, p1, p2, p3] = [at(i - 1), at(i), at(i + 1), at(i + 2)];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1.map(r).join(' ')} ${c2.map(r).join(' ')} ${p2.map(r).join(' ')}`;
+  }
+  return closed ? `${d}Z` : d;
+}
+
+// A squarish island with a gently wobbling coast.
+function coast(w, h) {
+  const pts = [];
+  for (let k = 0; k < 32; k++) {
+    const a = (k / 32) * Math.PI * 2;
+    const c = Math.cos(a);
+    const s = Math.sin(a);
+    const wob = 1 + 0.025 * Math.sin(a * 5) + 0.02 * Math.sin(a * 9 + 1);
+    pts.push([w / 2 + Math.sign(c) * Math.abs(c) ** 0.5 * (w / 2 - 34) * wob, h / 2 + Math.sign(s) * Math.abs(s) ** 0.5 * (h / 2 - 30) * wob]);
+  }
+  return smooth(pts, true);
+}
+
+// Seeded so the trees stay put between visits.
+function scatter({ w, h, pts }, count, seed, clear) {
+  let s = seed;
+  const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const xs = pts.map((p) => p[0]);
+  const [minX, maxX] = [Math.min(...xs), Math.max(...xs)];
+  const out = [];
+  for (let k = 0; k < 400 && out.length < count; k++) {
+    const x = 60 + rnd() * (w - 120);
+    const y = 60 + rnd() * (h - 120);
+    const nx = (x - w / 2) / (w / 2 - 70);
+    const ny = (y - h / 2) / (h / 2 - 70);
+    if (nx ** 4 + ny ** 4 > 1) continue;
+    if (clear) {
+      if (x < minX + 50 || x > maxX - 50) continue; // the path turns around out there
+      if (y < pts[0][1]) continue; // keep the title clear
+      if (pts.some(([px, py]) => Math.abs(y - py) < 48 || (Math.abs(x - px) < 115 && y - py > -90 && y - py < 175))) continue;
+      if (out.some(([ox, oy]) => Math.hypot(ox - x, oy - y) < 70)) continue;
+    }
+    out.push([x, y]);
+  }
+  return out;
+}
+
+function mapArt(L, cls) {
+  const { w, h, pts } = L;
+  const shore = coast(w, h);
+  const inland = `translate(${w / 2} ${h / 2}) scale(${(1 - 44 / w).toFixed(3)} ${(1 - 44 / h).toFixed(3)}) translate(${-w / 2} ${-h / 2})`;
+  const wave = (x, y) => `<path d="M${r(x - 34)} ${r(y)} q17 -14 34 0 q17 -14 34 0" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/>`;
+  const waves = [[0.06, 0.05], [0.93, 0.06], [0.05, 0.95], [0.94, 0.95], [0.03, 0.5], [0.97, 0.45]].map(([x, y]) => wave(x * w, y * h)).join('');
+  const patches = scatter(L, 6, 11, false).map(([x, y]) => `<circle cx="${r(x)}" cy="${r(y)}" r="80" fill="#8ccc70" opacity=".55"/>`).join('');
+  const trees = scatter(L, cls === 'wide' ? 10 : 8, 5, true).map(([x, y]) => `<g transform="translate(${r(x)} ${r(y)})"><rect x="-3" y="6" width="6" height="16" rx="2" fill="#8d5a3b"/><circle r="17" fill="#43a047"/><circle cx="5" cy="-6" r="8" fill="#66bb6a"/></g>`).join('');
+  const path = smooth(pts);
+  return `<svg class="map-art ${cls}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    ${waves}
+    <path d="${shore}" fill="#f7e3a3" stroke="#fff3cf" stroke-width="6"/>
+    <path d="${shore}" fill="#9ad77f" transform="${inland}"/>
+    ${patches}
+    <path d="${path}" fill="none" stroke="#e3c08a" stroke-width="30" stroke-linecap="round"/>
+    <path d="${path}" fill="none" stroke="#fbe7bd" stroke-width="22" stroke-linecap="round"/>
+    <path d="${path}" fill="none" stroke="#dcb376" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 26"/>
+    ${trees}
+  </svg>`;
+}
+
+// The story's cover scene, cropped to a square around its characters.
+function coverDisc(s) {
+  const scene = s.pages[s.cover].scene;
+  const xs = (scene.items || []).filter((it) => !['raw', 'sun', 'moon', 'cloud', 'sparkle'].includes(it[0])).map((it) => it[1]);
+  const cx = xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 500;
+  const x = r(Math.max(260, Math.min(740, cx)) - 260);
+  return sceneSVG(scene, { cls: 'still' }).replace('viewBox="0 0 1000 600"', `viewBox="${x} 60 520 520"`);
+}
+
 function homeScreen() {
-  const cards = STORIES.map((s, i) => {
+  const wide = mapLayout(LAYOUTS.wide, STORIES.length);
+  const tall = mapLayout(LAYOUTS.tall, STORIES.length);
+  // The pal waits at the first story without a star.
+  const here = Math.max(0, STORIES.findIndex((s) => !store.hasStar(s.id)));
+  const stops = STORIES.map((s, i) => {
     const done = store.hasStar(s.id);
-    return `<button class="card" data-id="${s.id}" style="animation-delay:${i * 0.05}s" aria-label="${esc(t(s.title))}">
-      <span class="thumb">${sceneSVG(s.pages[s.cover].scene, { cls: 'still' })}</span>
-      <span class="num">${i + 1}</span>
-      ${done ? `<span class="badge">${starIcon()}</span>` : ''}
-      <div class="title">${titleHTML(s.title)}</div>
+    const [wx, wy] = wide.pts[i];
+    const [tx, ty] = tall.pts[i];
+    const pos = `--wx:${pct(wx, wide.w)};--wy:${pct(wy, wide.h)};--tx:${pct(tx, tall.w)};--ty:${pct(ty, tall.h)}`;
+    const stars = [0, 1, 2].map(() => starIcon(done ? '#ffd54f' : '#fffdf5')).join('');
+    return `<button class="stop${done ? ' done' : ''}" data-id="${s.id}" style="${pos};--ring:${s.color};animation-delay:${i * 0.05}s" aria-label="${esc(t(s.title))}">
+      ${s.special ? `<span class="ribbon">${esc(t(s.special))}</span>` : ''}
+      <span class="disc">${coverDisc(s)}</span>
+      ${i === here ? `<svg class="pal" viewBox="-42 -72 84 126" aria-hidden="true">${place('person', 0, 0, 1, PAL, 'hop')}</svg>` : ''}
+      <span class="name">${titleHTML(s.title)}</span>
+      <span class="stars" aria-hidden="true">${stars}</span>
     </button>`;
   }).join('');
+  const heading = langs().map((l) => `<span lang="${l}">${esc(UI.welcome[l])}</span>`).join(' ');
   const lang = store.get('lang');
   app.innerHTML = `<main class="home">
     <div class="home-top">
@@ -104,13 +219,19 @@ function homeScreen() {
           <button class="chip" data-lang="both" aria-pressed="${lang === 'both'}">EN + ES</button>
         </div>
         <div class="star-count" aria-label="${store.starCount()} / ${STORIES.length}">${starIcon()}<span>${store.starCount()}/${STORIES.length}</span></div>
+        ${soundButton()}
         <button class="icon-btn small" id="parents" aria-label="${esc(t(UI.parents))}">${ICON.lock}</button>
       </div>
     </div>
-    <div class="grid">${cards}</div>
+    <nav class="map" aria-label="${esc(t(UI.welcome))}" style="--wide-ar:${wide.w} / ${wide.h};--wide-r:${(wide.w / wide.h).toFixed(4)};--tall-ar:${tall.w} / ${tall.h}">
+      ${mapArt(wide, 'wide')}${mapArt(tall, 'tall')}
+      <div class="map-title"><h2>${heading}</h2>${langs().length === 1 ? `<p>${esc(t(UI.tapMap))}</p>` : ''}</div>
+      ${stops}
+    </nav>
   </main>`;
 
-  app.querySelectorAll('.card').forEach((c) => c.addEventListener('click', () => {
+  wireSound(app);
+  app.querySelectorAll('.stop').forEach((c) => c.addEventListener('click', () => {
     sfx.tap();
     go(`#/story/${c.dataset.id}/0`);
   }));
@@ -259,6 +380,153 @@ function rewardScreen(story) {
   speak([praise, story.lesson]);
 }
 
+/* ---------------- 12-hour pass (App Store build) ---------------- */
+const PASS_TEXT = {
+  en: {
+    freeDone: `The ${FREE_MINUTES} free minutes are used up.`,
+    passDone: `The ${PASS_HOURS}-hour pass has ended.`,
+    offer: (p) => `Grown-ups: unlock ${PASS_HOURS} hours of every story and game for ${p}. It doesn't renew.`,
+    unlock: (p) => `Unlock ${PASS_HOURS} hours · ${p}`,
+    more: (p) => `Add ${PASS_HOURS} more hours · ${p}`,
+    buying: 'Opening the App Store…',
+    pending: 'Waiting for a parent to approve the purchase. Play starts as soon as it’s approved.',
+    failed: 'The App Store isn’t available right now. Please try again later.',
+    restore: 'Restore purchase',
+    restored: 'Purchases checked.',
+    title: 'Play time',
+    left: (m) => `Free play left: ${m} min.`,
+    none: 'Free play is used up.',
+    until: (time) => `Unlocked until ${time}.`,
+    gate: 'Grown-ups only',
+    ask: (a, b) => `What is ${a} times ${b}?`,
+    erase: 'Erase',
+    cancel: 'Cancel',
+  },
+  es: {
+    freeDone: `Se acabaron los ${FREE_MINUTES} minutos gratis.`,
+    passDone: `Se acabó el pase de ${PASS_HOURS} horas.`,
+    offer: (p) => `Adultos: desbloqueen ${PASS_HOURS} horas de todas las historias y juegos por ${p}. No se renueva.`,
+    unlock: (p) => `Desbloquear ${PASS_HOURS} horas · ${p}`,
+    more: (p) => `Añadir ${PASS_HOURS} horas más · ${p}`,
+    buying: 'Abriendo el App Store…',
+    pending: 'Esperando que un padre apruebe la compra. El juego empieza en cuanto se apruebe.',
+    failed: 'El App Store no está disponible ahora. Inténtelo más tarde.',
+    restore: 'Restaurar compra',
+    restored: 'Compras revisadas.',
+    title: 'Tiempo de juego',
+    left: (m) => `Juego gratis restante: ${m} min.`,
+    none: 'Se acabó el juego gratis.',
+    until: (time) => `Desbloqueado hasta las ${time}.`,
+    gate: 'Solo para adultos',
+    ask: (a, b) => `¿Cuánto es ${a} por ${b}?`,
+    erase: 'Borrar',
+    cancel: 'Cancelar',
+  },
+};
+
+// Buys a pass behind the math gate, reporting progress in `note`. Calls `onPaid` once
+// play is unlocked, including after an Ask to Buy approval that comes in later.
+function unlockFlow(btn, note, onPaid) {
+  const P = PASS_TEXT[langs()[0]];
+  mathGate(async () => {
+    const gen = generation;
+    btn.disabled = true;
+    note.textContent = P.buying;
+    const r = await buy();
+    if (gen !== generation) return;
+    btn.disabled = false;
+    if (passLeft() > 0) { note.textContent = ''; sfx.tada(); onPaid(); return; }
+    if (r.pending) {
+      note.textContent = P.pending;
+      const poll = setInterval(async () => {
+        await refresh();
+        if (gen !== generation) clearInterval(poll);
+        else if (passLeft() > 0) { clearInterval(poll); onPaid(); }
+      }, 5000);
+      cleanups.push(() => clearInterval(poll));
+      return;
+    }
+    note.textContent = r.cancelled ? '' : P.failed;
+  });
+}
+
+function passScreen() {
+  const P = PASS_TEXT[langs()[0]];
+  app.innerHTML = `<section class="pass-wall">
+    <svg class="pass-art" viewBox="-62 -62 124 124" aria-hidden="true"><circle r="58" fill="#ffd54f" stroke="${INK}" stroke-width="4"/>${place('sheep', 0, -2, 0.95, {}, 'bob')}</svg>
+    <h2>${titleHTML(UI.askGrownup)}</h2>
+    <p>${esc(passUntil() ? P.passDone : P.freeDone)} <span class="offer"></span></p>
+    <div class="row">
+      <button class="icon-btn" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
+      <button class="big-btn green" data-act="unlock">${ICON.lock}<span></span></button>
+    </div>
+    <p class="pass-note" aria-live="polite"></p>
+  </section>`;
+  const btn = app.querySelector('[data-act=unlock]');
+  const showPrice = () => {
+    app.querySelector('.offer').textContent = P.offer(priceLabel());
+    btn.querySelector('span').textContent = P.unlock(priceLabel());
+  };
+  const gen = generation;
+  showPrice();
+  loadPrice().then(() => { if (gen === generation) showPrice(); });
+  app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
+  btn.addEventListener('click', () => unlockFlow(btn, app.querySelector('.pass-note'), route));
+  speak(UI.askGrownup);
+}
+
+// Apple's Kids Category wants purchases behind a check a young child can't pass by
+// tapping around, so this one asks a times-table question, written out in words.
+function mathGate(onPass) {
+  const lang = langs()[0];
+  const P = PASS_TEXT[lang];
+  const el = document.createElement('div');
+  el.className = 'gate';
+  el.innerHTML = `<div class="box math" role="dialog" aria-modal="true" aria-labelledby="gate-q" tabindex="-1">
+    <div>
+      <h3>${esc(P.gate)}</h3>
+      <p id="gate-q"></p>
+      <output class="answer" aria-live="polite"></output>
+    </div>
+    <div class="keypad">
+      ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button data-n="${n}">${n}</button>`).join('')}
+      <button data-act="cancel" aria-label="${esc(P.cancel)}">✕</button>
+      <button data-n="0">0</button>
+      <button data-act="erase" aria-label="${esc(P.erase)}">⌫</button>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  const q = el.querySelector('#gate-q');
+  const out = el.querySelector('.answer');
+  let answer = '';
+  let typed = '';
+  const ask = () => {
+    const a = 3 + Math.floor(Math.random() * 7);
+    const b = 3 + Math.floor(Math.random() * 7);
+    answer = String(a * b);
+    typed = '';
+    out.textContent = '';
+    q.textContent = P.ask(COUNT[lang][a - 1], COUNT[lang][b - 1]);
+  };
+  const close = () => el.remove();
+  el.querySelectorAll('[data-n]').forEach((k) => k.addEventListener('click', () => {
+    typed += k.dataset.n;
+    out.textContent = typed;
+    if (typed.length < answer.length) return;
+    if (typed === answer) { close(); onPass(); return; }
+    const box = el.querySelector('.box');
+    box.classList.remove('a-shake');
+    void box.offsetWidth;
+    box.classList.add('a-shake');
+    ask();
+  }));
+  el.querySelector('[data-act=erase]').addEventListener('click', () => { typed = typed.slice(0, -1); out.textContent = typed; });
+  el.querySelector('[data-act=cancel]').addEventListener('click', close);
+  el.addEventListener('click', (e) => { if (e.target === el) close(); });
+  ask();
+  el.querySelector('.box').focus();
+}
+
 /* ---------------- grown-ups ---------------- */
 function parentGate() {
   const el = document.createElement('div');
@@ -310,6 +578,7 @@ const PARENT_TEXT = {
     title: 'For grown-ups',
     about: 'Bible Story Pals is a bilingual (English & Spanish) Bible story game for children ages 3–6. Every story is read aloud, so no reading is needed. Each story ends with a gentle mini-game that practices counting, colors, numbers and new words.',
     privacy: 'Privacy: no ads, no in-app purchases, no accounts, no tracking. Nothing your child does leaves this device. After the first visit it works offline.',
+    privacyApp: `Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The only purchase is an optional ${PASS_HOURS}-hour pass, bought by a grown-up through the App Store.`,
     supportTitle: 'Support Bible Story Pals',
     support: 'This game is free with no ads. If it blesses your family, a gift helps us make more stories.',
     donate: 'Donate',
@@ -327,6 +596,7 @@ const PARENT_TEXT = {
     title: 'Para adultos',
     about: 'Amiguitos de la Biblia es un juego bilingüe (español e inglés) de historias bíblicas para niños de 3 a 6 años. Todas las historias se leen en voz alta, así que no hace falta saber leer. Cada historia termina con un minijuego que practica contar, los colores, los números y palabras nuevas.',
     privacy: 'Privacidad: sin anuncios, sin compras dentro de la app, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo. Después de la primera visita funciona sin internet.',
+    privacyApp: `Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. La única compra es un pase opcional de ${PASS_HOURS} horas, que compra un adulto en el App Store.`,
     supportTitle: 'Apoye a Amiguitos de la Biblia',
     support: 'Este juego es gratis y sin anuncios. Si bendice a su familia, una ofrenda nos ayuda a crear más historias.',
     donate: 'Donar',
@@ -347,6 +617,7 @@ const isNativeApp = () => !!window.Capacitor?.isNativePlatform?.();
 
 function parentsScreen() {
   const P = PARENT_TEXT[langs()[0]];
+  const T = PASS_TEXT[langs()[0]];
   const showDonate = DONATE_URL && !isNativeApp();
   const toggle = (key, label) => `<div class="setting"><span>${esc(label)}</span><button class="toggle" role="switch" data-key="${key}" aria-checked="${!!store.get(key)}" aria-label="${esc(label)}"></button></div>`;
   const lang = store.get('lang');
@@ -354,7 +625,11 @@ function parentsScreen() {
     <button class="link-btn" data-act="home">‹ ${esc(P.back)}</button>
     <h2>${esc(P.title)}</h2>
     <p>${esc(P.about)}</p>
-    <p><strong>${esc(P.privacy)}</strong></p>
+    <p><strong>${esc(paywalled ? P.privacyApp : P.privacy)}</strong></p>
+    ${paywalled ? `<h3>${esc(T.title)}</h3><p class="pass-status"></p>
+      <p><button class="big-btn green" data-act="unlock">${ICON.lock}<span></span></button></p>
+      <p class="pass-note" aria-live="polite"></p>
+      <p><button class="link-btn" data-act="restore">${esc(T.restore)}</button></p>` : ''}
     ${showDonate ? `<h3>${esc(P.supportTitle)}</h3><p>${esc(P.support)}</p>
       <p><a class="big-btn green" href="${esc(DONATE_URL)}" target="_blank" rel="noopener">${esc(P.donate)}</a></p>` : ''}
     <h3>${esc(P.settings)}</h3>
@@ -375,6 +650,7 @@ function parentsScreen() {
     <p><button class="link-btn" data-act="reset">${esc(P.reset)}</button></p>
   </div></main>`;
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
+  if (paywalled) wirePassSettings(T);
   app.querySelectorAll('.toggle').forEach((b) => b.addEventListener('click', () => {
     const v = !store.get(b.dataset.key);
     store.set(b.dataset.key, v);
@@ -395,10 +671,38 @@ function parentsScreen() {
   });
 }
 
+// The grown-ups area shows how much play time is left, and sells or restores the pass.
+function wirePassSettings(T) {
+  const status = app.querySelector('.pass-status');
+  const btn = app.querySelector('[data-act=unlock]');
+  const note = app.querySelector('.pass-note');
+  const show = () => {
+    const end = new Date(passUntil());
+    const sameDay = end.toDateString() === new Date().toDateString();
+    const time = end.toLocaleString(langs()[0], sameDay ? { hour: 'numeric', minute: '2-digit' } : { weekday: 'long', hour: 'numeric', minute: '2-digit' });
+    status.textContent = passLeft() > 0 ? T.until(time) : freeLeft() > 0 ? T.left(Math.ceil(freeLeft() / 60)) : T.none;
+    btn.querySelector('span').textContent = (passLeft() > 0 ? T.more : T.unlock)(priceLabel());
+  };
+  const gen = generation;
+  show();
+  Promise.all([refresh(), loadPrice()]).then(() => { if (gen === generation) show(); });
+  btn.addEventListener('click', () => unlockFlow(btn, note, show));
+  app.querySelector('[data-act=restore]').addEventListener('click', async () => {
+    const r = await restore();
+    if (gen !== generation) return;
+    note.textContent = r.error ? T.failed : T.restored;
+    show();
+  });
+}
+
 /* ---------------- boot ---------------- */
 unlockAudio();
-route();
+// Kids' minutes count only inside stories, games and the star screen, never on the map.
+startClock(() => /^#\/?(story|play|yay)\//.test(current));
+// Wait briefly for the App Store's answer, so a paid-up family never sees the pass screen.
+Promise.race([refresh(), new Promise((r) => setTimeout(r, 1500))]).then(route);
 
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+// The store apps ship every file inside the app, so only the website needs the service worker.
+if ('serviceWorker' in navigator && !isNativeApp() && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
