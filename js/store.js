@@ -5,7 +5,8 @@ const KEY = 'bsp:v1';
 
 function defaults() {
   const nav = (typeof navigator !== 'undefined' && navigator.language) || 'en';
-  return { lang: nav.toLowerCase().startsWith('es') ? 'es' : 'en', narration: true, sfx: true, stars: {} };
+  // played: seconds of the App Store build's free play time already used (see pass.js).
+  return { lang: nav.toLowerCase().startsWith('es') ? 'es' : 'en', narration: true, sfx: true, stars: {}, played: 0 };
 }
 
 let state = defaults();

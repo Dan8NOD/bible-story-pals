@@ -29,7 +29,7 @@ Finishing a story earns a gold star on the home screen.
 - **Three language modes:** English, Español, or **EN + ES**, which reads every page in both languages. That's great for bilingual homes and dual-language classrooms. On first launch it picks the device language.
 - **Read-aloud narration** uses the device's built-in text-to-speech (`es-MX`/`es-US` preferred for Spanish), so there are no audio files and the whole app is **under 250 KB**.
 - **Works offline** after the first visit (service worker). Installable as an app (PWA manifest + icons).
-- **No ads, no purchases, no accounts, no tracking, no network calls.** Progress is stored only on the device. This makes COPPA / Google Play "Designed for Families" / Apple Kids Category review straightforward.
+- **No ads, no accounts, no tracking, no network calls.** Progress is stored only on the device. This makes COPPA / Google Play "Designed for Families" / Apple Kids Category review straightforward. The website is free; the App Store build gives **20 free minutes**, then a grown-up can buy a **12-hour pass for $1.99** (see below).
 - **Grown-ups area** sits behind a 3-second press-and-hold gate. It has narration and sound toggles, the language setting, Bible references for each story, parent tips, and a star reset.
 - Big touch targets, swipe between pages, honors "reduce motion", and works on phones (portrait and landscape), tablets, Chromebooks and desktops.
 - All art is hand-built SVG in `js/art.js`, with no emoji or stock images, so there are no licensing questions. The font (Baloo 2) is OFL-licensed and bundled.
@@ -76,6 +76,21 @@ Inside the app, lines without a recorded clip are read by `@capacitor-community/
 voice) instead of the WebView's speech API, the Donate button stays hidden, and the service worker is off.
 `ios/App/App/PrivacyInfo.xcprivacy` declares no tracking and no data collected. `npm run icons` also redraws the
 1024×1024 app icon and the launch image from the game art.
+
+**The 12-hour pass (App Store build only).** Free minutes count only inside stories, games and the star screen,
+never on the map or in the grown-ups area. When they run out, a story opens to a "Time to ask a grown-up!" screen;
+the grown-ups area also shows the time left and sells the pass. Buying sits behind a times-table question written in
+words and answered on a keypad, the kind of parental gate Apple's Kids Category asks for. `js/pass.js` holds the
+rules and `ios/App/App/PassPlugin.swift` talks to StoreKit 2. The pass is a **non-renewing subscription** with
+product ID `com.dancruz.biblestorypals.pass12h`. Paid time is worked out from the App Store's signed transactions, so
+it survives a reinstall and follows the family's Apple ID. Passes bought back to back stack, and Ask to Buy approvals
+unlock play as soon as they arrive. To try a purchase in the simulator without App Store Connect, run from Xcode: the
+shared `App` scheme uses `ios/App/App/Pass.storekit`.
+
+In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App
+Purchases → +**. Pick **Non-Renewing Subscription**, with reference name `12-Hour Pass` and the product ID above.
+Set the price to **$1.99 (USD)**, add English and Spanish display names and descriptions, and add a review screenshot
+of the pass screen. Submit it with the first app version.
 
 **Google Play:** add Android the same way (`npm i @capacitor/android && npx cap add android`).
 
@@ -125,7 +140,7 @@ in-app support later.
   historias bíblicas, Noah's ark, Christian games.
 - **Screenshots:** use the reward screen, Noah's ark game and the EN + ES caption. Run `npm test -- --shots shots/`
   to capture them all.
-- **Free with no ads** is the hook. Churches, Sunday schools, Christian preschools and homeschool co-ops share
+- **No ads, 20 free minutes** is the hook (the website stays free). Churches, Sunday schools, Christian preschools and homeschool co-ops share
   apps like this. A one-page flyer with a QR code to the web version is a cheap way to reach them.
 - **Retention:** add a new story every few weeks (see roadmap) so families come back.
 
@@ -159,6 +174,8 @@ js/games.js           mini-game engine (collect / prompt / steer / memory / seek
 js/art.js             SVG characters, animals, props, backgrounds
 js/audio.js           narration (Web Speech) + synthesized sound effects (Web Audio)
 js/i18n.js, store.js  UI words, settings & progress
+js/pass.js            App Store build: 20 free minutes, then the 12-hour pass
+ios/                  Capacitor iOS app (PassPlugin.swift sells the pass)
 sw.js, manifest.webmanifest, icons/   offline + install
 tests/play-through.mjs                end-to-end test
 tools/make-icons.mjs                  regenerates the app icons from the art

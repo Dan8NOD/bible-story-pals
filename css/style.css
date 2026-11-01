@@ -323,6 +323,33 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 .gate .hold { position: relative; overflow: hidden; }
 .gate .hold .fill { position: absolute; inset: 0; background: #66bb6a; transform-origin: left; transform: scaleX(0); }
 .gate .hold span { position: relative; }
+.gate .box:focus { outline: none; }
+.gate .answer { display: block; min-height: 52px; margin-bottom: 12px; border-radius: 14px; background: #fff; font-size: 36px; font-weight: 800; letter-spacing: 6px; line-height: 52px; }
+.keypad { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; justify-content: center; }
+.keypad button { height: 56px; border-radius: 16px; background: #fff; box-shadow: var(--shadow); font-size: 28px; font-weight: 800; }
+.keypad button:active { transform: translateY(3px); }
+.keypad [data-act] { background: #f1e6d6; }
+
+/* ---------- 12-hour pass (App Store build) ---------- */
+.pass-wall {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: calc(16px + var(--safe-t)) calc(16px + var(--safe-r)) calc(16px + var(--safe-b)) calc(16px + var(--safe-l));
+  text-align: center;
+  background: radial-gradient(circle at 50% 35%, #eef9ff, #b3e0f8 55%, var(--sky));
+  overflow-y: auto;
+}
+.pass-wall .pass-art { width: min(30vh, 200px); height: min(30vh, 200px); flex: none; animation: star-in 0.9s cubic-bezier(.2, 1.6, .4, 1) both; }
+.pass-wall h2 { margin: 0; font-size: clamp(28px, 5vw, 46px); line-height: 1.05; font-weight: 800; }
+.pass-wall h2 small { display: block; color: var(--es); font-size: 0.7em; }
+.pass-wall p { margin: 0; max-width: 680px; font-size: clamp(17px, 2.6vw, 22px); font-weight: 500; }
+.pass-wall .row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; align-items: center; }
+.pass-note:empty { display: none; }
+.big-btn:disabled { opacity: 0.6; }
 
 .rotate-hint { display: none; }
 
@@ -389,6 +416,12 @@ a.big-btn { text-decoration: none; color: var(--ink); }
   .chip { min-height: 44px; padding: 0 12px; font-size: 17px; }
   .star-count { min-height: 44px; font-size: 20px; padding: 4px 12px 4px 6px; }
   .star-count svg { width: 30px; height: 30px; }
+  .pass-wall { gap: 8px; }
+  .pass-wall .pass-art { width: 26vh; height: 26vh; }
+  /* Landscape phones: question on the left, keypad on the right. */
+  .gate .box.math { max-width: 600px; display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; padding: 16px 20px; }
+  .keypad { grid-template-columns: repeat(3, 64px); gap: 8px; }
+  .keypad button { height: 48px; }
 }
 
 /* Home-screen thumbnails stay still to save battery. */

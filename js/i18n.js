@@ -15,6 +15,7 @@ export const UI = {
   welcome: { en: 'Pick a story!', es: '¡Escoge una historia!' },
   tapMap: { en: 'Tap a place on the map', es: 'Toca un lugar en el mapa' },
   sound: { en: 'Sound', es: 'Sonido' },
+  askGrownup: { en: 'Time to ask a grown-up!', es: '¡Hora de llamar a un adulto!' },
 };
 
 export const COUNT = {
