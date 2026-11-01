@@ -85,7 +85,7 @@ const audioReqs = [];
 page.on('request', (r) => { if (r.url().includes('/audio/en/')) audioReqs.push(r.url()); });
 await page.goto(`http://localhost:${web.address().port}/#/`);
 await page.click('.chip[data-lang=en]');
-await page.click('.card[data-id=creation]');
+await page.click('.stop[data-id=creation]');
 await page.waitForTimeout(800);
 assert.ok(audioReqs.some((u) => u.endsWith(`/audio/en/${clipId(first.en)}.mp3`)), `expected clip request, got ${audioReqs}`);
 await browser.close();
