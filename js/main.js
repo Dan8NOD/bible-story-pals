@@ -55,9 +55,16 @@ function route() {
   if (parts[0] === 'story' && story) return storyScreen(story, Math.max(0, Math.min(story.pages.length - 1, +parts[2] || 0)));
   if (parts[0] === 'play' && story) return gameScreen(story);
   if (parts[0] === 'yay' && story) return rewardScreen(story);
-  if (parts[0] === 'parents') return parentsScreen();
+  if (parts[0] === 'parents') {
+    // Back, Forward or a reload can land here without the hold, so ask again.
+    if (gatePassed) { gatePassed = false; return parentsScreen(); }
+    homeScreen();
+    return parentGate();
+  }
   return homeScreen();
 }
+// Set by the hold gate for exactly one visit to the grown-ups screen.
+let gatePassed = false;
 const fromUrl = () => { if (location.hash !== current) { current = location.hash; route(); } };
 window.addEventListener('hashchange', fromUrl);
 window.addEventListener('popstate', fromUrl);
@@ -398,11 +405,12 @@ function parentGate() {
   const tick = (now) => {
     const k = Math.min(1, (now - t0) / 3000);
     fill.style.transform = `scaleX(${k})`;
-    if (k >= 1) { el.remove(); go('#/parents'); return; }
+    if (k >= 1) { el.remove(); gatePassed = true; go('#/parents'); return; }
     raf = requestAnimationFrame(tick);
   };
   const hold = el.querySelector('.hold');
-  hold.addEventListener('pointerdown', (e) => { e.preventDefault(); t0 = performance.now(); raf = requestAnimationFrame(tick); });
+  // A second finger restarts the hold instead of starting a loop that `stop` can't cancel.
+  hold.addEventListener('pointerdown', (e) => { e.preventDefault(); cancelAnimationFrame(raf); t0 = performance.now(); raf = requestAnimationFrame(tick); });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => hold.addEventListener(ev, stop));
   el.querySelector('[data-act=cancel]').addEventListener('click', () => el.remove());
   el.addEventListener('click', (e) => { if (e.target === el) el.remove(); });
@@ -498,7 +506,7 @@ function parentsScreen() {
     store.set(b.dataset.key, v);
     b.setAttribute('aria-checked', v);
   }));
-  app.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => { store.set('lang', c.dataset.lang); route(); }));
+  app.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => { store.set('lang', c.dataset.lang); gatePassed = true; route(); }));
   // Two taps instead of confirm(), which some app views block.
   const reset = app.querySelector('[data-act=reset]');
   reset.addEventListener('click', () => {

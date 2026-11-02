@@ -133,6 +133,7 @@ function promptGame(cfg, ctx) {
   ctx.counter(0, rounds.length);
 
   const ask = () => {
+    if (r >= rounds.length) return; // the listen button during the final praise
     svg.dataset.want = rounds[r].key;
     ctx.caption(rounds[r].say);
     speak(rounds[r].say);
@@ -337,9 +338,13 @@ function memoryGame(cfg, ctx) {
       el.classList.add('gone');
       sfx.tap();
       open.push(el);
-      if (open.length === 2) locked = true;
+      // Only the second card's handler judges the pair. If the first card's handler
+      // also did (when two cards are tapped within one flip), it would clear `open`
+      // a second time later and strand a third card face-up.
+      const second = open.length === 2;
+      if (second) locked = true;
       await flip(el, front(card));
-      if (open.length < 2) { setWant(); return; }
+      if (!second) { setWant(); return; }
       const [a, b] = open;
       if (a.dataset.key === b.dataset.key) {
         open = [];
