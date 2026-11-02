@@ -517,6 +517,7 @@ function parentsScreen() {
 unlockAudio();
 route();
 
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+// The store apps ship every file inside the app, so only the website needs the service worker.
+if ('serviceWorker' in navigator && !isNativeApp() && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
