@@ -16,6 +16,7 @@ jobs:
       - run: npm install
       - run: npx playwright install --with-deps chromium
       - run: node tests/play-through.mjs --shots shots
+      - run: node tests/regressions.mjs
       - run: node tests/voices.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()

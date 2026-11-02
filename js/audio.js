@@ -118,6 +118,8 @@ function silence() {
 export async function speak(entries, { force = false } = {}) {
   const token = ++speakToken;
   silence();
+  // Whatever was speaking has been cut off; every early return below leaves this off.
+  emit(false);
   const list = [].concat(entries || []);
   if (!list.length) return;
   if (!store.get('narration') && !force) {
