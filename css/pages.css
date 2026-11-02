@@ -1,0 +1,32 @@
+/* Plain reading pages (privacy, support). The game itself uses style.css. */
+@font-face {
+  font-family: 'Baloo 2';
+  src: url('../fonts/baloo2-latin.woff2') format('woff2');
+  font-weight: 400 800;
+  font-display: swap;
+}
+
+:root {
+  --ink: #4a3326;
+  --cream: #fff8ec;
+  --sky: #7cc6f2;
+  --es: #c2185b;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font: 18px/1.55 'Baloo 2', system-ui, sans-serif;
+}
+
+main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 0.4em 0 0.1em; }
+h2 { font-size: 1.25rem; margin: 1.4em 0 0.3em; }
+.meta { margin-top: 0; opacity: 0.75; }
+a { color: #1f6fa8; }
+#es h1, #es h2 { color: var(--es); }
+dt { font-weight: 700; margin-top: 0.9em; }
+dd { margin: 0.2em 0 0; }
+hr { border: 0; border-top: 2px dashed var(--sky); margin: 40px 0; }
+.lang, .back { font-weight: 600; }
