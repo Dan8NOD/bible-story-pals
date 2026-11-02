@@ -100,7 +100,7 @@ for (const l of LANGS) await mkdir(join(OUT, l), { recursive: true });
 let spent = 0;
 for (const [i, j] of plan.entries()) {
   const id = clipId(j.text);
-  const body = { text: j.text, model_id: MODEL, voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.35 } };
+  const body = { text: j.text, model_id: MODEL, voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0.2 } };
   if (/flash|turbo/.test(MODEL)) body.language_code = j.lang;
   const r = await api(`/v1/text-to-speech/${VOICES[j.lang]}?output_format=mp3_44100_64`, {
     method: 'POST',
