@@ -13,6 +13,7 @@ export const UI = {
   nextStory: { en: 'Next story', es: 'Siguiente historia' },
   parents: { en: 'For grown-ups', es: 'Para adultos' },
   welcome: { en: 'Pick a story!', es: '¡Escoge una historia!' },
+  tapMap: { en: 'Tap a place on the map', es: 'Toca un lugar en el mapa' },
   sound: { en: 'Sound', es: 'Sonido' },
 };
 

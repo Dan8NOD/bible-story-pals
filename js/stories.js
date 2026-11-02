@@ -327,6 +327,7 @@ const ALL = [
     id: 'nativity',
     color: '#9fa8da',
     title: { en: 'Baby Jesus Is Born', es: 'Nace el Niño Jesús' },
+    special: { en: 'Christmas Special!', es: '¡Especial de Navidad!' },
     lesson: { en: "Jesus is God's gift of love to us.", es: 'Jesús es el regalo de amor de Dios para nosotros.' },
     cover: 2,
     pages: [
