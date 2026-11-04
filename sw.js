@@ -1,5 +1,5 @@
 // Offline support: cache the whole (tiny) app on install, serve cache-first.
-const VERSION = 'bsp-v5';
+const VERSION = 'bsp-v9';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css', 'fonts/baloo2-latin.woff2',
   'js/main.js', 'js/art.js', 'js/audio.js', 'js/games.js', 'js/i18n.js', 'js/store.js', 'js/stories.js', 'js/config.js', 'js/phrases.js',
@@ -22,7 +22,9 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   // The clip list changes when new voices are recorded: try the network first.
   if (new URL(e.request.url).pathname.endsWith('/audio/manifest.json')) {
+    // Keep the last good list if the network answers with an error page.
     e.respondWith(fetch(e.request).then((res) => {
+      if (!res.ok) return caches.match(e.request).then((hit) => hit || res);
       const copy = res.clone();
       caches.open(VERSION).then((c) => c.put(e.request, copy));
       return res;

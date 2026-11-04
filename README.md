@@ -10,15 +10,16 @@ that practices early-learning skills. No one can lose; wrong taps just wiggle.
 | 2 | Noah's Big Boat · El Gran Barco de Noé | Tap the animals into the ark, two by two | Counting to 8 |
 | 3 | Baby Moses · El Bebé Moisés | Steer the basket down the river, catch flowers | Fine motor, counting |
 | 4 | David the Brave · David el Valiente | Pick five smooth stones | Counting to 5 |
-| 5 | Jonah and the Big Fish · Jonás y el Gran Pez | "Pop the red bubble!" | Colors |
-| 6 | Daniel and the Lions · Daniel y los Leones | Tap each lion to put it to sleep | Counting |
-| 7 | Baby Jesus Is Born · Nace el Niño Jesús | Tap stars 1-2-3-4-5 to light the way | Number recognition |
-| 8 | Jesus Is Baptized · El Bautismo de Jesús | Memory match: God the Father, Jesus, the Holy Spirit | Memory, the Trinity |
-| 9 | Jesus Calms the Storm · Jesús Calma la Tormenta | Tap the storm clouds to calm the sea | Counting |
-| 10 | Jesus Feeds Everyone · Jesús Alimenta a Todos | Put 5 loaves and 2 fish in the basket | Counting to 7 |
-| 11 | The Good Samaritan · El Buen Samaritano | Give the hurt man a bandage, water, bread and blanket | Kindness, new words |
-| 12 | The Lost Sheep · La Oveja Perdida | Hide-and-seek behind the bushes | Searching, persistence |
-| 13 | Zacchaeus Climbs a Tree · Zaqueo Sube a un Árbol | Find Zacchaeus hiding in the leaves | Searching |
+| 5 | God Is My Shepherd · Dios Es Mi Pastor (Psalm 23) | Tap the path home: grass, water, cup, the shepherd's hand | Order, counting to 4 |
+| 6 | Jonah and the Big Fish · Jonás y el Gran Pez | "Pop the red bubble!" | Colors |
+| 7 | Daniel and the Lions · Daniel y los Leones | Tap each lion to put it to sleep | Counting |
+| 8 | Baby Jesus Is Born · Nace el Niño Jesús | Tap stars 1-2-3-4-5 to light the way | Number recognition |
+| 9 | Jesus Is Baptized · El Bautismo de Jesús | Memory match: God the Father, Jesus, the Holy Spirit | Memory, the Trinity |
+| 10 | Jesus Calms the Storm · Jesús Calma la Tormenta | Tap the storm clouds to calm the sea | Counting |
+| 11 | Jesus Feeds Everyone · Jesús Alimenta a Todos | Put 5 loaves and 2 fish in the basket | Counting to 7 |
+| 12 | The Good Samaritan · El Buen Samaritano | Give the hurt man a bandage, water, bread and blanket | Kindness, new words |
+| 13 | The Lost Sheep · La Oveja Perdida | Hide-and-seek behind the bushes | Searching, persistence |
+| 14 | Zacchaeus Climbs a Tree · Zaqueo Sube a un Árbol | Find Zacchaeus hiding in the leaves | Searching |
 
 **The Trinity** appears together in the baptism story, as Matthew 3:16–17 describes it: Jesus, the Holy Spirit as
 a dove, and the Father as a voice from heaven. The Father is drawn as light pouring down, never as a person.
@@ -64,19 +65,23 @@ Turn it on once under **Settings → Pages → Source: GitHub Actions**. (Pages 
 on a free plan, make the repo public or upload the folder to Netlify, Cloudflare Pages or Vercel.)
 It must be served over HTTPS for offline/install to work.
 
-**App Store and Google Play (where the downloads are):** wrap the same files with [Capacitor](https://capacitorjs.com):
+**iOS (App Store / TestFlight):** the Capacitor project lives in `ios/` (bundle ID `com.dancruz.biblestorypals`,
+iPad and iPhone, landscape only, version in Xcode's General tab). After changing the game:
 
 ```bash
-npm i @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios
-npx cap init "Bible Story Pals" com.yourname.biblestorypals --web-dir .
-npx cap add android && npx cap add ios
-npx cap sync && npx cap open android   # or: npx cap open ios
+npm install
+npm run ios        # copies the game into www/ and syncs it into ios/
+npm run ios:open   # opens Xcode: pick your team under Signing, Any iOS Device, Product → Archive
 ```
 
+Inside the app, lines without a recorded clip are read by `@capacitor-community/text-to-speech` (the native iOS
+voice) instead of the WebView's speech API, the Donate button stays hidden, and the service worker is off.
+`ios/App/App/PrivacyInfo.xcprivacy` declares no tracking and no data collected. `npm run icons` also redraws the
+1024×1024 app icon and the launch image from the game art.
+
+**Google Play:** add Android the same way (`npm i @capacitor/android && npx cap add android`).
+
 Before submitting:
-- Lock orientation to landscape in the native projects if you prefer (the web version supports both).
-- For best narration inside native apps, consider adding `@capacitor-community/text-to-speech`.
-  It uses the same OS voices and is more reliable than the WebView's speech API on some Android devices.
 - Google Play: target the **Designed for Families** program, ages 5 & under / 6–8, with content rating "Everyone".
 - Apple: Kids Category, ages 5 & under. Privacy "nutrition label": **Data Not Collected**.
 
@@ -98,10 +103,10 @@ Then bump `VERSION` in `sw.js` and commit `audio/`. Running it again continues w
 a line twice. Lines are recorded in priority order: the whole Creation story first, then shared lines (praise and
 counting), then the other stories.
 
-| Model | Credits/character | First story (EN + ES) | All 13 stories |
+| Model | Credits/character | First story (EN + ES) | All 14 stories |
 |---|---|---|---|
-| `eleven_flash_v2_5` (default) | 0.5 | ~500 | ~4,900 |
-| `eleven_multilingual_v2` (`--model`) | 1 | ~1,000 | ~9,600 |
+| `eleven_flash_v2_5` (default) | 0.5 | ~500 | ~5,200 |
+| `eleven_multilingual_v2` (`--model`) | 1 | ~1,000 | ~10,400 |
 
 `npm run test:voices` checks the script against a fake ElevenLabs server, so it costs no credits.
 
@@ -151,7 +156,7 @@ Add the new file names to `sw.js` if you add files, and bump `VERSION` there whe
 index.html            app shell
 css/style.css         all styles + animations
 js/main.js            screens: home, story, game, reward, grown-ups
-js/stories.js         the 13 stories (bilingual text, scenes, game configs)
+js/stories.js         the 14 stories (bilingual text, scenes, game configs)
 js/games.js           mini-game engine (collect / prompt / steer / memory / seek)
 js/art.js             SVG characters, animals, props, backgrounds
 js/audio.js           narration (Web Speech) + synthesized sound effects (Web Audio)
