@@ -33,12 +33,12 @@ Answer **None** to every content item (violence, scary themes, etc.). The storie
 
 - **Name** (28): `Bible Story Pals: Kids Bible`
 - **Subtitle** (28): `Bilingual Bible stories, 3–6`
-- **Promotional text** (148): `Twelve Bible stories read aloud in English and Spanish, each ending in a gentle mini-game. No ads, no accounts, works offline. Made for ages 3 to 6.`
+- **Promotional text** (150): `Fourteen Bible stories read aloud in English and Spanish, each ending in a gentle mini-game. No ads, no accounts, works offline. Made for ages 3 to 6.`
 - **Keywords** (95): `kids bible,bible stories,preschool,toddler,bilingual,spanish,christian,noah,sunday school,faith`
 
 **Description:**
 
-> Bible Story Pals brings twelve favorite Bible stories to life for little ones, read aloud in English, Spanish, or both.
+> Bible Story Pals brings fourteen favorite Bible stories to life for little ones, read aloud in English, Spanish, or both.
 >
 > Every page is narrated, so children don't need to read. Each story ends with a gentle mini-game that practices early-learning skills. Nobody can lose: a wrong tap just wiggles.
 >
@@ -52,7 +52,7 @@ Answer **None** to every content item (violence, scary themes, etc.). The storie
 > • Daniel and the Lions: put the lions to sleep
 > • Baby Jesus Is Born: light the stars 1 to 5
 > • Jesus Is Baptized: a memory match about the Father, the Son and the Holy Spirit
-> • Jesus Calms the Storm, Jesus Feeds Everyone, and The Lost Sheep
+> • Jesus Calms the Storm, Jesus Feeds Everyone, The Good Samaritan, The Lost Sheep, and Zacchaeus Climbs a Tree
 >
 > MADE FOR FAMILIES
 > • English, Español, or EN + ES, which reads every page in both languages. Great for bilingual homes and dual-language classrooms.
@@ -68,12 +68,12 @@ Answer **None** to every content item (violence, scary themes, etc.). The storie
 
 - **Name** (22): `Amiguitos de la Biblia`
 - **Subtitle** (27): `Biblia para niños, bilingüe`
-- **Promotional text** (163): `Doce historias de la Biblia leídas en voz alta en español e inglés, con un minijuego al final de cada una. Sin anuncios, sin cuentas y sin internet. De 3 a 6 años.`
+- **Promotional text** (166): `Catorce historias de la Biblia leídas en voz alta en español e inglés, con un minijuego al final de cada una. Sin anuncios, sin cuentas y sin internet. De 3 a 6 años.`
 - **Keywords** (98): `biblia para niños,historias bíblicas,preescolar,cristiano,bilingüe,inglés,noé,escuela dominical,fe`
 
 **Descripción:**
 
-> Amiguitos de la Biblia da vida a doce historias bíblicas favoritas para los más pequeños, leídas en voz alta en español, en inglés o en los dos idiomas.
+> Amiguitos de la Biblia da vida a catorce historias bíblicas favoritas para los más pequeños, leídas en voz alta en español, en inglés o en los dos idiomas.
 >
 > Cada página se narra, así que los niños no necesitan saber leer. Cada historia termina con un minijuego tranquilo que practica habilidades tempranas. Nadie pierde: si tocan mal, solo se mueve un poquito.
 >
@@ -87,7 +87,7 @@ Answer **None** to every content item (violence, scary themes, etc.). The storie
 > • Daniel y los Leones: haz dormir a los leones
 > • Nace el Niño Jesús: enciende las estrellas del 1 al 5
 > • El Bautismo de Jesús: un juego de memoria sobre el Padre, el Hijo y el Espíritu Santo
-> • Jesús Calma la Tormenta, Jesús Alimenta a Todos y La Oveja Perdida
+> • Jesús Calma la Tormenta, Jesús Alimenta a Todos, El Buen Samaritano, La Oveja Perdida y Zaqueo Sube a un Árbol
 >
 > HECHO PARA LAS FAMILIAS
 > • Español, English o EN + ES, que lee cada página en los dos idiomas. Ideal para hogares bilingües y salones de doble idioma.
