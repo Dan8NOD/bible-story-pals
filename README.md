@@ -17,9 +17,12 @@ that practices early-learning skills. No one can lose; wrong taps just wiggle.
 | 9 | Jesus Is Baptized · El Bautismo de Jesús | Memory match: God the Father, Jesus, the Holy Spirit | Memory, the Trinity |
 | 10 | Jesus Calms the Storm · Jesús Calma la Tormenta | Tap the storm clouds to calm the sea | Counting |
 | 11 | Jesus Feeds Everyone · Jesús Alimenta a Todos | Put 5 loaves and 2 fish in the basket | Counting to 7 |
-| 12 | The Good Samaritan · El Buen Samaritano | Give the hurt man a bandage, water, bread and blanket | Kindness, new words |
-| 13 | The Lost Sheep · La Oveja Perdida | Hide-and-seek behind the bushes | Searching, persistence |
-| 14 | Zacchaeus Climbs a Tree · Zaqueo Sube a un Árbol | Find Zacchaeus hiding in the leaves | Searching |
+| 12 | The Lost Sheep · La Oveja Perdida | Hide-and-seek behind the bushes | Searching, persistence |
+| 13 | The Big Catch · La Gran Pesca | Tap the fish to fill Peter's boat | Counting to 7 |
+| 14 | The Good Samaritan · El Buen Samaritano | Bring the hurt man a bandage, water, bread and a blanket | Vocabulary, kindness |
+| 15 | Zacchaeus Climbs a Tree · Zaqueo Sube a un Árbol | Find Zacchaeus in the leaves | Searching |
+
+Stories 1–12 are on **Story Island**. Stories 13–15 are the three ports of **Friendship Sea**. Each world has its own map and a tab above it.
 
 **The Trinity** appears together in the baptism story, as Matthew 3:16–17 describes it: Jesus, the Holy Spirit as
 a dove, and the Father as a voice from heaven. The Father is drawn as light pouring down, never as a person.
@@ -31,7 +34,7 @@ Finishing a story earns a gold star on the home screen.
 - **Three language modes:** English, Español, or **EN + ES**, which reads every page in both languages. That's great for bilingual homes and dual-language classrooms. On first launch it picks the device language.
 - **Read-aloud narration** uses the device's built-in text-to-speech (`es-MX`/`es-US` preferred for Spanish), so there are no audio files and the whole app is **under 250 KB**.
 - **Works offline** after the first visit (service worker). Installable as an app (PWA manifest + icons).
-- **No ads, no purchases, no accounts, no tracking, no network calls.** Progress is stored only on the device. This makes COPPA / Google Play "Designed for Families" / Apple Kids Category review straightforward.
+- **No ads, no accounts, no tracking, no network calls.** Progress is stored only on the device. This makes COPPA / Google Play "Designed for Families" / Apple Kids Category review straightforward. The website is free. In the App Store build the first **3 stories are free**, then a grown-up can buy any story for **$1** or everything left in a world for **$2** (see below).
 - **Grown-ups area** sits behind a 3-second press-and-hold gate. It has narration and sound toggles, the language setting, Bible references for each story, parent tips, and a star reset.
 - Big touch targets, swipe between pages, honors "reduce motion", and works on phones (portrait and landscape), tablets, Chromebooks and desktops.
 - All art is hand-built SVG in `js/art.js`, with no emoji or stock images, so there are no licensing questions. The font (Baloo 2) is OFL-licensed and bundled.
@@ -78,6 +81,19 @@ Inside the app, lines without a recorded clip are read by `@capacitor-community/
 voice) instead of the WebView's speech API, the Donate button stays hidden, and the service worker is off.
 `ios/App/App/PrivacyInfo.xcprivacy` declares no tracking and no data collected. `npm run icons` also redraws the
 1024×1024 app icon and the launch image from the game art.
+
+**Unlocking stories (App Store build only).** God Made the World, Noah and Baby Moses are free. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering that story or everything left in its world. The grown-ups area sells the worlds too, and both screens can restore purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift` talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a reinstall, follow the family's Apple ID, and lock again after a refund. Ask to Buy approvals open the story as soon as they arrive. To try a purchase in the simulator without App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
+
+In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App Purchases → +** and create these 14 **Non-Consumable** products, each with English and Spanish display names and a review screenshot of the unlock screen. Submit them with the app version.
+
+| Product ID (`com.dancruz.biblestorypals.` + …) | Unlocks | Price |
+|---|---|---|
+| `world.island` | Everything on Story Island (9 paid stories) | $2.00 |
+| `world.sea` | Everything on Friendship Sea (3 stories) | $2.00 |
+| `story.david`, `story.psalm23`, `story.jonah`, `story.daniel`, `story.nativity`, `story.baptism`, `story.storm`, `story.loaves`, `story.sheep` | One Story Island story | $1.00 |
+| `story.bigcatch`, `story.samaritan`, `story.zacchaeus` | One Friendship Sea story | $1.00 |
+
+The game shows whatever price the App Store reports, so the buttons always match the tier you pick.
 
 **Google Play:** add Android the same way (`npm i @capacitor/android && npx cap add android`).
 
@@ -127,7 +143,7 @@ in-app support later.
   historias bíblicas, Noah's ark, Christian games.
 - **Screenshots:** use the reward screen, Noah's ark game and the EN + ES caption. Run `npm test -- --shots shots/`
   to capture them all.
-- **Free with no ads** is the hook. Churches, Sunday schools, Christian preschools and homeschool co-ops share
+- **No ads, 3 free stories** is the hook (the website stays free). Churches, Sunday schools, Christian preschools and homeschool co-ops share
   apps like this. A one-page flyer with a QR code to the web version is a cheap way to reach them.
 - **Retention:** add a new story every few weeks (see roadmap) so families come back.
 
@@ -156,11 +172,13 @@ Add the new file names to `sw.js` if you add files, and bump `VERSION` there whe
 index.html            app shell
 css/style.css         all styles + animations
 js/main.js            screens: home, story, game, reward, grown-ups
-js/stories.js         the 14 stories (bilingual text, scenes, game configs)
+js/stories.js         the 15 stories and the two worlds (bilingual text, scenes, game configs)
 js/games.js           mini-game engine (collect / prompt / steer / memory / seek)
 js/art.js             SVG characters, animals, props, backgrounds
 js/audio.js           narration (Web Speech) + synthesized sound effects (Web Audio)
 js/i18n.js, store.js  UI words, settings & progress
+js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world
+ios/                  Capacitor iOS app (UnlocksPlugin.swift sells stories and worlds)
 sw.js, manifest.webmanifest, icons/   offline + install
 tests/play-through.mjs                end-to-end test
 tools/make-icons.mjs                  regenerates the app icons from the art
