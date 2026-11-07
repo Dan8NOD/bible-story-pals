@@ -694,6 +694,69 @@ const PARENT_TEXT = {
   },
 };
 
+// The full policy, shown in the app so no one has to follow a link out of it. Keep in step with privacy.html.
+const POLICY = {
+  en: {
+    title: 'Privacy policy',
+    effective: 'Effective November 6, 2026',
+    intro: "Bible Story Pals collects no data. We don't ask for, collect, store or share personal information from children or adults.",
+    sections: [
+      ['What the app does', [
+        'No accounts, sign-in, ads, analytics or tracking. The app contains no advertising or analytics software.',
+        "Stories are read aloud by recorded clips that come with the app, or by your device's own built-in voice. The words are spoken on the device and never sent anywhere.",
+        'The stars your child earns, your settings (language, sound) and a note of which stories are unlocked are saved only on your device. Deleting the app deletes them. You can also clear the stars in the grown-ups area.',
+        'Stories play offline. Nothing your child does in the game is sent anywhere.',
+      ]],
+      ['In-app purchases', [
+        "The first three stories are free. A grown-up can buy other stories through Apple's App Store, after answering a question meant for grown-ups.",
+        "Apple handles every purchase, under Apple's privacy policy (apple.com/legal/privacy). We never see your name, Apple Account or payment details. Apple gives us sales totals that don't identify you.",
+        'To show prices and check what your family owns, the app asks the App Store. These requests go only to Apple, and the app adds no information about your child to them.',
+        'What you buy stays with your Apple Account, so you can restore it after deleting the app. For a refund, ask Apple at reportaproblem.apple.com.',
+      ]],
+      ['Children', [
+        'Bible Story Pals is made for children ages 3 to 6. Because we collect nothing, we hold no personal information to review or delete, and there is no consent to withdraw. The grown-ups area is behind a press-and-hold gate, and purchases are behind a question for grown-ups.',
+      ]],
+      ['Changes and contact', [
+        'If a future version changes any of this, we will update this policy first. It is also online, with a note about our website, at dan8nod.github.io/bible-story-pals/privacy.html. Questions: negotiatorsondemand@gmail.com.',
+      ]],
+    ],
+  },
+  es: {
+    title: 'Política de privacidad',
+    effective: 'Vigente desde el 6 de noviembre de 2026',
+    intro: 'Amiguitos de la Biblia no recopila ningún dato. No pedimos, recopilamos, guardamos ni compartimos información personal de niños ni de adultos.',
+    sections: [
+      ['Lo que hace la app', [
+        'Sin cuentas, inicio de sesión, anuncios, analítica ni rastreo. La app no incluye software de publicidad ni de analítica.',
+        'Las historias se leen en voz alta con grabaciones incluidas en la app o con la voz integrada de su dispositivo. Las palabras se pronuncian en el dispositivo y nunca se envían a ningún lugar.',
+        'Las estrellas que gana su hijo, sus ajustes (idioma, sonido) y una nota de las historias desbloqueadas se guardan solo en su dispositivo. Al borrar la app se borran. También puede borrar las estrellas en el área para adultos.',
+        'Las historias funcionan sin internet. Nada de lo que hace su hijo en el juego se envía a ningún lugar.',
+      ]],
+      ['Compras dentro de la app', [
+        'Las primeras tres historias son gratis. Un adulto puede comprar otras historias en el App Store de Apple, después de responder una pregunta para adultos.',
+        'Apple se encarga de cada compra, según su política de privacidad (apple.com/legal/privacy). Nunca vemos su nombre, su Cuenta de Apple ni sus datos de pago. Apple nos da totales de ventas que no lo identifican.',
+        'Para mostrar los precios y revisar lo que su familia ya tiene, la app le pregunta al App Store. Estas solicitudes van solo a Apple, y la app no les agrega información sobre su hijo.',
+        'Lo que compra queda en su Cuenta de Apple, así que puede restaurarlo después de borrar la app. Para pedir un reembolso, escriba a Apple en reportaproblem.apple.com.',
+      ]],
+      ['Niños', [
+        'Amiguitos de la Biblia está hecho para niños de 3 a 6 años. Como no recopilamos nada, no guardamos información personal que revisar ni borrar, y no hay consentimiento que retirar. El área para adultos está protegida: hay que mantener presionado para entrar. Las compras están protegidas con una pregunta para adultos.',
+      ]],
+      ['Cambios y contacto', [
+        'Si una versión futura cambia algo de esto, primero actualizaremos esta política. También está en internet, con una nota sobre nuestro sitio web, en dan8nod.github.io/bible-story-pals/privacy.html. Preguntas: negotiatorsondemand@gmail.com.',
+      ]],
+    ],
+  },
+};
+
+const policyHtml = () => langs().map((l) => {
+  const p = POLICY[l];
+  return `<details class="policy" lang="${l}"><summary>${esc(p.title)}</summary>
+    <p class="policy-date">${esc(p.effective)}</p>
+    <p><strong>${esc(p.intro)}</strong></p>
+    ${p.sections.map(([h, items]) => `<h4>${esc(h)}</h4>${items.length > 1 ? `<ul>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(items[0])}</p>`}`).join('')}
+  </details>`;
+}).join('');
+
 // Store apps (Capacitor) must not link out to donations; only the website shows it.
 const isNativeApp = () => !!window.Capacitor?.isNativePlatform?.();
 
@@ -708,6 +771,7 @@ function parentsScreen() {
     <h2>${esc(P.title)}</h2>
     <p>${esc(P.about)}</p>
     <p><strong>${esc(paywalled ? P.privacyApp : P.privacy)}</strong></p>
+    ${paywalled ? policyHtml() : ''}
     ${paywalled ? `<h3>${esc(T.title)}</h3><div class="world-offers"></div>
       <p class="unlock-note" aria-live="polite"></p>
       <p><button class="link-btn" data-act="restore">${esc(T.restore)}</button></p>` : ''}

@@ -336,6 +336,10 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 .parents h2 { font-size: 32px; margin: 8px 0; }
 .parents h3 { margin: 22px 0 6px; font-size: 22px; }
 .parents p, .parents li { font-size: 18px; line-height: 1.45; font-weight: 500; }
+.parents .policy { margin: 10px 0; }
+.parents .policy summary { min-height: 44px; display: flex; align-items: center; font-size: 18px; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.parents .policy h4 { margin: 16px 0 4px; font-size: 19px; }
+.parents .policy-date { margin-top: 0; font-size: 16px; }
 .setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; border-radius: 16px; padding: 10px 16px; margin: 8px 0; box-shadow: var(--shadow); font-size: 20px; }
 .toggle { width: 74px; height: 42px; border-radius: 30px; background: #ccc; position: relative; flex: none; }
 .toggle::after { content: ''; position: absolute; top: 5px; left: 5px; width: 32px; height: 32px; border-radius: 50%; background: #fff; transition: left 0.2s; }

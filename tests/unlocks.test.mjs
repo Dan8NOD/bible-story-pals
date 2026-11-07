@@ -164,6 +164,10 @@ await page.waitForSelector('.world-offers [data-world=sea]');
 const offers = await page.textContent('.world-offers');
 assert.match(offers, /Story Island: 4 of 12 stories open/);
 assert.match(offers, /Friendship Sea: 0 of 3 stories open/);
+// The full privacy policy is readable in the app, without any link out of it.
+await page.locator('.policy summary').click();
+assert.match(await page.textContent('.policy'), /collects no data[\s\S]*Apple handles every purchase[\s\S]*negotiatorsondemand@gmail\.com/);
+assert.equal(await page.locator('.policy a').count(), 0);
 await page.click('.world-offers [data-world=sea]');
 await solveGate(page);
 await page.waitForFunction(() => /Friendship Sea: 3 of 3/.test(document.querySelector('.world-offers').textContent));
