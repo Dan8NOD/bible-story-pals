@@ -5,8 +5,8 @@ const KEY = 'bsp:v1';
 
 function defaults() {
   const nav = (typeof navigator !== 'undefined' && navigator.language) || 'en';
-  // played: seconds of the App Store build's free play time already used (see pass.js).
-  return { lang: nav.toLowerCase().startsWith('es') ? 'es' : 'en', narration: true, sfx: true, stars: {}, played: 0 };
+  // world: the map on screen. owned: App Store products bought, as last reported (see unlocks.js).
+  return { lang: nav.toLowerCase().startsWith('es') ? 'es' : 'en', narration: true, sfx: true, stars: {}, world: 'island', owned: [] };
 }
 
 let state = defaults();

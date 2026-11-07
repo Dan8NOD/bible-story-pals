@@ -13,6 +13,7 @@ const MOM = { scarf: '#ab47bc', robe: '#ce93d8' };
 const PRINCESS = { crown: true, robe: '#f8bbd0', hair: '#212121', sash: '#ffd54f' };
 const KID = (robe, hair = '#3e2723') => ({ robe, hair });
 
+const PETER = { robe: '#64b5f6', sash: '#ffcc80', hair: '#4e342e', beard: '#4e342e' };
 const JOHN = { robe: '#a1887f', sash: '#6d4c41', hair: '#3e2723', beard: '#3e2723' };
 const SHEPHERD = { robe: '#4db6ac', sash: '#ffcc80', hair: '#6d4c41', beard: '#6d4c41', staff: true };
 const FRIEND = { robe: '#ffb74d', hair: '#4e342e', beard: '#4e342e' };
@@ -615,10 +616,70 @@ const ALL = [
       spots: [[400, 265], [510, 240], [620, 270], [395, 375], [505, 355], [615, 380]],
     },
   },
+  {
+    id: 'bigcatch',
+    color: '#81d4fa',
+    title: { en: 'The Big Catch', es: 'La Gran Pesca' },
+    lesson: { en: 'Jesus calls us to follow Him!', es: '¡Jesús nos llama a seguirlo!' },
+    cover: 3,
+    pages: [
+      {
+        text: { en: 'Peter fished all night long, but he did not catch one fish.', es: 'Pedro pescó toda la noche, pero no atrapó ni un pez.' },
+        scene: { bg: 'sea', items: [['moon', 830, 110, 0.7, {}, ''], ['person', 500, 316, 0.8, PETER, ''], ['boat', 500, 360, 1.6, {}, 'rock']] },
+      },
+      {
+        text: { en: "In the morning, Jesus got into Peter's boat and told the people about God.", es: 'En la mañana, Jesús subió a la barca de Pedro y le habló a la gente de Dios.' },
+        scene: { bg: 'sea', items: [['sun', 150, 110, 0.9, {}, ''], ['person', 398, 312, 0.8, { ...JESUS, arms: 'up' }, ''], ['person', 598, 316, 0.75, PETER, ''], ['boat', 500, 360, 1.6, {}, 'rock'], ['bird', 780, 150, 0.5, {}, 'drift']] },
+      },
+      {
+        text: { en: "Jesus said, 'Go out deep and let down your nets.' So Peter did.", es: "Jesús dijo: 'Ve a lo hondo y echa tus redes.' Y Pedro lo hizo." },
+        scene: { bg: 'sea', items: [['sun', 820, 110, 0.9, {}, ''], ['person', 398, 312, 0.8, JESUS, ''], ['person', 598, 316, 0.75, { ...PETER, arms: 'up' }, 'hop'], ['boat', 500, 360, 1.6, {}, 'rock'], ['fish', 180, 500, 0.6, {}, 'drift']] },
+      },
+      {
+        text: { en: 'So many fish! The nets were so full that his friends came to help.', es: '¡Cuántos peces! Las redes estaban tan llenas que sus amigos vinieron a ayudar.' },
+        scene: { bg: 'sea', items: [['sun', 820, 110, 0.9, {}, ''], ['person', 400, 312, 0.8, { ...PETER, mood: 'open', arms: 'up' }, 'hop'], ['person', 600, 316, 0.75, { ...FRIEND, arms: 'up' }, 'hop'], ['boat', 500, 360, 1.6, {}, 'rock'], ['fish', 180, 490, 0.7, {}, 'bob'], ['fish', 320, 530, 0.7, {}, 'bob'], ['fish', 500, 510, 0.7, {}, 'bob'], ['fish', 680, 530, 0.7, {}, 'bob'], ['fish', 830, 490, 0.7, {}, 'bob']] },
+      },
+      {
+        text: { en: "Jesus said, 'Follow me!' And Peter left his boat and went with Jesus.", es: "Jesús dijo: '¡Sígueme!' Y Pedro dejó su barca y se fue con Jesús." },
+        scene: { bg: 'day', items: [['sun', 150, 110, 0.9, {}, ''], ['person', 420, 390, 1.5, { ...JESUS, arms: 'up' }, ''], ['person', 620, 400, 1.4, PETER, 'hop'], ['heart', 520, 200, 0.6, {}, 'pulse']] },
+      },
+    ],
+    game: {
+      type: 'collect',
+      mode: 'fly',
+      bg: 'sea',
+      prompt: { en: "Help Peter! Tap the fish to fill his boat.", es: '¡Ayuda a Pedro! Toca los peces para llenar su barca.' },
+      decor: [['person', 398, 312, 0.8, { ...PETER, arms: 'up' }, 'hop']],
+      target: ['boat', 500, 360, 1.6],
+      targetPoint: [540, 350],
+      items: [
+        { art: 'fish', x: 90, y: 480, s: 1, anim: 'bob' },
+        { art: 'fish', x: 230, y: 550, s: 1, anim: 'bob' },
+        { art: 'fish', x: 370, y: 480, s: 1, anim: 'bob' },
+        { art: 'fish', x: 510, y: 550, s: 1, anim: 'bob' },
+        { art: 'fish', x: 650, y: 480, s: 1, anim: 'bob' },
+        { art: 'fish', x: 790, y: 550, s: 1, anim: 'bob' },
+        { art: 'fish', x: 920, y: 480, s: 1, anim: 'bob' },
+      ],
+    },
+  },
 ];
 
-// Bible order on the home screen.
-const ORDER = ['creation', 'noah', 'moses', 'david', 'jonah', 'daniel', 'nativity', 'baptism', 'storm', 'loaves', 'samaritan', 'sheep', 'zacchaeus'];
-export const STORIES = ORDER.map((id) => ALL.find((s) => s.id === id));
+// The map's worlds. Each one's stories are in Bible order.
+export const WORLDS = [
+  {
+    id: 'island',
+    title: { en: 'Story Island', es: 'Isla de las Historias' },
+    stories: ['creation', 'noah', 'moses', 'david', 'psalm23', 'jonah', 'daniel', 'nativity', 'baptism', 'storm', 'loaves', 'sheep'],
+  },
+  {
+    id: 'sea',
+    title: { en: 'Friendship Sea', es: 'Mar de la Amistad' },
+    stories: ['bigcatch', 'samaritan', 'zacchaeus'],
+  },
+];
+export const STORIES = WORLDS.flatMap((w) => w.stories).map((id) => ALL.find((s) => s.id === id));
 
 export const byId = (id) => STORIES.find((s) => s.id === id);
+export const worldById = (id) => WORLDS.find((w) => w.id === id);
+export const worldOf = (storyId) => WORLDS.find((w) => w.stories.includes(storyId));

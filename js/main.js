@@ -1,11 +1,11 @@
-import { STORIES, byId } from './stories.js';
+import { STORIES, WORLDS, byId, worldById, worldOf } from './stories.js';
 import { sceneSVG, place, ART, INK } from './art.js';
 import { speak, stopSpeaking, sfx, onSpeaking, unlockAudio } from './audio.js';
 import { store, langs } from './store.js';
 import { UI, PRAISE, COUNT, pick } from './i18n.js';
 import { startGame } from './games.js';
 import { DONATE_URL } from './config.js';
-import { paywalled, canPlay, freeLeft, passLeft, passUntil, priceLabel, refresh, loadPrice, buy, restore, startClock, FREE_MINUTES, PASS_HOURS } from './pass.js';
+import { paywalled, isOpen, lockedIn, storyProduct, worldProduct, priceOf, refresh, loadPrices, buy, restore, FREE_STORIES } from './unlocks.js';
 
 const app = document.getElementById('app');
 
@@ -53,8 +53,8 @@ function route() {
   document.documentElement.lang = langs()[0];
   const parts = current.replace(/^#\/?/, '').split('/');
   const story = byId(parts[1]);
-  // Out of play time: the story waits behind the grown-up screen, and opens once a pass is bought.
-  if ((parts[0] === 'story' || parts[0] === 'play') && story && !canPlay()) return passScreen();
+  // A story that isn't unlocked waits behind the grown-up screen, and opens once it's bought.
+  if ((parts[0] === 'story' || parts[0] === 'play') && story && !isOpen(story.id)) return unlockScreen(story);
   if (parts[0] === 'story' && story) return storyScreen(story, Math.max(0, Math.min(story.pages.length - 1, +parts[2] || 0)));
   if (parts[0] === 'play' && story) return gameScreen(story);
   if (parts[0] === 'yay' && story) return rewardScreen(story);
@@ -96,6 +96,12 @@ const LAYOUTS = {
 const PAL = { robe: '#f48fb1', hair: '#5d4037', sash: '#ffd54f' };
 const r = Math.round;
 const pct = (v, total) => `${((v / total) * 100).toFixed(2)}%`;
+
+// Friendship Sea has only three ports, each on its own little island.
+const SEA_LAYOUTS = {
+  wide: { w: 1000, h: 540, pts: [[185, 320], [500, 180], [815, 320]] },
+  tall: { w: 600, h: 1020, pts: [[175, 235], [425, 530], [175, 815]] },
+};
 
 function mapLayout({ cols, w, x0, dx, y0, dy }, n) {
   const rows = Math.ceil(n / cols);
@@ -179,6 +185,42 @@ function mapArt(L, cls) {
   </svg>`;
 }
 
+// Open water, a dotted sailing route between the ports, and an island with a dock under each one.
+function seaArt(L, cls) {
+  const { w, h, pts } = L;
+  const route = smooth(pts);
+  const k = cls === 'wide' ? 1 : 1.05;
+  const waves = [];
+  for (let row = 0; row < 7; row++) {
+    for (let col = 0; col < 6; col++) {
+      const x = ((col + (row % 2) / 2 + 0.2) / 6) * w;
+      const y = ((row + 0.5) / 7) * h;
+      if (!pts.some(([px, py]) => Math.hypot(x - px, (y - py - 40) * 1.2) < 190 * k)) {
+        waves.push(`<path d="M${r(x - 26)} ${r(y)} q13 -11 26 0 q13 -11 26 0" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".45"/>`);
+      }
+    }
+  }
+  const islands = pts.map(([x, y]) => {
+    const cy = y + 42 * k;
+    return `<g>
+      <rect x="${r(x + 92 * k)}" y="${r(cy + 42 * k)}" width="${r(86 * k)}" height="13" rx="4" fill="#a1744a"/>
+      <rect x="${r(x + 116 * k)}" y="${r(cy + 50 * k)}" width="8" height="26" fill="#8d5a3b"/>
+      <rect x="${r(x + 160 * k)}" y="${r(cy + 50 * k)}" width="8" height="26" fill="#8d5a3b"/>
+      <ellipse cx="${x}" cy="${r(cy)}" rx="${r(138 * k)}" ry="${r(112 * k)}" fill="#f7e3a3" stroke="#fff3cf" stroke-width="6"/>
+      <ellipse cx="${x}" cy="${r(cy - 6 * k)}" rx="${r(112 * k)}" ry="${r(90 * k)}" fill="#9ad77f"/>
+    </g>`;
+  }).join('');
+  const [bx, by] = [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2];
+  const [cx, cy] = [(pts[1][0] + pts[2][0]) / 2, (pts[1][1] + pts[2][1]) / 2];
+  return `<svg class="map-art ${cls}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    ${waves.join('')}
+    <path d="${route}" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="1 24" opacity=".9"/>
+    ${islands}
+    ${place('boat', r(bx), r(by + 30), 0.5, {}, 'rock')}
+    ${place('fish', r(cx), r(cy + 80), 0.55, {}, 'bob')}
+  </svg>`;
+}
+
 // The story's cover scene, cropped to a square around its characters.
 function coverDisc(s) {
   const scene = s.pages[s.cover].scene;
@@ -189,19 +231,24 @@ function coverDisc(s) {
 }
 
 function homeScreen() {
-  const wide = mapLayout(LAYOUTS.wide, STORIES.length);
-  const tall = mapLayout(LAYOUTS.tall, STORIES.length);
+  const world = worldById(store.get('world')) || WORLDS[0];
+  const stories = world.stories.map(byId);
+  const sea = world.id === 'sea';
+  const wide = sea ? SEA_LAYOUTS.wide : mapLayout(LAYOUTS.wide, stories.length);
+  const tall = sea ? SEA_LAYOUTS.tall : mapLayout(LAYOUTS.tall, stories.length);
+  const art = sea ? seaArt : mapArt;
   // The pal waits at the first story without a star.
-  const here = Math.max(0, STORIES.findIndex((s) => !store.hasStar(s.id)));
-  const stops = STORIES.map((s, i) => {
+  const here = Math.max(0, stories.findIndex((s) => !store.hasStar(s.id)));
+  const stops = stories.map((s, i) => {
     const done = store.hasStar(s.id);
+    const open = isOpen(s.id);
     const [wx, wy] = wide.pts[i];
     const [tx, ty] = tall.pts[i];
     const pos = `--wx:${pct(wx, wide.w)};--wy:${pct(wy, wide.h)};--tx:${pct(tx, tall.w)};--ty:${pct(ty, tall.h)}`;
     const stars = [0, 1, 2].map(() => starIcon(done ? '#ffd54f' : '#fffdf5')).join('');
-    return `<button class="stop${done ? ' done' : ''}" data-id="${s.id}" style="${pos};--ring:${s.color};animation-delay:${i * 0.05}s" aria-label="${esc(t(s.title))}">
+    return `<button class="stop${done ? ' done' : ''}${open ? '' : ' locked'}" data-id="${s.id}" style="${pos};--ring:${s.color};animation-delay:${i * 0.05}s" aria-label="${esc(t(s.title))}">
       ${s.special ? `<span class="ribbon">${esc(t(s.special))}</span>` : ''}
-      <span class="disc">${coverDisc(s)}</span>
+      <span class="disc">${coverDisc(s)}${open ? '' : `<span class="padlock">${ICON.lock}</span>`}</span>
       ${i === here ? `<svg class="pal" viewBox="-42 -72 84 126" aria-hidden="true">${place('person', 0, 0, 1, PAL, 'hop')}</svg>` : ''}
       <span class="name">${titleHTML(s.title)}</span>
       <span class="stars" aria-hidden="true">${stars}</span>
@@ -209,6 +256,10 @@ function homeScreen() {
   }).join('');
   const heading = langs().map((l) => `<span lang="${l}">${esc(UI.welcome[l])}</span>`).join(' ');
   const lang = store.get('lang');
+  const tabIcon = { island: place('palm', 0, 18, 0.32), sea: place('boat', 0, 6, 0.42) };
+  const tabs = WORLDS.map((w) => `<button class="world-tab" data-world="${w.id}" aria-pressed="${w === world}">
+    <svg viewBox="-34 -34 68 68" aria-hidden="true">${tabIcon[w.id]}</svg><span>${titleHTML(w.title)}</span>
+  </button>`).join('');
   app.innerHTML = `<main class="home">
     <div class="home-top">
       <div class="brand">${logo()}<h1>${titleHTML(UI.appName)}</h1></div>
@@ -223,8 +274,9 @@ function homeScreen() {
         <button class="icon-btn small" id="parents" aria-label="${esc(t(UI.parents))}">${ICON.lock}</button>
       </div>
     </div>
-    <nav class="map" aria-label="${esc(t(UI.welcome))}" style="--wide-ar:${wide.w} / ${wide.h};--wide-r:${(wide.w / wide.h).toFixed(4)};--tall-ar:${tall.w} / ${tall.h}">
-      ${mapArt(wide, 'wide')}${mapArt(tall, 'tall')}
+    <div class="world-tabs" role="group" aria-label="${esc(t(UI.worlds))}">${tabs}</div>
+    <nav class="map ${world.id}" aria-label="${esc(t(world.title))}" style="--wide-ar:${wide.w} / ${wide.h};--wide-r:${(wide.w / wide.h).toFixed(4)};--tall-ar:${tall.w} / ${tall.h}">
+      ${art(wide, 'wide')}${art(tall, 'tall')}
       <div class="map-title"><h2>${heading}</h2>${langs().length === 1 ? `<p>${esc(t(UI.tapMap))}</p>` : ''}</div>
       ${stops}
     </nav>
@@ -234,6 +286,13 @@ function homeScreen() {
   app.querySelectorAll('.stop').forEach((c) => c.addEventListener('click', () => {
     sfx.tap();
     go(`#/story/${c.dataset.id}/0`);
+  }));
+  app.querySelectorAll('.world-tab').forEach((b) => b.addEventListener('click', () => {
+    if (b.dataset.world === world.id) return;
+    store.set('world', b.dataset.world);
+    sfx.page();
+    route();
+    speak(worldById(b.dataset.world).title);
   }));
   app.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => {
     store.set('lang', c.dataset.lang);
@@ -246,6 +305,7 @@ function homeScreen() {
 
 /* ---------------- story pages ---------------- */
 function storyScreen(story, i) {
+  store.set('world', worldOf(story.id).id);
   const page = story.pages[i];
   const last = i === story.pages.length - 1;
   const dots = story.pages.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('');
@@ -380,43 +440,37 @@ function rewardScreen(story) {
   speak([praise, story.lesson]);
 }
 
-/* ---------------- 12-hour pass (App Store build) ---------------- */
-const PASS_TEXT = {
+/* ---------------- unlocking stories (App Store build) ---------------- */
+const BUY_TEXT = {
   en: {
-    freeDone: `The ${FREE_MINUTES} free minutes are used up.`,
-    passDone: `The ${PASS_HOURS}-hour pass has ended.`,
-    offer: (p) => `Grown-ups: unlock ${PASS_HOURS} hours of every story and game for ${p}. It doesn't renew.`,
-    unlock: (p) => `Unlock ${PASS_HOURS} hours · ${p}`,
-    more: (p) => `Add ${PASS_HOURS} more hours · ${p}`,
+    wall: (n) => `The first ${n} stories are free. Grown-ups can unlock this one, or every story left in this world. It's a one-time purchase and it's yours to keep.`,
+    story: (p) => `This story · ${p}`,
+    world: (name, n, p) => `${n === 1 ? 'The story' : `All ${n} stories`} left in ${name} · ${p}`,
     buying: 'Opening the App Store…',
-    pending: 'Waiting for a parent to approve the purchase. Play starts as soon as it’s approved.',
+    pending: 'Waiting for a parent to approve the purchase. The story opens as soon as it’s approved.',
     failed: 'The App Store isn’t available right now. Please try again later.',
-    restore: 'Restore purchase',
+    restore: 'Restore purchases',
     restored: 'Purchases checked.',
-    title: 'Play time',
-    left: (m) => `Free play left: ${m} min.`,
-    none: 'Free play is used up.',
-    until: (time) => `Unlocked until ${time}.`,
+    title: 'Stories',
+    open: (a, b) => `${a} of ${b} stories open`,
+    allOpen: 'All stories are unlocked.',
     gate: 'Grown-ups only',
     ask: (a, b) => `What is ${a} times ${b}?`,
     erase: 'Erase',
     cancel: 'Cancel',
   },
   es: {
-    freeDone: `Se acabaron los ${FREE_MINUTES} minutos gratis.`,
-    passDone: `Se acabó el pase de ${PASS_HOURS} horas.`,
-    offer: (p) => `Adultos: desbloqueen ${PASS_HOURS} horas de todas las historias y juegos por ${p}. No se renueva.`,
-    unlock: (p) => `Desbloquear ${PASS_HOURS} horas · ${p}`,
-    more: (p) => `Añadir ${PASS_HOURS} horas más · ${p}`,
+    wall: (n) => `Las primeras ${n} historias son gratis. Los adultos pueden desbloquear esta, o todas las que quedan en este mundo. Es una sola compra y es suya para siempre.`,
+    story: (p) => `Esta historia · ${p}`,
+    world: (name, n, p) => `${n === 1 ? 'La historia que queda' : `Las ${n} historias que quedan`} en ${name} · ${p}`,
     buying: 'Abriendo el App Store…',
-    pending: 'Esperando que un padre apruebe la compra. El juego empieza en cuanto se apruebe.',
+    pending: 'Esperando que un padre apruebe la compra. La historia se abre en cuanto se apruebe.',
     failed: 'El App Store no está disponible ahora. Inténtelo más tarde.',
-    restore: 'Restaurar compra',
+    restore: 'Restaurar compras',
     restored: 'Compras revisadas.',
-    title: 'Tiempo de juego',
-    left: (m) => `Juego gratis restante: ${m} min.`,
-    none: 'Se acabó el juego gratis.',
-    until: (time) => `Desbloqueado hasta las ${time}.`,
+    title: 'Historias',
+    open: (a, b) => `${a} de ${b} historias abiertas`,
+    allOpen: 'Todas las historias están desbloqueadas.',
     gate: 'Solo para adultos',
     ask: (a, b) => `¿Cuánto es ${a} por ${b}?`,
     erase: 'Borrar',
@@ -424,24 +478,24 @@ const PASS_TEXT = {
   },
 };
 
-// Buys a pass behind the math gate, reporting progress in `note`. Calls `onPaid` once
-// play is unlocked, including after an Ask to Buy approval that comes in later.
-function unlockFlow(btn, note, onPaid) {
-  const P = PASS_TEXT[langs()[0]];
+// Buys a product behind the math gate, reporting progress in `note`. Calls `onPaid` once
+// `isPaid()` is true, including after an Ask to Buy approval that comes in later.
+function unlockFlow(product, btns, note, isPaid, onPaid) {
+  const P = BUY_TEXT[langs()[0]];
   mathGate(async () => {
     const gen = generation;
-    btn.disabled = true;
+    btns.forEach((b) => { b.disabled = true; });
     note.textContent = P.buying;
-    const r = await buy();
+    const r = await buy(product);
     if (gen !== generation) return;
-    btn.disabled = false;
-    if (passLeft() > 0) { note.textContent = ''; sfx.tada(); onPaid(); return; }
+    btns.forEach((b) => { b.disabled = false; });
+    if (isPaid()) { note.textContent = ''; sfx.tada(); onPaid(); return; }
     if (r.pending) {
       note.textContent = P.pending;
       const poll = setInterval(async () => {
         await refresh();
         if (gen !== generation) clearInterval(poll);
-        else if (passLeft() > 0) { clearInterval(poll); onPaid(); }
+        else if (isPaid()) { clearInterval(poll); onPaid(); }
       }, 5000);
       cleanups.push(() => clearInterval(poll));
       return;
@@ -450,28 +504,45 @@ function unlockFlow(btn, note, onPaid) {
   });
 }
 
-function passScreen() {
-  const P = PASS_TEXT[langs()[0]];
-  app.innerHTML = `<section class="pass-wall">
-    <svg class="pass-art" viewBox="-62 -62 124 124" aria-hidden="true"><circle r="58" fill="#ffd54f" stroke="${INK}" stroke-width="4"/>${place('sheep', 0, -2, 0.95, {}, 'bob')}</svg>
+function unlockScreen(story) {
+  const P = BUY_TEXT[langs()[0]];
+  const world = worldOf(story.id);
+  const left = lockedIn(world).length;
+  // With one story left, the world price would only cost more.
+  const offerWorld = left > 1;
+  app.innerHTML = `<section class="unlock-wall">
+    <svg class="unlock-art" viewBox="-62 -62 124 124" aria-hidden="true"><circle r="58" fill="#ffd54f" stroke="${INK}" stroke-width="4"/>${place('sheep', 0, -2, 0.95, {}, 'bob')}</svg>
     <h2>${titleHTML(UI.askGrownup)}</h2>
-    <p>${esc(passUntil() ? P.passDone : P.freeDone)} <span class="offer"></span></p>
+    <p>${esc(P.wall(FREE_STORIES.length))}</p>
     <div class="row">
       <button class="icon-btn" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
-      <button class="big-btn green" data-act="unlock">${ICON.lock}<span></span></button>
+      <button class="big-btn" data-act="story">${ICON.lock}<span></span></button>
+      ${offerWorld ? `<button class="big-btn green" data-act="world">${ICON.lock}<span></span></button>` : ''}
     </div>
-    <p class="pass-note" aria-live="polite"></p>
+    <p class="unlock-note" aria-live="polite"></p>
+    <p><button class="link-btn" data-act="restore">${esc(P.restore)}</button></p>
   </section>`;
-  const btn = app.querySelector('[data-act=unlock]');
-  const showPrice = () => {
-    app.querySelector('.offer').textContent = P.offer(priceLabel());
-    btn.querySelector('span').textContent = P.unlock(priceLabel());
+  const storyBtn = app.querySelector('[data-act=story]');
+  const worldBtn = app.querySelector('[data-act=world]');
+  const note = app.querySelector('.unlock-note');
+  const btns = [storyBtn, worldBtn].filter(Boolean);
+  const showPrices = () => {
+    storyBtn.querySelector('span').textContent = P.story(priceOf(storyProduct(story.id)));
+    if (worldBtn) worldBtn.querySelector('span').textContent = P.world(t(world.title), left, priceOf(worldProduct(world.id)));
   };
   const gen = generation;
-  showPrice();
-  loadPrice().then(() => { if (gen === generation) showPrice(); });
+  showPrices();
+  loadPrices().then(() => { if (gen === generation) showPrices(); });
+  const paid = () => isOpen(story.id);
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
-  btn.addEventListener('click', () => unlockFlow(btn, app.querySelector('.pass-note'), route));
+  storyBtn.addEventListener('click', () => unlockFlow(storyProduct(story.id), btns, note, paid, route));
+  worldBtn?.addEventListener('click', () => unlockFlow(worldProduct(world.id), btns, note, paid, route));
+  app.querySelector('[data-act=restore]').addEventListener('click', async () => {
+    const r = await restore();
+    if (gen !== generation) return;
+    if (paid()) route();
+    else note.textContent = r.error ? P.failed : P.restored;
+  });
   speak(UI.askGrownup);
 }
 
@@ -479,7 +550,7 @@ function passScreen() {
 // tapping around, so this one asks a times-table question, written out in words.
 function mathGate(onPass) {
   const lang = langs()[0];
-  const P = PASS_TEXT[lang];
+  const P = BUY_TEXT[lang];
   const el = document.createElement('div');
   el.className = 'gate';
   el.innerHTML = `<div class="box math" role="dialog" aria-modal="true" aria-labelledby="gate-q" tabindex="-1">
@@ -570,6 +641,7 @@ const REFS = {
   nativity: 'Luke 2:1–20 · Lucas 2:1–20',
   baptism: 'Matthew 3:13–17 · Mateo 3:13–17',
   storm: 'Mark 4:35–41 · Marcos 4:35–41',
+  bigcatch: 'Luke 5:1–11 · Lucas 5:1–11',
   samaritan: 'Luke 10:25–37 · Lucas 10:25–37',
   sheep: 'Luke 15:3–7 · Lucas 15:3–7',
   zacchaeus: 'Luke 19:1–10 · Lucas 19:1–10',
@@ -580,7 +652,7 @@ const PARENT_TEXT = {
     title: 'For grown-ups',
     about: 'Bible Story Pals is a bilingual (English & Spanish) Bible story game for children ages 3–6. Every story is read aloud, so no reading is needed. Each story ends with a gentle mini-game that practices counting, colors, numbers and new words.',
     privacy: 'Privacy: no ads, no in-app purchases, no accounts, no tracking. Nothing your child does leaves this device. After the first visit it works offline.',
-    privacyApp: `Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The only purchase is an optional ${PASS_HOURS}-hour pass, bought by a grown-up through the App Store.`,
+    privacyApp: 'Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The first stories are free. Others are one-time purchases made by a grown-up through the App Store.',
     supportTitle: 'Support Bible Story Pals',
     support: 'This game is free with no ads. If it blesses your family, a gift helps us make more stories.',
     donate: 'Donate',
@@ -598,7 +670,7 @@ const PARENT_TEXT = {
     title: 'Para adultos',
     about: 'Amiguitos de la Biblia es un juego bilingüe (español e inglés) de historias bíblicas para niños de 3 a 6 años. Todas las historias se leen en voz alta, así que no hace falta saber leer. Cada historia termina con un minijuego que practica contar, los colores, los números y palabras nuevas.',
     privacy: 'Privacidad: sin anuncios, sin compras dentro de la app, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo. Después de la primera visita funciona sin internet.',
-    privacyApp: `Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. La única compra es un pase opcional de ${PASS_HOURS} horas, que compra un adulto en el App Store.`,
+    privacyApp: 'Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. Las primeras historias son gratis. Las demás son compras únicas que hace un adulto en el App Store.',
     supportTitle: 'Apoye a Amiguitos de la Biblia',
     support: 'Este juego es gratis y sin anuncios. Si bendice a su familia, una ofrenda nos ayuda a crear más historias.',
     donate: 'Donar',
@@ -619,7 +691,7 @@ const isNativeApp = () => !!window.Capacitor?.isNativePlatform?.();
 
 function parentsScreen() {
   const P = PARENT_TEXT[langs()[0]];
-  const T = PASS_TEXT[langs()[0]];
+  const T = BUY_TEXT[langs()[0]];
   const showDonate = DONATE_URL && !isNativeApp();
   const toggle = (key, label) => `<div class="setting"><span>${esc(label)}</span><button class="toggle" role="switch" data-key="${key}" aria-checked="${!!store.get(key)}" aria-label="${esc(label)}"></button></div>`;
   const lang = store.get('lang');
@@ -628,9 +700,8 @@ function parentsScreen() {
     <h2>${esc(P.title)}</h2>
     <p>${esc(P.about)}</p>
     <p><strong>${esc(paywalled ? P.privacyApp : P.privacy)}</strong></p>
-    ${paywalled ? `<h3>${esc(T.title)}</h3><p class="pass-status"></p>
-      <p><button class="big-btn green" data-act="unlock">${ICON.lock}<span></span></button></p>
-      <p class="pass-note" aria-live="polite"></p>
+    ${paywalled ? `<h3>${esc(T.title)}</h3><div class="world-offers"></div>
+      <p class="unlock-note" aria-live="polite"></p>
       <p><button class="link-btn" data-act="restore">${esc(T.restore)}</button></p>` : ''}
     ${showDonate ? `<h3>${esc(P.supportTitle)}</h3><p>${esc(P.support)}</p>
       <p><a class="big-btn green" href="${esc(DONATE_URL)}" target="_blank" rel="noopener">${esc(P.donate)}</a></p>` : ''}
@@ -652,7 +723,7 @@ function parentsScreen() {
     <p><button class="link-btn" data-act="reset">${esc(P.reset)}</button></p>
   </div></main>`;
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
-  if (paywalled) wirePassSettings(T);
+  if (paywalled) wireUnlockSettings(T);
   app.querySelectorAll('.toggle').forEach((b) => b.addEventListener('click', () => {
     const v = !store.get(b.dataset.key);
     store.set(b.dataset.key, v);
@@ -673,22 +744,25 @@ function parentsScreen() {
   });
 }
 
-// The grown-ups area shows how much play time is left, and sells or restores the pass.
-function wirePassSettings(T) {
-  const status = app.querySelector('.pass-status');
-  const btn = app.querySelector('[data-act=unlock]');
-  const note = app.querySelector('.pass-note');
-  const show = () => {
-    const end = new Date(passUntil());
-    const sameDay = end.toDateString() === new Date().toDateString();
-    const time = end.toLocaleString(langs()[0], sameDay ? { hour: 'numeric', minute: '2-digit' } : { weekday: 'long', hour: 'numeric', minute: '2-digit' });
-    status.textContent = passLeft() > 0 ? T.until(time) : freeLeft() > 0 ? T.left(Math.ceil(freeLeft() / 60)) : T.none;
-    btn.querySelector('span').textContent = (passLeft() > 0 ? T.more : T.unlock)(priceLabel());
-  };
+// The grown-ups area shows what's open in each world, and sells or restores what isn't.
+function wireUnlockSettings(T) {
+  const box = app.querySelector('.world-offers');
+  const note = app.querySelector('.unlock-note');
   const gen = generation;
+  const show = () => {
+    box.innerHTML = WORLDS.map((w) => {
+      const left = lockedIn(w).length;
+      return `<p><strong>${esc(t(w.title))}:</strong> ${esc(T.open(w.stories.length - left, w.stories.length))}</p>
+        ${left > 1 ? `<p><button class="big-btn green" data-world="${w.id}">${ICON.lock}<span>${esc(T.world(t(w.title), left, priceOf(worldProduct(w.id))))}</span></button></p>` : ''}`;
+    }).join('');
+    const btns = [...box.querySelectorAll('[data-world]')];
+    btns.forEach((b) => b.addEventListener('click', () => {
+      const w = worldById(b.dataset.world);
+      unlockFlow(worldProduct(w.id), btns, note, () => !lockedIn(w).length, show);
+    }));
+  };
   show();
-  Promise.all([refresh(), loadPrice()]).then(() => { if (gen === generation) show(); });
-  btn.addEventListener('click', () => unlockFlow(btn, note, show));
+  Promise.all([refresh(), loadPrices()]).then(() => { if (gen === generation) show(); });
   app.querySelector('[data-act=restore]').addEventListener('click', async () => {
     const r = await restore();
     if (gen !== generation) return;
@@ -699,9 +773,9 @@ function wirePassSettings(T) {
 
 /* ---------------- boot ---------------- */
 unlockAudio();
-// Kids' minutes count only inside stories, games and the star screen, never on the map.
-startClock(() => /^#\/?(story|play|yay)\//.test(current));
-// Wait briefly for the App Store's answer, so a paid-up family never sees the pass screen.
+// An Ask to Buy approval or a purchase on another device can land while the app is away.
+if (paywalled) document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refresh(); });
+// Wait briefly for the App Store's answer, so a paid-up family never sees a lock by mistake.
 Promise.race([refresh(), new Promise((r) => setTimeout(r, 1500))]).then(route);
 
 // The store apps ship every file inside the app, so only the website needs the service worker.
