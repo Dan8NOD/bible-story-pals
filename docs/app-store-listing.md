@@ -10,7 +10,6 @@ Paste these into App Store Connect. This repo is public, so keep your reviewer p
 |---|---|---|
 | **Made for Kids, ages 5 and under** | Apple locks this once the app is approved, and all later updates must follow the Kids rules. Apps outside the Kids Category can't describe children as the main audience, so this copy only works inside it. | Yes |
 | **ElevenLabs plan** | Clips made on a free plan can't be used commercially, even if you upgrade later. Check which plan recorded the 66 clips in `audio/`. | Confirm it was a paid plan, or re-record them |
-| **Family Sharing on the 14 purchases** | Apple doesn't let you turn it off again. It's currently off. | Your call |
 | **Age rating answers** | They are your statement to Apple. See the two judgment calls below. | None, as listed |
 
 ## Before submitting
@@ -69,7 +68,7 @@ Answering "Infrequent" for Cartoon or Fantasy Violence would make the app 9+. Ap
 
 **Promotional text:**
 ```
-Fifteen Bible stories read aloud in English, Spanish or both, each with a gentle mini-game at the end. The first 3 are free. No ads, no accounts. For ages 3 to 6.
+Fifteen Bible stories read aloud in English, Spanish or both, for ages 3 to 6. The first 3 are free. No ads. Buy a story once and share it with your whole family.
 ```
 
 **Keywords:**
@@ -112,6 +111,9 @@ MADE FOR FAMILIES
 THE FIRST 3 STORIES ARE FREE
 God Made the World, Noah's Big Boat and Baby Moses are free. A grown-up can unlock any other story, or everything left in a world, with a one-time in-app purchase. There are no subscriptions. Purchases sit behind a question for grown-ups and can be restored at any time.
 
+SHARE WITH THE ONES YOU LOVE
+Every purchase works with Apple's Family Sharing. Buy a story once, and you and up to five family members can enjoy it on your own devices at no extra cost. Be a giver: one gift of a story can reach every child in your family.
+
 SAFE BY DESIGN
 No ads. No accounts. No tracking. No data collected. Nothing your child does leaves the device.
 ```
@@ -126,7 +128,7 @@ Apple may refuse the name if another app already uses it. If so, try `Amiguitos 
 
 **Promotional text:**
 ```
-Quince historias bíblicas leídas en voz alta en español, inglés o ambos, con un minijuego al final de cada una. Las primeras 3 son gratis. Sin anuncios. De 3 a 6 años.
+Quince historias bíblicas en voz alta en español, inglés o ambos, de 3 a 6 años. Las primeras 3 son gratis. Sin anuncios. Compra una vez y comparte con tu familia.
 ```
 
 **Keywords:**
@@ -169,6 +171,9 @@ HECHO PARA LAS FAMILIAS
 LAS PRIMERAS 3 HISTORIAS SON GRATIS
 Dios Creó el Mundo, El Gran Barco de Noé y El Bebé Moisés son gratis. Un adulto puede desbloquear cualquier otra historia, o todas las que quedan en un mundo, con una sola compra dentro de la app. No hay suscripciones. Las compras están protegidas con una pregunta para adultos y se pueden restaurar en cualquier momento.
 
+COMPARTE CON QUIENES MÁS QUIERES
+Cada compra funciona con Compartir en familia de Apple. Compre una historia una sola vez, y usted y hasta cinco familiares pueden disfrutarla en sus propios dispositivos sin costo adicional. Sea generoso: el regalo de una historia puede llegar a cada niño de su familia.
+
 SEGURO DESDE EL PRINCIPIO
 Sin anuncios. Sin cuentas. Sin rastreo. No se recopilan datos. Nada de lo que hace su hijo sale del dispositivo.
 ```
@@ -197,7 +202,7 @@ Bilingual Bible Story Pals is a Bible story game for ages 3 to 6, in English and
 FREE STORIES
 God Made the World, Noah's Big Boat and Baby Moses open right away from the Story Island map.
 
-IN-APP PURCHASES (all non-consumable)
+IN-APP PURCHASES (all non-consumable, with Family Sharing on)
 1. Tap any stop with a padlock, for example David the Brave.
 2. "Time to ask a grown-up!" offers that story or every story left in that world.
 3. Choosing one opens the parental gate: a multiplication question written in words, such as "What is seven times four?", answered on a keypad. A wrong answer does not continue.
@@ -220,4 +225,4 @@ In Jesus Is Baptized, God the Father appears only as light and a voice, never as
 
 ## In-app purchases
 
-All 14 exist in App Store Connect with English and Spanish (Mexico) names, 175 regions and a review screenshot. Add all of them to this version's submission, since a first purchase can only be reviewed with an app version.
+All 14 exist in App Store Connect with English and Spanish (Mexico) names, 175 regions, a review screenshot and Family Sharing on, which Apple does not allow to be turned off. Add all of them to this version's submission, since a first purchase can only be reviewed with an app version.
