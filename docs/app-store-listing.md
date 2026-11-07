@@ -14,7 +14,7 @@ Paste these into App Store Connect. This repo is public, so keep your reviewer p
 
 ## Before submitting
 
-- **Submit build 5 or later, not build 4.** Build 4 lacks the Nov 1 fixes from `main`, and on its code the regression test fails with "memory game got stuck after fast taps". Build 5 has those fixes and shows the full privacy policy in the grown-ups area, as guideline 5.1.1(i) asks, with no link out of the app.
+- **Submit build 6 or later.** The review notes below describe the recordings added after build 5. Build 4 also lacks the Nov 1 fixes from `main`, and on its code the regression test fails with "memory game got stuck after fast taps". Build 5 has those fixes and shows the full privacy policy in the grown-ups area, as guideline 5.1.1(i) asks, with no link out of the app.
 - **Publish the new pages first:** the live privacy page still says "No in-app purchases in version 1.0", and App Review will read it.
 
 ## App Information
@@ -214,7 +214,7 @@ GROWN-UPS AREA
 Tap "For grown-ups", then press and hold "Hold" for 3 seconds. It has the language setting (English, Español, EN + ES), narration and sound settings, purchases, the privacy policy, tips, and the Bible reference for each story. Any purchase made here goes through the same multiplication gate.
 
 NARRATION
-God Made the World and common phrases are recorded clips bundled with the app. All other lines use the iOS text-to-speech voice.
+The first five stories (God Made the World through God Is My Shepherd) and common phrases are recorded clips bundled with the app. All other lines use the iOS text-to-speech voice.
 
 NETWORK
 All game content is bundled and plays offline. The app's only network use is StoreKit, for prices, purchases and restoring.
