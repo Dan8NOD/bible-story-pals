@@ -119,10 +119,10 @@ Then bump `VERSION` in `sw.js` and commit `audio/`. Running it again continues w
 a line twice. Lines are recorded in priority order: the whole Creation story first, then shared lines (praise and
 counting), then the other stories.
 
-| Model | Credits/character | First story (EN + ES) | All 11 stories |
+| Model | Credits/character | First story (EN + ES) | All 14 stories |
 |---|---|---|---|
-| `eleven_flash_v2_5` (default) | 0.5 | ~500 | ~4,000 |
-| `eleven_multilingual_v2` (`--model`) | 1 | ~1,000 | ~7,900 |
+| `eleven_flash_v2_5` (default) | 0.5 | ~500 | ~5,200 |
+| `eleven_multilingual_v2` (`--model`) | 1 | ~1,000 | ~10,400 |
 
 `npm run test:voices` checks the script against a fake ElevenLabs server, so it costs no credits.
 

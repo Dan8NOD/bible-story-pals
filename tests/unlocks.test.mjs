@@ -159,6 +159,7 @@ await page.close();
 
 // 8. The grown-ups area shows each world and sells what's left.
 page = await open('#/parents', { owned: [`${P}.story.david`] });
+await page.locator('.gate .hold').dispatchEvent('pointerdown'); // #/parents always asks for the hold
 await page.waitForSelector('.world-offers [data-world=sea]');
 const offers = await page.textContent('.world-offers');
 assert.match(offers, /Story Island: 4 of 12 stories open/);

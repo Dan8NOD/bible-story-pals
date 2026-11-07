@@ -442,7 +442,11 @@ a.big-btn { text-decoration: none; color: var(--ink); }
   .bar { min-height: 70px; padding-top: 6px; padding-bottom: calc(6px + var(--safe-b)); }
   .caption { font-size: 17px; }
   .big-btn { min-height: 60px; font-size: 22px; }
-  .reward .big-star { width: 34vh; height: 34vh; }
+  /* Star, title, lesson (two lines in EN + ES) and buttons must fit in ~320–390 px. */
+  .reward { gap: 6px; padding-top: calc(6px + var(--safe-t)); padding-bottom: calc(6px + var(--safe-b)); }
+  .reward .big-star { width: 26vh; height: 26vh; }
+  .reward h2 { font-size: 26px; }
+  .reward p { font-size: 16px; }
   /* The map would be tiny if it had to fit the height, so let it scroll. */
   .map { width: 100%; }
   .home-top { margin-bottom: 8px; }

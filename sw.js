@@ -22,7 +22,9 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   // The clip list changes when new voices are recorded: try the network first.
   if (new URL(e.request.url).pathname.endsWith('/audio/manifest.json')) {
+    // Keep the last good list if the network answers with an error page.
     e.respondWith(fetch(e.request).then((res) => {
+      if (!res.ok) return caches.match(e.request).then((hit) => hit || res);
       const copy = res.clone();
       caches.open(VERSION).then((c) => c.put(e.request, copy));
       return res;
