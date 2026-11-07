@@ -4,7 +4,7 @@
   "products": [
     {
       "displayPrice": "2.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000100",
       "localizations": [
         {
@@ -24,7 +24,7 @@
     },
     {
       "displayPrice": "2.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000101",
       "localizations": [
         {
@@ -44,7 +44,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000102",
       "localizations": [
         {
@@ -64,7 +64,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000103",
       "localizations": [
         {
@@ -84,7 +84,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000104",
       "localizations": [
         {
@@ -104,7 +104,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000105",
       "localizations": [
         {
@@ -124,7 +124,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000106",
       "localizations": [
         {
@@ -144,7 +144,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000107",
       "localizations": [
         {
@@ -164,7 +164,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000108",
       "localizations": [
         {
@@ -184,7 +184,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000109",
       "localizations": [
         {
@@ -204,7 +204,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000110",
       "localizations": [
         {
@@ -224,7 +224,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000111",
       "localizations": [
         {
@@ -244,7 +244,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000112",
       "localizations": [
         {
@@ -264,7 +264,7 @@
     },
     {
       "displayPrice": "1.00",
-      "familyShareable": false,
+      "familyShareable": true,
       "internalID": "6760000113",
       "localizations": [
         {

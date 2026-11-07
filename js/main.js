@@ -711,7 +711,7 @@ const POLICY = {
         "The first three stories are free. A grown-up can buy other stories through Apple's App Store, after answering a question meant for grown-ups.",
         "Apple handles every purchase, under Apple's privacy policy (apple.com/legal/privacy). We never see your name, Apple Account or payment details. Apple gives us sales totals that don't identify you.",
         'To show prices and check what your family owns, the app asks the App Store. These requests go only to Apple, and the app adds no information about your child to them.',
-        'What you buy stays with your Apple Account, so you can restore it after deleting the app. For a refund, ask Apple at reportaproblem.apple.com.',
+        'What you buy stays with your Apple Account, so you can restore it after deleting the app. With Apple\'s Family Sharing, people in your family group can use it too; Apple manages that group, and we never see who is in it. For a refund, ask Apple at reportaproblem.apple.com.',
       ]],
       ['Children', [
         'Bible Story Pals is made for children ages 3 to 6. Because we collect nothing, we hold no personal information to review or delete, and there is no consent to withdraw. The grown-ups area is behind a press-and-hold gate, and purchases are behind a question for grown-ups.',
@@ -736,7 +736,7 @@ const POLICY = {
         'Las primeras tres historias son gratis. Un adulto puede comprar otras historias en el App Store de Apple, después de responder una pregunta para adultos.',
         'Apple se encarga de cada compra, según su política de privacidad (apple.com/legal/privacy). Nunca vemos su nombre, su Cuenta de Apple ni sus datos de pago. Apple nos da totales de ventas que no lo identifican.',
         'Para mostrar los precios y revisar lo que su familia ya tiene, la app le pregunta al App Store. Estas solicitudes van solo a Apple, y la app no les agrega información sobre su hijo.',
-        'Lo que compra queda en su Cuenta de Apple, así que puede restaurarlo después de borrar la app. Para pedir un reembolso, escriba a Apple en reportaproblem.apple.com.',
+        'Lo que compra queda en su Cuenta de Apple, así que puede restaurarlo después de borrar la app. Con Compartir en familia de Apple, las personas de su grupo familiar también pueden usarlo; Apple administra ese grupo y nunca vemos quién lo forma. Para pedir un reembolso, escriba a Apple en reportaproblem.apple.com.',
       ]],
       ['Niños', [
         'Amiguitos de la Biblia está hecho para niños de 3 a 6 años. Como no recopilamos nada, no guardamos información personal que revisar ni borrar, y no hay consentimiento que retirar. El área para adultos está protegida: hay que mantener presionado para entrar. Las compras están protegidas con una pregunta para adultos.',
