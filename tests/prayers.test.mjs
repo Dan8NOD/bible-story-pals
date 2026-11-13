@@ -25,7 +25,7 @@ const base = `http://localhost:${server.address().port}/`;
 const { chromium } = createRequire(import.meta.url)('playwright');
 const browser = await chromium.launch();
 const errors = [];
-const P = 'com.dancruz.biblestorypals';
+const P = 'com.dancruz.torahstorypals';
 
 // shop: { owned, buy }, or null for the website.
 async function open(hash, shop = null) {
@@ -33,7 +33,7 @@ async function open(hash, shop = null) {
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.addInitScript((shop) => {
     if (!sessionStorage.getItem('seeded')) {
-      localStorage.setItem('bsp:v1', JSON.stringify({ lang: 'en', narration: false, sfx: false, stars: {} }));
+      localStorage.setItem('tsp:v1', JSON.stringify({ lang: 'en', narration: false, sfx: false, stars: {} }));
       sessionStorage.setItem('seeded', '1');
     }
     if (!shop) return;
@@ -50,6 +50,9 @@ async function open(hash, shop = null) {
       },
     };
   }, shop);
+  // These tests are about the paywall, so it is on here whatever config.js says today.
+  const config = (await readFile(join(root, 'js/config.js'), 'utf8')).replace(/OPEN_FOR_TESTERS = (true|false)/, `OPEN_FOR_TESTERS = ${!!shop?.testers}`);
+  await page.route('**/js/config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: config }));
   await page.goto(base + hash);
   return page;
 }
@@ -138,7 +141,7 @@ assert.ok(priced.includes(`${P}.prayer.blessing`), 'the prayer price comes from 
 await page.close();
 
 // 7. A world purchase covers stories, not prayers; a bought prayer opens after a reinstall (owned list).
-page = await open('#/pray/blessing/0', { owned: [`${P}.world.island`, `${P}.world.sea`] });
+page = await open('#/pray/blessing/0', { owned: [`${P}.world.torah`, `${P}.world.prophets`] });
 await page.waitForSelector('.unlock-wall');
 await page.close();
 page = await open('#/pray/blessing/0', { owned: [`${P}.prayer.blessing`] });

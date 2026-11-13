@@ -27,7 +27,7 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(String(e)));
 // A stand-in for the bridge Capacitor injects into the iOS WebView.
 await page.addInitScript(() => {
-  localStorage.setItem('bsp:v1', JSON.stringify({ lang: 'en', narration: true, sfx: true, stars: {} }));
+  localStorage.setItem('tsp:v1', JSON.stringify({ lang: 'en', narration: true, sfx: true, stars: {} }));
   window.__tts = [];
   window.Capacitor = {
     isNativePlatform: () => true,

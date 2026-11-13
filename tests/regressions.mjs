@@ -41,7 +41,7 @@ const fail = (msg) => { throw new Error(msg); };
 //    flips back. The third card used to stay face-up forever and the game never ended.
 {
   const page = await freshPage();
-  await page.goto(`${base}#/play/baptism`);
+  await page.goto(`${base}#/play/joseph`);
   await page.waitForSelector('.stage-svg .item');
   await page.evaluate(async () => {
     const down = (el) => el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
@@ -57,7 +57,7 @@ const fail = (msg) => { throw new Error(msg); };
   });
   // Now play it out the way a child would: keep tapping what the game wants.
   const deadline = Date.now() + 30000;
-  while ((await page.evaluate(() => location.hash)) === '#/play/baptism') {
+  while ((await page.evaluate(() => location.hash)) === '#/play/joseph') {
     if (Date.now() > deadline) fail('memory game got stuck after fast taps');
     const want = await page.evaluate(() => document.querySelector('.stage-svg')?.dataset.want ?? null);
     if (want) await tapKey(page, want);
@@ -130,12 +130,12 @@ const fail = (msg) => { throw new Error(msg); };
   await page.close();
 }
 
-// 6. The reward screen fits short landscape phones, even with both languages.
-for (const [width, height] of [[667, 375], [844, 390]]) {
+// 6. The reward screen fits short landscape phones, even with two languages on.
+for (const [width, height, lang] of [[667, 375, 'en+es'], [844, 390, 'en+es'], [667, 375, 'en+he'], [667, 375, 'es+he']]) {
   const page = await freshPage({ width, height });
   await page.goto(`${base}#/`);
-  await page.evaluate(() => localStorage.setItem('bsp:v1', JSON.stringify({ ...JSON.parse(localStorage.getItem('bsp:v1') || '{}'), lang: 'both' })));
-  await page.goto(`${base}#/yay/baptism`);
+  await page.evaluate((lang) => localStorage.setItem('tsp:v1', JSON.stringify({ ...JSON.parse(localStorage.getItem('tsp:v1') || '{}'), lang })), lang);
+  await page.goto(`${base}#/yay/joseph`);
   await page.waitForSelector('.reward .row');
   await page.waitForTimeout(1100); // star-in animation
   const box = await page.evaluate(() => {
@@ -143,7 +143,7 @@ for (const [width, height] of [[667, 375], [844, 390]]) {
     const bottom = Math.max(...[...document.querySelectorAll('.reward .row > *')].map((b) => b.getBoundingClientRect().bottom));
     return { top, bottom, h: innerHeight };
   });
-  if (box.top < 0 || box.bottom > box.h) fail(`reward clipped at ${width}x${height}: ${JSON.stringify(box)}`);
+  if (box.top < 0 || box.bottom > box.h) fail(`reward clipped at ${width}x${height} in ${lang}: ${JSON.stringify(box)}`);
   await page.close();
 }
 console.log('✓ reward screen fits short landscape phones');

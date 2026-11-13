@@ -1,6 +1,6 @@
 {
-  "appId": "com.dancruz.biblestorypals",
-  "appName": "Bible Story Pals",
+  "appId": "com.dancruz.torahstorypals",
+  "appName": "Torah Story Pals",
   "webDir": "www",
   "backgroundColor": "#7cc6f2",
   "ios": {

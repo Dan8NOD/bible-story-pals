@@ -1,59 +1,88 @@
-# Bible Story Pals · Amiguitos de la Biblia
+# Torah Story Pals · Amiguitos de la Torá · חברים לסיפורי התורה
 
-A bilingual (English / Español) Bible story game for **pre-K and kindergarten** (ages 3–6).
-Every page is read aloud, so kids don't need to read. Each story ends with a short mini-game
-that practices early-learning skills. No one can lose; wrong taps just wiggle.
+A story game in **English, Español and עברית** for **pre-K and kindergarten** (ages 3–6), with stories from the
+Torah, the Prophets and the Writings. Every page is read aloud, so kids don't need to read. Each story ends with a
+short mini-game that practices early-learning skills. No one can lose; wrong taps just wiggle.
 
-| # | Story | Mini-game | Skill |
-|---|-------|-----------|-------|
-| 1 | God Made the World · Dios Creó el Mundo | Tap sparkles to create sun, trees, animals… | Vocabulary (EN/ES words) |
-| 2 | Noah's Big Boat · El Gran Barco de Noé | Tap the animals into the ark, two by two | Counting to 8 |
-| 3 | Baby Moses · El Bebé Moisés | Steer the basket down the river, catch flowers | Fine motor, counting |
-| 4 | David the Brave · David el Valiente | Pick five smooth stones | Counting to 5 |
-| 5 | God Is My Shepherd · Dios Es Mi Pastor (Psalm 23) | Tap the path home: grass, water, cup, the shepherd's hand | Order, counting to 4 |
-| 6 | Jonah and the Big Fish · Jonás y el Gran Pez | "Pop the red bubble!" | Colors |
-| 7 | Daniel and the Lions · Daniel y los Leones | Tap each lion to put it to sleep | Counting |
-| 8 | Baby Jesus Is Born · Nace el Niño Jesús | Tap stars 1-2-3-4-5 to light the way | Number recognition |
-| 9 | Jesus Is Baptized · El Bautismo de Jesús | Memory match: God the Father, Jesus, the Holy Spirit | Memory, the Trinity |
-| 10 | Jesus Calms the Storm · Jesús Calma la Tormenta | Tap the storm clouds to calm the sea | Counting |
-| 11 | Jesus Feeds Everyone · Jesús Alimenta a Todos | Put 5 loaves and 2 fish in the basket | Counting to 7 |
-| 12 | The Lost Sheep · La Oveja Perdida | Hide-and-seek behind the bushes | Searching, persistence |
-| 13 | The Big Catch · La Gran Pesca | Tap the fish to fill Peter's boat | Counting to 7 |
-| 14 | The Good Samaritan · El Buen Samaritano | Bring the hurt man a bandage, water, bread and a blanket | Vocabulary, kindness |
-| 15 | Zacchaeus Climbs a Tree · Zaqueo Sube a un Árbol | Find Zacchaeus in the leaves | Searching |
+It is the sister app of [Bible Story Pals](https://github.com/Dan8NOD/bible-story-pals) and shares its engine.
+This code lives on the `feat/torah-version` branch of that repo. **It must never be merged into `main`**: `main` is
+Bible Story Pals and publishes that app's website.
 
-Stories 1–12 are on **Story Island**. Stories 13–15 are the three ports of **Friendship Sea**. Each world has its own map and a tab above it.
+**Torah Trail** (the five books of the Torah)
 
-**The Trinity** appears together in the baptism story, as Matthew 3:16–17 describes it: Jesus, the Holy Spirit as
-a dove, and the Father as a voice from heaven. The Father is drawn as light pouring down, never as a person.
+| # | Story | Passage | Mini-game | Skill |
+|---|-------|---------|-----------|-------|
+| 1 | Hashem Made the World | Genesis 1–2 | Tap sparkles to find the sun, trees, animals… | Vocabulary |
+| 2 | Noah's Big Boat | Genesis 6–9 | Tap the animals into the ark, two by two | Counting to 8 |
+| 3 | Abraham Counts the Stars | Genesis 12, 15 | Tap stars 1-2-3-4-5 | Number recognition |
+| 4 | Joseph's Colorful Coat | Genesis 37, 41–45 | Memory match: red, blue and yellow coats | Memory, colors |
+| 5 | Baby Moses | Exodus 2 | Steer the basket down the river, catch flowers | Fine motor, counting |
+| 6 | Crossing the Sea | Exodus 14–15 | Tap the people to help them cross | Counting to 6 |
+| 7 | Bread from Heaven | Exodus 16 | Fill six baskets with manna | Counting to 6 |
 
-Finishing a story earns a gold star on the home screen.
+**Kings and Prophets** (the Prophets and the Writings, in the Hebrew Bible's order)
 
-### Voice-Guided Prayers · Oraciones guiadas
+| # | Story | Passage | Mini-game | Skill |
+|---|-------|---------|-----------|-------|
+| 8 | Samuel Hears a Voice | 1 Samuel 3 | "Listen! Tap the moon." | Listening, vocabulary |
+| 9 | David the Brave | 1 Samuel 17 | Pick five smooth stones | Counting to 5 |
+| 10 | Elijah and the Ravens | 1 Kings 17 | Find the raven behind the bushes | Searching |
+| 11 | Jonah and the Big Fish | Jonah 1–3 | "Pop the red bubble!" | Colors |
+| 12 | Hashem Is My Shepherd | Psalm 23 | Tap the path home: grass, water, cup, the shepherd's hand | Order, counting to 4 |
+| 13 | Ruth and Naomi | Ruth 1–2 | Gather grain into Ruth's basket | Counting to 6 |
+| 14 | Queen Esther | Esther 2–8 | Find Queen Esther in the garden | Searching |
+| 15 | Daniel and the Lions | Daniel 6 | Tap each lion to put it to sleep | Counting |
+
+Each world has its own map and a tab above it. Finishing a story earns a gold star on the home screen.
+
+## How this version speaks and draws
+
+- **God's name is "Hashem"** in English and Spanish, and **השם** in Hebrew.
+- **Hashem is never drawn.** A voice from heaven is shown as light pouring down.
+- **No halos and no folded hands.** Angels have wings and a white robe. People who pray lift their hands or stand
+  quietly. The prayers tab is an open prayer book.
+- **Shabbat is part of the stories**: Creation ends on the seventh day, and the manna story gathers double on Friday.
+- **Passages follow the Hebrew Bible's numbering** (the bedtime prayer's verse is Psalm 4:9, which church Bibles
+  number 4:8).
+- **People keep their usual English and Spanish names** (Noah, Moses, Noé, Moisés). Spanish uses *rezar* for "pray",
+  and the names Boaz and Mordejai.
+- **Hebrew speaks to "you" in the plural** (לחצו, מצאתם), so no line has to guess whether a child is a boy or a girl.
+  It is written without vowel points.
+
+The Hebrew text was written by Claude and **has not been checked by a native speaker yet**. Have one read it
+before the app goes to the App Store.
+
+### Voice-Guided Prayers · Oraciones guiadas · תפילות מודרכות
 
 Three short prayers a family says together, opened from the **Voice-Guided Prayers** tab above the map. The voice
-reads one line, then the screen shows **"Your turn! / ¡Ahora ustedes!"** with a filling bar while everyone says it
-back, then moves on by itself. Pause holds the current step, the arrows step through by hand, and Listen starts the
-line over. Every step has its own animated scene. With narration off, each line waits long enough for a grown-up to
-read it aloud.
+reads one line, then the screen shows **"Your turn!"** with a filling bar while everyone says it back, then moves on
+by itself. Pause holds the current step, the arrows step through by hand, and Listen starts the line over. With
+narration off, each line waits long enough for a grown-up to read it aloud.
 
 | Prayer | Passage | App Store build |
 |---|---|---|
-| Thank You, God · Gracias, Dios | Psalm 100:4 | Free |
-| Goodnight, God · Buenas noches, Dios | Psalm 4:8 | Free |
-| God Bless the People I Love · Dios bendiga a quienes amo (includes a pause to say the names of people you love) | Numbers 6:24 | $1, the price of one story |
+| Thank You, Hashem · Gracias, Hashem · תודה, השם | Psalm 100:4 | Free |
+| Goodnight, Hashem · Buenas noches, Hashem · לילה טוב, השם | Psalm 4:9 | Free |
+| Hashem Bless the People I Love · Hashem bendiga a quienes amo · ברכה לאהובים שלנו (includes a pause to say the names of people you love) | Numbers 6:24 | $1, the price of one story |
 
 The prayers are data in `js/prayers.js`. They don't earn stars, and on the website all three are open.
 
 ## What makes it kid-, parent-, and store-friendly
 
-- **Three language modes:** English, Español, or **EN + ES**, which reads every page in both languages. That's great for bilingual homes and dual-language classrooms. On first launch it picks the device language.
-- **Read-aloud narration** uses the device's built-in text-to-speech (`es-MX`/`es-US` preferred for Spanish), so there are no audio files and the whole app is **under 250 KB**.
+- **Three languages, one or two at a time.** The chips **English**, **Español** and **עברית** are switches. Turn on
+  two and every page is shown and read in both. On first launch it picks the device language.
+- **Hebrew reads right to left**, while the buttons stay where a child already knows them.
+- **Read-aloud narration** plays recorded clips where a line has one, and the device's own voice for the rest.
 - **Works offline** after the first visit (service worker). Installable as an app (PWA manifest + icons).
-- **No ads, no accounts, no tracking, no network calls.** Progress is stored only on the device. This makes COPPA / Google Play "Designed for Families" / Apple Kids Category review straightforward. The website is free. In the App Store build the first **3 stories are free**, then a grown-up can buy any story for **$1** or everything left in a world for **$2** (see below).
-- **Grown-ups area** sits behind a 3-second press-and-hold gate. It has narration and sound toggles, the language setting, Bible references for each story, parent tips, and a star reset.
-- Big touch targets, swipe between pages, honors "reduce motion", and works on phones (portrait and landscape), tablets, Chromebooks and desktops.
-- All art is hand-built SVG in `js/art.js`, with no emoji or stock images, so there are no licensing questions. The font (Baloo 2) is OFL-licensed and bundled.
+- **No ads, no accounts, no tracking, no network calls.** Progress is stored only on the device. The website is
+  free. In the App Store build the first **3 stories are free**, then a grown-up can buy any story for **$1** or
+  everything left in a world for **$2** (see below).
+- **Grown-ups area** sits behind a 3-second press-and-hold gate. It has narration and sound toggles, the language
+  switches, the passage for each story, parent tips, and a star reset.
+- Big touch targets, swipe between pages, honors "reduce motion", and works on phones (portrait and landscape),
+  tablets, Chromebooks and desktops.
+- All art is hand-built SVG in `js/art.js`, with no emoji or stock images, so there are no licensing questions. The
+  font (Baloo 2) is OFL-licensed and bundled. It has no Hebrew letters, so Hebrew uses the device's own font.
 
 ## Run it
 
@@ -66,25 +95,23 @@ It is plain HTML/CSS/JS ES modules with no build step. Any static host works.
 
 ## Test it
 
-Every pull request runs this automatically (`.github/workflows/test.yml`). To run it yourself:
-
 ```bash
 npm install && npx playwright install chromium   # first time only
 npm test
 ```
 
-`tests/play-through.mjs` opens every story, reads every page, plays every mini-game to the
-reward screen, checks language switching and phone layouts, and fails on any console error.
-Add `--shots <dir>` to save a screenshot of every screen.
+`tests/play-through.mjs` opens every story, reads every page, plays every mini-game to the reward screen, checks
+the language switches and phone layouts, and fails on any console error. Add `--shots <dir>` to save a screenshot
+of every screen, and `--lang he` (or `es`, `en+he`…) to take them in another language.
 
 ## Publish it
 
-**Web (fastest, free):** every push to `main` deploys to GitHub Pages through `.github/workflows/pages.yml`.
-Turn it on once under **Settings → Pages → Source: GitHub Actions**. (Pages on a private repo needs a paid GitHub plan;
-on a free plan, make the repo public or upload the folder to Netlify, Cloudflare Pages or Vercel.)
-It must be served over HTTPS for offline/install to work.
+**Web:** there is no website for this version yet. GitHub Pages publishes only `main`, which is Bible Story Pals.
+The privacy policy inside the app names `dan8nod.github.io/torah-story-pals/privacy.html` (`POLICY_URL` in
+`js/config.js`), so that page has to exist before a build goes to the App Store. The simplest way is to give this
+version its own repository with Pages turned on.
 
-**iOS (App Store / TestFlight):** the Capacitor project lives in `ios/` (bundle ID `com.dancruz.biblestorypals`,
+**iOS (App Store / TestFlight):** the Capacitor project lives in `ios/` (bundle ID `com.dancruz.torahstorypals`,
 iPad and iPhone, landscape only, version in Xcode's General tab). After changing the game:
 
 ```bash
@@ -95,28 +122,36 @@ npm run ios:open   # opens Xcode: pick your team under Signing, Any iOS Device, 
 
 Inside the app, lines without a recorded clip are read by `@capacitor-community/text-to-speech` (the native iOS
 voice) instead of the WebView's speech API, the Donate button stays hidden, and the service worker is off.
-`ios/App/App/PrivacyInfo.xcprivacy` declares no tracking and no data collected. `npm run icons` also redraws the
-1024×1024 app icon and the launch image from the game art.
+`ios/App/App/PrivacyInfo.xcprivacy` declares no tracking and no data collected. `npm run icons` redraws the app
+icon and the launch image from the game art.
 
-**Unlocking stories (App Store build only).** God Made the World, Noah and Baby Moses are free. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering that story or everything left in its world. The grown-ups area sells the worlds too, and both screens can restore purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift` talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a reinstall, follow the family's Apple ID, and lock again after a refund. Ask to Buy approvals open the story as soon as they arrive. To try a purchase in the simulator without App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
+**Tester builds.** While `OPEN_FOR_TESTERS` in `js/config.js` is `true`, the app opens every story and prayer and
+hides everything about buying, the way the website does. The grown-ups area says so. It is on today because the
+in-app purchases don't exist in App Store Connect yet. Set it to `false` for the build that goes to the App Store.
 
-In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App Purchases → +** and create these 15 **Non-Consumable** products, each with English and Spanish display names and a review screenshot of the unlock screen. Submit them with the app version.
+**Unlocking stories (App Store build only).** The first three stops on Torah Trail are free: Creation, Noah and
+Abraham. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering that
+story or everything left in its world. The grown-ups area sells the worlds too, and both screens can restore
+purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of
+parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift`
+talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a
+reinstall, follow the family's Apple ID, and lock again after a refund. To try a purchase in the simulator without
+App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
 
-| Product ID (`com.dancruz.biblestorypals.` + …) | Unlocks | Price |
+In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App
+Purchases → +** and create these 15 **Non-Consumable** products. `npm run storekit -- --table` prints every
+product with its English, Spanish and Hebrew display name, and `npm run storekit` rewrites `Unlocks.storekit`
+after stories change.
+
+| Product ID (`com.dancruz.torahstorypals.` + …) | Unlocks | Price |
 |---|---|---|
-| `world.island` | Everything on Story Island (9 paid stories) | $2.00 |
-| `world.sea` | Everything on Friendship Sea (3 stories) | $2.00 |
-| `story.david`, `story.psalm23`, `story.jonah`, `story.daniel`, `story.nativity`, `story.baptism`, `story.storm`, `story.loaves`, `story.sheep` | One Story Island story | $1.00 |
-| `story.bigcatch`, `story.samaritan`, `story.zacchaeus` | One Friendship Sea story | $1.00 |
-| `prayer.blessing` | The voice-guided prayer God Bless the People I Love | $1.00 |
+| `world.torah` | Everything on Torah Trail (4 paid stories) | $2.00 |
+| `world.prophets` | Everything in Kings and Prophets (8 stories) | $2.00 |
+| `story.joseph`, `story.moses`, `story.redsea`, `story.manna` | One Torah Trail story | $1.00 |
+| `story.samuel`, `story.david`, `story.elijah`, `story.jonah`, `story.psalm23`, `story.ruth`, `story.esther`, `story.daniel` | One Kings and Prophets story | $1.00 |
+| `prayer.blessing` | The voice-guided prayer Hashem Bless the People I Love | $1.00 |
 
 The game shows whatever price the App Store reports, so the buttons always match the tier you pick.
-
-**Google Play:** add Android the same way (`npm i @capacitor/android && npx cap add android`).
-
-Before submitting:
-- Google Play: target the **Designed for Families** program, ages 5 & under / 6–8, with content rating "Everyone".
-- Apple: Kids Category, ages 5 & under. Privacy "nutrition label": **Data Not Collected**.
 
 ## Voices (ElevenLabs)
 
@@ -126,63 +161,55 @@ device voice until it is recorded again.
 
 ```bash
 export ELEVENLABS_API_KEY=...                  # elevenlabs.io → Profile → API keys
-node tools/voices.mjs --list-voices            # pick a warm storyteller voice for each language
-export ELEVENLABS_VOICE_EN=<id> ELEVENLABS_VOICE_ES=<id>
-node tools/voices.mjs --dry-run --budget 499   # what it would record, and the cost
-node tools/voices.mjs --budget 499             # record (never spends more than the budget)
+node tools/voices.mjs --dry-run --budget 1000  # what it would record, and the cost (needs no key)
+node tools/voices.mjs --budget 1000            # record (never spends more than the budget)
 ```
+
+English and Spanish keep the voices already in `audio/manifest.json`, so those need no setting. Hebrew needs a
+voice the first time (`node tools/voices.mjs --list-voices`, then `export ELEVENLABS_VOICE_HE=<id>`) and records
+with Eleven v3, because Flash and Multilingual v2 don't speak Hebrew. `--langs he` records one language alone.
+After removing or rewording stories, `node tools/voices.mjs --prune` deletes clips no line uses any more.
 
 Then bump `VERSION` in `sw.js` and commit `audio/`. Running it again continues where it stopped and never pays for
 a line twice. Lines are recorded in priority order: the whole Creation story first, then shared lines (praise and
-counting), then the voice-guided prayers (about 710 credits on Flash for all three, both languages), then the other
-stories.
+counting), then the voice-guided prayers, then the other stories.
 
-| Model | Credits/character | First story (EN + ES) | All 14 stories |
+| What | Model | Credits/character | To finish every line |
 |---|---|---|---|
-| `eleven_flash_v2_5` (default) | 0.5 | ~500 | ~5,200 |
-| `eleven_multilingual_v2` (`--model`) | 1 | ~1,000 | ~10,400 |
+| English + Spanish | `eleven_flash_v2_5` | 0.5 | about 5,000 (148 of 336 clips carried over from Bible Story Pals) |
+| Hebrew | `eleven_v3` | 1 | about 5,300 (nothing recorded yet) |
 
 `npm run test:voices` checks the script against a fake ElevenLabs server, so it costs no credits.
 
 ## Donations
 
-Set `DONATE_URL` in `js/config.js` to your Ko-fi, Buy Me a Coffee, PayPal.me or Stripe payment link. A bilingual
-"Support" section with a **Donate** button then appears in the grown-ups area, behind the hold-to-open gate, so
-children can't reach it. It stays hidden inside the native App Store / Google Play builds: Apple and Google don't
-allow external donation links in apps (except registered nonprofits). Use in-app "tip" purchases there if you want
-in-app support later.
-
-## Getting downloads (App Store Optimization)
-
-- **Title:** `Bible Story Pals: Kids Bible` / Spanish listing `Amiguitos de la Biblia: Biblia para niños`.
-  Localize the store listing in **both** English and Spanish (US + Mexico + Latin America). Spanish-language
-  kids' Bible apps have far less competition than English ones.
-- **Keywords:** kids bible, bible stories for kids, preschool, toddler, bilingual, español, biblia para niños,
-  historias bíblicas, Noah's ark, Christian games.
-- **Screenshots:** use the reward screen, Noah's ark game and the EN + ES caption. Run `npm test -- --shots shots/`
-  to capture them all.
-- **No ads, 3 free stories** is the hook (the website stays free). Churches, Sunday schools, Christian preschools and homeschool co-ops share
-  apps like this. A one-page flyer with a QR code to the web version is a cheap way to reach them.
-- **Retention:** add a new story every few weeks (see roadmap) so families come back.
+Set `DONATE_URL` in `js/config.js` to your Ko-fi, Buy Me a Coffee, PayPal.me or Stripe payment link. A "Support"
+section with a **Donate** button then appears in the grown-ups area, behind the hold-to-open gate, so children
+can't reach it. It stays hidden inside the native App Store / Google Play builds: Apple and Google don't allow
+external donation links in apps (except registered nonprofits).
 
 ## Add a story
 
-Stories are plain data in `js/stories.js`: pages with `{ en, es }` text, plus a scene made from art pieces
-(`[art, x, y, scale, options, animation]` on a 1000×600 stage). Then pick one of three mini-game types:
+Stories are plain data in `js/stories.js`: pages with `{ en, es, he }` text, plus a scene made from art pieces
+(`[art, x, y, scale, options, animation]` on a 1000×600 stage). Then pick a mini-game type:
 
-- `collect`: tap items. Modes are `fly` (into a target), `reveal` (sparkle → new thing, says the word) and `transform` (e.g. lion → sleeping lion).
-- `prompt`: "tap the ___" rounds (colors, numbers, shapes…).
+- `collect`: tap items. Modes are `fly` (into a target), `reveal` (sparkle → new thing, says the word) and
+  `transform` (e.g. empty basket → full basket).
+- `prompt`: "tap the ___" rounds (colors, numbers, listening…).
 - `steer`: drag to guide something and catch items.
+- `memory`: flip cards to find pairs.
+- `seek`: find who is hiding behind the bushes.
 
-Add the new file names to `sw.js` if you add files, and bump `VERSION` there whenever you ship changes.
+Add the story's id to a world in `WORLDS`, its passage to `REFS` in `js/main.js`, and run `npm run storekit`.
+Bump `VERSION` in `sw.js` whenever you ship changes. `docs/CREATOR-CANON.md` is the brief for what belongs here.
 
 ## Roadmap ideas
 
-- More stories: Adam & Eve's garden, Joseph's coat (colors), Easter morning.
-- Recorded human narration (EN + ES) as an optional upgrade over device voices.
-- Sing-along songs ("This Little Light of Mine" / "Esta lucecita").
-- Coloring pages generated from the same SVG art.
-- Sticker book screen for collected stars.
+- A native speaker's pass over the Hebrew, and a rounded Hebrew font to match Baloo 2.
+- Hebrew that mirrors the whole screen (arrows and all), not just the words.
+- More stories: Rebecca at the well, the Ten Commandments, Joshua and Jericho, Deborah, Hannah, Solomon's wish.
+- Holiday ribbons on the map (Purim on Queen Esther, Passover on Crossing the Sea, Shavuot on Ruth).
+- Traditional prayers as a choice: Modeh Ani, the bedtime Shema, the blessing over children.
 
 ## Project layout
 
@@ -190,15 +217,14 @@ Add the new file names to `sw.js` if you add files, and bump `VERSION` there whe
 index.html            app shell
 css/style.css         all styles + animations
 js/main.js            screens: home, story, game, reward, prayers, grown-ups
-js/stories.js         the 15 stories and the two worlds (bilingual text, scenes, game configs)
-js/prayers.js         the 3 voice-guided prayers (bilingual lines, echo steps, scenes)
+js/stories.js         the 15 stories and the two worlds (text in three languages, scenes, game configs)
+js/prayers.js         the 3 voice-guided prayers (lines, echo steps, scenes)
 js/games.js           mini-game engine (collect / prompt / steer / memory / seek)
 js/art.js             SVG characters, animals, props, backgrounds
-js/audio.js           narration (Web Speech) + synthesized sound effects (Web Audio)
-js/i18n.js, store.js  UI words, settings & progress
+js/audio.js           narration (recorded clips, then the device voice) + synthesized sound effects
+js/i18n.js, store.js  UI words, languages, settings & progress
 js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world; 2 free prayers, then $1 a prayer
 ios/                  Capacitor iOS app (UnlocksPlugin.swift sells stories and worlds)
-sw.js, manifest.webmanifest, icons/   offline + install
-tests/play-through.mjs                end-to-end test
-tools/make-icons.mjs                  regenerates the app icons from the art
+tools/                voices.mjs (ElevenLabs), make-icons.mjs, make-storekit.mjs, stage-www.mjs
+tests/                play-through, regressions, voices, native, unlocks, prayers
 ```

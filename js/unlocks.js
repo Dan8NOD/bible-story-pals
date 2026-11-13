@@ -10,15 +10,18 @@
 import { store } from './store.js';
 import { WORLDS, worldOf } from './stories.js';
 import { PRAYERS, FREE_PRAYERS } from './prayers.js';
+import { OPEN_FOR_TESTERS } from './config.js';
 
-export const FREE_STORIES = ['creation', 'noah', 'moses'];
-const BASE = 'com.dancruz.biblestorypals';
+// The first three stops on Torah Trail.
+export const FREE_STORIES = ['creation', 'noah', 'abraham'];
+const BASE = 'com.dancruz.torahstorypals';
 export const storyProduct = (id) => `${BASE}.story.${id}`;
 export const worldProduct = (id) => `${BASE}.world.${id}`;
 export const prayerProduct = (id) => `${BASE}.prayer.${id}`;
 
 const cap = typeof window !== 'undefined' ? window.Capacitor : null;
-export const paywalled = !!(cap?.isNativePlatform?.() && cap.PluginHeaders?.some((h) => h.name === 'Unlocks'));
+// Nothing is locked on the website, or in a tester build (see config.js).
+export const paywalled = !OPEN_FOR_TESTERS && !!(cap?.isNativePlatform?.() && cap.PluginHeaders?.some((h) => h.name === 'Unlocks'));
 
 let prices = {}; // the App Store's localized prices, e.g. "$0.99"
 const call = (method, options = {}) => cap.nativePromise('Unlocks', method, options);

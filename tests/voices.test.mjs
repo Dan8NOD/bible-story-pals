@@ -5,7 +5,7 @@
 import { createServer } from 'node:http';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { mkdtemp, readFile, readdir, rm, cp } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, cp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,6 +26,14 @@ const fake = createServer((req, res) => {
       res.writeHead(200, { 'content-type': 'audio/mpeg' });
       return res.end(Buffer.from('ID3fake-mp3'));
     }
+    if (req.url === '/v1/models') {
+      const speaks = (...ids) => ids.map((language_id) => ({ language_id }));
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(JSON.stringify([
+        { model_id: 'eleven_flash_v2_5', languages: speaks('en', 'es') },
+        { model_id: 'eleven_v3', languages: speaks('en', 'es', 'he') },
+      ]));
+    }
     if (req.url === '/v1/user/subscription') {
       res.writeHead(200, { 'content-type': 'application/json' });
       return res.end(JSON.stringify({ character_count: 100, character_limit: 10000 }));
@@ -34,7 +42,7 @@ const fake = createServer((req, res) => {
   });
 }).listen(0);
 
-const out = await mkdtemp(join(tmpdir(), 'bsp-voices-'));
+const out = await mkdtemp(join(tmpdir(), 'tsp-voices-'));
 const env = { ...process.env, ELEVENLABS_API_KEY: 'test-key', ELEVENLABS_VOICE_EN: 'voiceEN', ELEVENLABS_VOICE_ES: 'voiceES', ELEVENLABS_BASE_URL: `http://localhost:${fake.address().port}` };
 const voices = (...a) => run('node', [join(root, 'tools/voices.mjs'), '--out', out, ...a], { env });
 
@@ -60,15 +68,43 @@ assert.ok(second.length > 0 && !second.some((t) => calls.slice(0, before).some((
 // 3. A different voice is refused unless --redo.
 await assert.rejects(run('node', [join(root, 'tools/voices.mjs'), '--out', out], { env: { ...env, ELEVENLABS_VOICE_EN: 'other' } }));
 
-// 4. Dry run spends nothing.
+// 4. Dry run spends nothing, and needs no key.
 const n = calls.length;
 await voices('--dry-run', '--budget', '100000');
+const { ELEVENLABS_API_KEY: _key, ...noKey } = env;
+const dry = await run('node', [join(root, 'tools/voices.mjs'), '--out', out, '--dry-run', '--langs', 'en,es,he', '--budget', '100000'], { env: noKey });
+assert.match(dry.stdout, /he: eleven_v3/);
 assert.equal(calls.length, n);
+
+// 5. Hebrew has its own voice and model (Eleven v3, a credit a character), and --langs records it alone.
+//    The English and Spanish voices come from the manifest, so only Hebrew's needs naming.
+const heEnv = { ...noKey, ELEVENLABS_API_KEY: 'test-key', ELEVENLABS_VOICE_EN: '', ELEVENLABS_VOICE_ES: '', ELEVENLABS_VOICE_HE: 'voiceHE' };
+await assert.rejects(run('node', [join(root, 'tools/voices.mjs'), '--out', out, '--langs', 'he', '--model-he', 'eleven_flash_v2_5'], { env: heEnv }), /doesn't speak "he"/);
+assert.equal(calls.length, n, 'a model that cannot speak Hebrew must not be charged');
+await run('node', [join(root, 'tools/voices.mjs'), '--out', out, '--langs', 'he', '--budget', '300'], { env: heEnv });
+const he = calls.slice(n);
+assert.ok(he.length > 0 && he.every((c) => c.voice === 'voiceHE' && c.model_id === 'eleven_v3' && c.language_code === 'he'));
+assert.ok(he.reduce((sum, c) => sum + c.text.length, 0) <= 300, 'Hebrew costs a credit a character');
+assert.equal(he[0].text, first.he);
+const after = JSON.parse(await readFile(join(out, 'manifest.json'), 'utf8'));
+assert.equal(after.models.he, 'eleven_v3');
+assert.equal(after.voices.en, 'voiceEN');
+assert.ok(after.clips.he.includes(clipId(first.he)));
+
+// 6. --prune removes clips no line uses any more, and nothing else.
+after.clips.en.push('0stale0');
+await writeFile(join(out, 'manifest.json'), JSON.stringify(after));
+await writeFile(join(out, 'en', '0stale0.mp3'), 'old');
+await run('node', [join(root, 'tools/voices.mjs'), '--out', out, '--prune'], { env: noKey });
+const pruned = JSON.parse(await readFile(join(out, 'manifest.json'), 'utf8'));
+assert.ok(!pruned.clips.en.includes('0stale0') && !(await readdir(join(out, 'en'))).includes('0stale0.mp3'));
+assert.equal(pruned.clips.en.length, after.clips.en.length - 1);
+assert.equal(pruned.clips.he.length, after.clips.he.length);
 fake.close();
-console.log(`✓ voices script: ${before} clips for ${credits} credits on a 499 budget; resume, voice-change guard and dry run OK`);
+console.log(`✓ voices script: ${before} clips for ${credits} credits on a 499 budget; resume, voice-change guard, dry run, Hebrew and prune OK`);
 
 // 5. The game plays the recorded clip for page 1 of the first story.
-const site = await mkdtemp(join(tmpdir(), 'bsp-site-'));
+const site = await mkdtemp(join(tmpdir(), 'tsp-site-'));
 await cp(root, site, { recursive: true, filter: (p) => !p.includes('node_modules') && !p.endsWith('/audio') });
 await cp(out, join(site, 'audio'), { recursive: true });
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.mp3': 'audio/mpeg', '.woff2': 'font/woff2', '.svg': 'image/svg+xml' };

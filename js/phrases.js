@@ -16,15 +16,15 @@ export function clipId(text) {
   return h.toString(36).padStart(7, '0');
 }
 
-// { en, es } entries in recording priority: the first story (so a small budget
+// { en, es, he } entries in recording priority: the first story (so a small budget
 // still gives one fully voiced story), the lines every game shares, the
 // voice-guided prayers, then the other stories.
 export function allPhrases() {
   const seen = new Set();
   const out = [];
   const add = (e) => {
-    if (!e?.en || !e?.es) return;
-    const key = `${e.en}\u0000${e.es}`;
+    if (!e?.en || !e?.es || !e?.he) return;
+    const key = `${e.en}\u0000${e.es}\u0000${e.he}`;
     if (!seen.has(key)) { seen.add(key); out.push(e); }
   };
   const story = (s) => {

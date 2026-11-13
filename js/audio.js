@@ -4,7 +4,7 @@
 // Inside the iOS app that fallback is the native voice (@capacitor-community/
 // text-to-speech), which is steadier than the WebView's speechSynthesis.
 
-import { store, langs } from './store.js';
+import { store, langs, LANGS } from './store.js';
 import { clipId } from './phrases.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -12,8 +12,9 @@ const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
 // directly; nativePromise is what @capacitor/core's plugin proxies call.
 const cap = typeof window !== 'undefined' ? window.Capacitor : null;
 const nativeTTS = !!(cap?.isNativePlatform?.() && cap.PluginHeaders?.some((h) => h.name === 'TextToSpeech'));
-const LOCALES = { en: ['en-US', 'en-GB', 'en'], es: ['es-MX', 'es-US', 'es-419', 'es-ES', 'es'] };
-const NICE = /(Samantha|Paulina|Monica|Mónica|Google|Siri|Natural|Enhanced|Premium)/i;
+// 'iw' is the old code some Android devices still use for Hebrew.
+const LOCALES = { en: ['en-US', 'en-GB', 'en'], es: ['es-MX', 'es-US', 'es-419', 'es-ES', 'es'], he: ['he-IL', 'he', 'iw-IL', 'iw'] };
+const NICE = /(Samantha|Paulina|Monica|Mónica|Carmit|Google|Siri|Natural|Enhanced|Premium)/i;
 let voices = [];
 let speakToken = 0;
 const listeners = new Set();
@@ -39,10 +40,10 @@ const emit = (on) => listeners.forEach((fn) => fn(on));
 
 /* ---------------- recorded clips ---------------- */
 
-let clips = { en: new Set(), es: new Set() };
+let clips = Object.fromEntries(LANGS.map((l) => [l, new Set()]));
 const clipsReady = typeof fetch === 'undefined' ? Promise.resolve() : fetch('audio/manifest.json')
   .then((r) => (r.ok ? r.json() : null))
-  .then((m) => { if (m) clips = { en: new Set(m.clips?.en || []), es: new Set(m.clips?.es || []) }; })
+  .then((m) => { if (m) clips = Object.fromEntries(LANGS.map((l) => [l, new Set(m.clips?.[l] || [])])); })
   .catch(() => { /* no recordings yet */ });
 
 // One reusable element: once unlocked by a tap, iOS lets it play later clips too.
@@ -113,8 +114,8 @@ function silence() {
   if (stopClip) stopClip();
 }
 
-// Speak an { en, es } entry, or a list of them, in the chosen language(s):
-// all English lines first, then all Spanish ones. Resolves when finished.
+// Speak an { en, es, he } entry, or a list of them, in the chosen language(s):
+// every line in the first language, then every line in the second. Resolves when finished.
 export async function speak(entries, { force = false } = {}) {
   const token = ++speakToken;
   silence();

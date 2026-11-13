@@ -16,8 +16,8 @@ const icon = (pad = 1, rounded = true) => `<svg xmlns="http://www.w3.org/2000/sv
   <g transform="translate(256 256) scale(${pad}) translate(-256 -256)">
     <g transform="translate(256 330) scale(2.3)">${ART.rainbow()}</g>
     <path d="M0 400 Q256 340 512 400 L512 512 L0 512 Z" fill="#8bc34a"/>
-    ${place('star', 410, 110, 0.75)}
-    ${place('sheep', 256, 300, 2.6)}
+    ${place('scroll', 398, 118, 1.25)}
+    ${place('sheep', 236, 306, 2.5)}
   </g>
 </svg>`;
 

@@ -1,10 +1,10 @@
 import { STORIES, WORLDS, byId, worldById, worldOf } from './stories.js';
 import { sceneSVG, place, ART, INK } from './art.js';
 import { speak, stopSpeaking, sfx, onSpeaking, unlockAudio } from './audio.js';
-import { store, langs } from './store.js';
-import { UI, PRAISE, COUNT, pick } from './i18n.js';
+import { store, langs, toggleLang, LANGS } from './store.js';
+import { UI, PRAISE, COUNT, pick, LANG_NAMES } from './i18n.js';
 import { startGame } from './games.js';
-import { DONATE_URL } from './config.js';
+import { DONATE_URL, POLICY_URL, OPEN_FOR_TESTERS } from './config.js';
 import { paywalled, isOpen, lockedIn, storyProduct, worldProduct, priceOf, refresh, loadPrices, buy, restore, FREE_STORIES, prayerProduct, prayerOpen } from './unlocks.js';
 import { PRAYERS, FREE_PRAYERS, prayerById } from './prayers.js';
 
@@ -22,7 +22,8 @@ const ICON = {
   play: ic('<path d="M15 9 L38 24 L15 39 Z" fill="currentColor"/>'),
   lock: ic('<rect x="10" y="21" width="28" height="20" rx="4"/><path d="M16 21 V15 A8 8 0 0 1 32 15 V21"/>'),
   pause: ic('<path d="M17 11 V37 M31 11 V37"/>'),
-  pray: ic('<path d="M24 41 V12 Q24 6 19 9 L11 24 Q8 30 10 35 L14 41 M24 41 V12 Q24 6 29 9 L37 24 Q40 30 38 35 L34 41"/>'),
+  // An open prayer book.
+  pray: ic('<path d="M24 14 Q15 7 6 10 V37 Q15 34 24 41 Q33 34 42 37 V10 Q33 7 24 14 Z"/><path d="M24 14 V41"/>'),
 };
 const starIcon = (fill = '#ffd54f') => `<svg viewBox="-50 -50 100 100" aria-hidden="true">${ART.star({ color: fill })}</svg>`;
 const logo = () => `<svg viewBox="-62 -62 124 124" aria-hidden="true"><circle r="58" fill="#ffd54f" stroke="${INK}" stroke-width="4"/>${place('sheep', 0, -2, 0.95)}</svg>`;
@@ -30,7 +31,14 @@ const logo = () => `<svg viewBox="-62 -62 124 124" aria-hidden="true"><circle r=
 /* ---------------- text helpers ---------------- */
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const t = (entry) => entry[langs()[0]];
+// Hebrew reads right to left. Anything tagged lang="he" turns itself around (see style.css).
+const rtl = () => langs()[0] === 'he';
+// A title or a passage in the language(s) in use, e.g. "Baby Moses / משה התינוק".
+const both = (entry) => langs().map((l) => entry[l]).join(' / ');
 const lines = (entry) => langs().map((l) => `<div class="line ${l}" lang="${l}">${esc(entry[l])}</div>`).join('');
+// One chip per language. Each is a switch: one or two can be on at a time (see store.js).
+const langChips = () => `<div class="chips" role="group" aria-label="${esc(LANGS.map((l) => UI.language[l]).join(' / '))}">${
+  LANGS.map((l) => `<button class="chip" data-lang="${l}" lang="${l}" aria-pressed="${langs().includes(l)}">${LANG_NAMES[l]}</button>`).join('')}</div>`;
 const titleHTML = (entry) => {
   const [a, b] = langs();
   return `${esc(entry[a])}${b ? `<small lang="${b}">${esc(entry[b])}</small>` : ''}`;
@@ -54,6 +62,7 @@ function route() {
   generation++;
   stopSpeaking();
   document.documentElement.lang = langs()[0];
+  document.documentElement.classList.toggle('he-first', rtl());
   const parts = current.replace(/^#\/?/, '').split('/');
   const story = byId(parts[1]);
   // A story that isn't unlocked waits behind the grown-up screen, and opens once it's bought.
@@ -100,7 +109,7 @@ function wireSound(root) {
   });
 }
 
-/* ---------------- home: island map ---------------- */
+/* ---------------- home: the two maps ---------------- */
 // Stories sit on a path that snakes across an island: 4 stops per row on wide
 // screens, 2 per row on portrait phones. Both maps are drawn and CSS shows the
 // one that fits, so rotating the device needs no re-render.
@@ -112,10 +121,10 @@ const PAL = { robe: '#f48fb1', hair: '#5d4037', sash: '#ffd54f' };
 const r = Math.round;
 const pct = (v, total) => `${((v / total) * 100).toFixed(2)}%`;
 
-// Friendship Sea has only three ports, each on its own little island.
-const SEA_LAYOUTS = {
-  wide: { w: 1000, h: 540, pts: [[185, 320], [500, 180], [815, 320]] },
-  tall: { w: 600, h: 1020, pts: [[175, 235], [425, 530], [175, 815]] },
+// Each world's island has its own look: Torah Trail is green, Kings and Prophets is golden hill country.
+const THEMES = {
+  torah: { land: '#9ad77f', patch: '#8ccc70', path: ['#e3c08a', '#fbe7bd', '#dcb376'], palms: false },
+  prophets: { land: '#f0d48a', patch: '#e3bd62', path: ['#c79d63', '#fff6dc', '#b58a4f'], palms: true },
 };
 
 function mapLayout({ cols, w, x0, dx, y0, dy }, n) {
@@ -179,60 +188,27 @@ function scatter({ w, h, pts }, count, seed, clear) {
   return out;
 }
 
-function mapArt(L, cls) {
+function mapArt(L, cls, theme) {
   const { w, h, pts } = L;
   const shore = coast(w, h);
   const inland = `translate(${w / 2} ${h / 2}) scale(${(1 - 44 / w).toFixed(3)} ${(1 - 44 / h).toFixed(3)}) translate(${-w / 2} ${-h / 2})`;
   const wave = (x, y) => `<path d="M${r(x - 34)} ${r(y)} q17 -14 34 0 q17 -14 34 0" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/>`;
   const waves = [[0.06, 0.05], [0.93, 0.06], [0.05, 0.95], [0.94, 0.95], [0.03, 0.5], [0.97, 0.45]].map(([x, y]) => wave(x * w, y * h)).join('');
-  const patches = scatter(L, 6, 11, false).map(([x, y]) => `<circle cx="${r(x)}" cy="${r(y)}" r="80" fill="#8ccc70" opacity=".55"/>`).join('');
-  const trees = scatter(L, cls === 'wide' ? 10 : 8, 5, true).map(([x, y]) => `<g transform="translate(${r(x)} ${r(y)})"><rect x="-3" y="6" width="6" height="16" rx="2" fill="#8d5a3b"/><circle r="17" fill="#43a047"/><circle cx="5" cy="-6" r="8" fill="#66bb6a"/></g>`).join('');
+  const patches = scatter(L, 6, 11, false).map(([x, y]) => `<circle cx="${r(x)}" cy="${r(y)}" r="80" fill="${theme.patch}" opacity=".55"/>`).join('');
+  const tree = theme.palms
+    ? `<path d="M0 22 Q-4 6 1 -8" fill="none" stroke="#8d5a3b" stroke-width="5" stroke-linecap="round"/><path d="M1 -8 Q-16 -20 -24 -4 M1 -8 Q18 -20 26 -4 M1 -8 Q-8 -28 -19 -24 M1 -8 Q10 -28 21 -24" fill="none" stroke="#43a047" stroke-width="5" stroke-linecap="round"/>`
+    : `<rect x="-3" y="6" width="6" height="16" rx="2" fill="#8d5a3b"/><circle r="17" fill="#43a047"/><circle cx="5" cy="-6" r="8" fill="#66bb6a"/>`;
+  const trees = scatter(L, cls === 'wide' ? 10 : 8, 5, true).map(([x, y]) => `<g transform="translate(${r(x)} ${r(y)})">${tree}</g>`).join('');
   const path = smooth(pts);
   return `<svg class="map-art ${cls}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
     ${waves}
     <path d="${shore}" fill="#f7e3a3" stroke="#fff3cf" stroke-width="6"/>
-    <path d="${shore}" fill="#9ad77f" transform="${inland}"/>
+    <path d="${shore}" fill="${theme.land}" transform="${inland}"/>
     ${patches}
-    <path d="${path}" fill="none" stroke="#e3c08a" stroke-width="30" stroke-linecap="round"/>
-    <path d="${path}" fill="none" stroke="#fbe7bd" stroke-width="22" stroke-linecap="round"/>
-    <path d="${path}" fill="none" stroke="#dcb376" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 26"/>
+    <path d="${path}" fill="none" stroke="${theme.path[0]}" stroke-width="30" stroke-linecap="round"/>
+    <path d="${path}" fill="none" stroke="${theme.path[1]}" stroke-width="22" stroke-linecap="round"/>
+    <path d="${path}" fill="none" stroke="${theme.path[2]}" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 26"/>
     ${trees}
-  </svg>`;
-}
-
-// Open water, a dotted sailing route between the ports, and an island with a dock under each one.
-function seaArt(L, cls) {
-  const { w, h, pts } = L;
-  const route = smooth(pts);
-  const k = cls === 'wide' ? 1 : 1.05;
-  const waves = [];
-  for (let row = 0; row < 7; row++) {
-    for (let col = 0; col < 6; col++) {
-      const x = ((col + (row % 2) / 2 + 0.2) / 6) * w;
-      const y = ((row + 0.5) / 7) * h;
-      if (!pts.some(([px, py]) => Math.hypot(x - px, (y - py - 40) * 1.2) < 190 * k)) {
-        waves.push(`<path d="M${r(x - 26)} ${r(y)} q13 -11 26 0 q13 -11 26 0" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".45"/>`);
-      }
-    }
-  }
-  const islands = pts.map(([x, y]) => {
-    const cy = y + 42 * k;
-    return `<g>
-      <rect x="${r(x + 92 * k)}" y="${r(cy + 42 * k)}" width="${r(86 * k)}" height="13" rx="4" fill="#a1744a"/>
-      <rect x="${r(x + 116 * k)}" y="${r(cy + 50 * k)}" width="8" height="26" fill="#8d5a3b"/>
-      <rect x="${r(x + 160 * k)}" y="${r(cy + 50 * k)}" width="8" height="26" fill="#8d5a3b"/>
-      <ellipse cx="${x}" cy="${r(cy)}" rx="${r(138 * k)}" ry="${r(112 * k)}" fill="#f7e3a3" stroke="#fff3cf" stroke-width="6"/>
-      <ellipse cx="${x}" cy="${r(cy - 6 * k)}" rx="${r(112 * k)}" ry="${r(90 * k)}" fill="#9ad77f"/>
-    </g>`;
-  }).join('');
-  const [bx, by] = [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2];
-  const [cx, cy] = [(pts[1][0] + pts[2][0]) / 2, (pts[1][1] + pts[2][1]) / 2];
-  return `<svg class="map-art ${cls}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
-    ${waves.join('')}
-    <path d="${route}" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="1 24" opacity=".9"/>
-    ${islands}
-    ${place('boat', r(bx), r(by + 30), 0.5, {}, 'rock')}
-    ${place('fish', r(cx), r(cy + 80), 0.55, {}, 'bob')}
   </svg>`;
 }
 
@@ -248,10 +224,9 @@ function coverDisc(s) {
 function homeScreen() {
   const world = worldById(store.get('world')) || WORLDS[0];
   const stories = world.stories.map(byId);
-  const sea = world.id === 'sea';
-  const wide = sea ? SEA_LAYOUTS.wide : mapLayout(LAYOUTS.wide, stories.length);
-  const tall = sea ? SEA_LAYOUTS.tall : mapLayout(LAYOUTS.tall, stories.length);
-  const art = sea ? seaArt : mapArt;
+  const wide = mapLayout(LAYOUTS.wide, stories.length);
+  const tall = mapLayout(LAYOUTS.tall, stories.length);
+  const theme = THEMES[world.id];
   // The pal waits at the first story without a star.
   const here = Math.max(0, stories.findIndex((s) => !store.hasStar(s.id)));
   const stops = stories.map((s, i) => {
@@ -270,8 +245,7 @@ function homeScreen() {
     </button>`;
   }).join('');
   const heading = langs().map((l) => `<span lang="${l}">${esc(UI.welcome[l])}</span>`).join(' ');
-  const lang = store.get('lang');
-  const tabIcon = { island: place('palm', 0, 18, 0.32), sea: place('boat', 0, 6, 0.42) };
+  const tabIcon = { torah: place('scroll', 0, 2, 0.5), prophets: place('crown', 0, 4, 0.62) };
   const tabs = WORLDS.map((w) => `<button class="world-tab" data-world="${w.id}" aria-pressed="${w === world}">
     <svg viewBox="-34 -34 68 68" aria-hidden="true">${tabIcon[w.id]}</svg><span>${titleHTML(w.title)}</span>
   </button>`).join('');
@@ -279,11 +253,7 @@ function homeScreen() {
     <div class="home-top">
       <div class="brand">${logo()}<h1>${titleHTML(UI.appName)}</h1></div>
       <div class="top-right">
-        <div class="chips" role="group" aria-label="Language / Idioma">
-          <button class="chip" data-lang="en" lang="en" aria-pressed="${lang === 'en'}">English</button>
-          <button class="chip" data-lang="es" lang="es" aria-pressed="${lang === 'es'}">Español</button>
-          <button class="chip" data-lang="both" aria-pressed="${lang === 'both'}">EN + ES</button>
-        </div>
+        ${langChips()}
         <div class="star-count" aria-label="${store.starCount()} / ${STORIES.length}">${starIcon()}<span>${store.starCount()}/${STORIES.length}</span></div>
         ${soundButton()}
         <button class="icon-btn small" id="parents" aria-label="${esc(t(UI.parents))}">${ICON.lock}</button>
@@ -293,7 +263,7 @@ function homeScreen() {
       <button class="world-tab prayers-tab" data-act="prayers">${ICON.pray}<span>${titleHTML(UI.prayers)}</span></button>
     </div>
     <nav class="map ${world.id}" aria-label="${esc(t(world.title))}" style="--wide-ar:${wide.w} / ${wide.h};--wide-r:${(wide.w / wide.h).toFixed(4)};--tall-ar:${tall.w} / ${tall.h}">
-      ${art(wide, 'wide')}${art(tall, 'tall')}
+      ${mapArt(wide, 'wide', theme)}${mapArt(tall, 'tall', theme)}
       <div class="map-title"><h2>${heading}</h2>${langs().length === 1 ? `<p>${esc(t(UI.tapMap))}</p>` : ''}</div>
       ${stops}
     </nav>
@@ -313,7 +283,7 @@ function homeScreen() {
     speak(worldById(b.dataset.world).title);
   }));
   app.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => {
-    store.set('lang', c.dataset.lang);
+    toggleLang(c.dataset.lang);
     sfx.tap();
     route();
     speak(UI.welcome);
@@ -373,7 +343,7 @@ function storyScreen(story, i) {
 /* ---------------- games ---------------- */
 function gameScreen(story) {
   const cfg = story.game;
-  const prompt = cfg.prompt || { en: '', es: '' };
+  const prompt = cfg.prompt || { en: '', es: '', he: '' };
   app.innerHTML = `<section class="screen">
     <div class="stage"><svg class="stage-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
       <div class="hud">
@@ -644,6 +614,25 @@ const BUY_TEXT = {
     erase: 'Borrar',
     cancel: 'Cancelar',
   },
+  he: {
+    wall: (n) => `${n} הסיפורים הראשונים חינם. מבוגרים יכולים לפתוח את הסיפור הזה, או את כל הסיפורים שנשארו בעולם הזה. זו רכישה חד-פעמית, והיא נשארת שלכם.`,
+    story: (p) => `הסיפור הזה · ${p}`,
+    prayerWall: (n) => `${n} תפילות הן חינם. מבוגרים יכולים לפתוח את התפילה הזאת במחיר של סיפור אחד. זו רכישה חד-פעמית, והיא נשארת שלכם.`,
+    prayer: (p) => `התפילה הזאת · ${p}`,
+    world: (name, n, p) => `${n === 1 ? 'הסיפור שנשאר' : `כל ${n} הסיפורים שנשארו`} ב„${name}” · ${p}`,
+    buying: 'פותחים את ה-App Store…',
+    pending: 'ממתינים לאישור הרכישה מההורה. הסיפור ייפתח ברגע שהיא תאושר.',
+    failed: 'ה-App Store לא זמין כרגע. נסו שוב מאוחר יותר.',
+    restore: 'שחזור רכישות',
+    restored: 'הרכישות נבדקו.',
+    title: 'סיפורים',
+    open: (a, b) => `${a} מתוך ${b} סיפורים פתוחים`,
+    allOpen: 'כל הסיפורים פתוחים.',
+    gate: 'למבוגרים בלבד',
+    ask: (a, b) => `כמה זה ${a} כפול ${b}?`,
+    erase: 'מחיקה',
+    cancel: 'ביטול',
+  },
 };
 
 // Buys a product behind the math gate, reporting progress in `note`. Calls `onPaid` once
@@ -799,15 +788,21 @@ function mathGate(onPass) {
 }
 
 /* ---------------- grown-ups ---------------- */
+const GATE_TEXT = {
+  en: { title: 'Grown-ups only', how: 'Press and hold the button for 3 seconds.', hold: 'Hold' },
+  es: { title: 'Solo para adultos', how: 'Mantén presionado el botón por 3 segundos.', hold: 'Mantener' },
+  he: { title: 'למבוגרים בלבד', how: 'לחצו על הכפתור והחזיקו 3 שניות.', hold: 'להחזיק' },
+};
+
 function parentGate() {
   const el = document.createElement('div');
   el.className = 'gate';
-  const es = langs()[0] === 'es';
+  const G = GATE_TEXT[langs()[0]];
   el.innerHTML = `<div class="box" role="dialog" aria-modal="true">
-    <h3>${es ? 'Solo para adultos' : 'Grown-ups only'}</h3>
-    <p>${es ? 'Mantén presionado el botón por 3 segundos.' : 'Press and hold the button for 3 seconds.'}</p>
+    <h3>${esc(G.title)}</h3>
+    <p>${esc(G.how)}</p>
     <div class="row" style="display:flex;gap:12px;justify-content:center">
-      <button class="big-btn green hold"><span class="fill"></span><span>${es ? 'Mantener' : 'Hold'}</span></button>
+      <button class="big-btn green hold"><span class="fill"></span><span>${esc(G.hold)}</span></button>
       <button class="big-btn" data-act="cancel">✕</button>
     </div>
   </div>`;
@@ -830,71 +825,99 @@ function parentGate() {
   el.addEventListener('click', (e) => { if (e.target === el) el.remove(); });
 }
 
+// Where each story comes from, for grown-ups. Chapters follow the Hebrew Bible's numbering.
 const REFS = {
-  creation: 'Genesis 1–2 · Génesis 1–2',
-  noah: 'Genesis 6–9 · Génesis 6–9',
-  moses: 'Exodus 2 · Éxodo 2',
-  david: '1 Samuel 17',
-  psalm23: 'Psalm 23 · Salmo 23',
-  jonah: 'Jonah 1–3 · Jonás 1–3',
-  daniel: 'Daniel 6',
-  loaves: 'John 6:1–14 · Juan 6:1–14',
-  nativity: 'Luke 2:1–20 · Lucas 2:1–20',
-  baptism: 'Matthew 3:13–17 · Mateo 3:13–17',
-  storm: 'Mark 4:35–41 · Marcos 4:35–41',
-  bigcatch: 'Luke 5:1–11 · Lucas 5:1–11',
-  samaritan: 'Luke 10:25–37 · Lucas 10:25–37',
-  sheep: 'Luke 15:3–7 · Lucas 15:3–7',
-  zacchaeus: 'Luke 19:1–10 · Lucas 19:1–10',
+  creation: { en: 'Genesis 1–2', es: 'Génesis 1–2', he: 'בראשית א–ב' },
+  noah: { en: 'Genesis 6–9', es: 'Génesis 6–9', he: 'בראשית ו–ט' },
+  abraham: { en: 'Genesis 12 and 15', es: 'Génesis 12 y 15', he: 'בראשית יב, טו' },
+  joseph: { en: 'Genesis 37 and 41–45', es: 'Génesis 37 y 41–45', he: 'בראשית לז, מא–מה' },
+  moses: { en: 'Exodus 2', es: 'Éxodo 2', he: 'שמות ב' },
+  redsea: { en: 'Exodus 14–15', es: 'Éxodo 14–15', he: 'שמות יד–טו' },
+  manna: { en: 'Exodus 16', es: 'Éxodo 16', he: 'שמות טז' },
+  samuel: { en: '1 Samuel 3', es: '1 Samuel 3', he: 'שמואל א, ג' },
+  david: { en: '1 Samuel 17', es: '1 Samuel 17', he: 'שמואל א, יז' },
+  elijah: { en: '1 Kings 17', es: '1 Reyes 17', he: 'מלכים א, יז' },
+  jonah: { en: 'Jonah 1–3', es: 'Jonás 1–3', he: 'יונה א–ג' },
+  psalm23: { en: 'Psalm 23', es: 'Salmo 23', he: 'תהילים כג' },
+  ruth: { en: 'Ruth 1–2', es: 'Rut 1–2', he: 'רות א–ב' },
+  esther: { en: 'Esther 2–8', es: 'Ester 2–8', he: 'אסתר ב–ח' },
+  daniel: { en: 'Daniel 6', es: 'Daniel 6', he: 'דניאל ו' },
 };
 
 const PARENT_TEXT = {
   en: {
     title: 'For grown-ups',
-    about: 'Bible Story Pals is a bilingual (English & Spanish) Bible story game for children ages 3–6. Every story is read aloud, so no reading is needed. Each story ends with a gentle mini-game that practices counting, colors, numbers and new words.',
+    about: 'Torah Story Pals is a story game in English, Spanish and Hebrew for children ages 3–6, with stories from the Torah, the Prophets and the Writings. Every story is read aloud, so no reading is needed. Each story ends with a gentle mini-game that practices counting, colors, numbers and new words.',
     privacy: 'Privacy: no ads, no in-app purchases, no accounts, no tracking. Nothing your child does leaves this device. After the first visit it works offline.',
     privacyApp: 'Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The first stories and two voice-guided prayers are free. Others are one-time purchases made by a grown-up through the App Store.',
-    supportTitle: 'Support Bible Story Pals',
+    supportTitle: 'Support Torah Story Pals',
     support: 'This game is free with no ads. If it blesses your family, a gift helps us make more stories.',
     donate: 'Donate',
     tipsTitle: 'Tips',
     tips: [
-      'Choose “EN + ES” to hear every page in both languages.',
+      'Turn on two languages to hear every page in both.',
       'Pause and ask: “How do you think Noah felt?”',
       'Point to things in the picture and name them together.',
     ],
     settings: 'Settings', narration: 'Read stories aloud', sfx: 'Sound effects', lang: 'Language',
-    reset: 'Reset stars', resetAsk: 'Tap again to remove all stars', resetDone: 'Stars reset', storiesTitle: 'Stories & Bible passages', back: 'Back to stories',
-    prayersTitle: 'Voice-guided prayers & Bible passages',
-    voices: 'Narration uses your device’s built-in voices. For the best Spanish voice, install a Spanish (Mexico or US) voice in your device’s text-to-speech settings.',
+    reset: 'Reset stars', resetAsk: 'Tap again to remove all stars', resetDone: 'Stars reset', storiesTitle: 'Stories & where they come from', back: 'Back to stories',
+    prayersTitle: 'Voice-guided prayers & their verses',
+    voices: 'Lines without a recorded voice are read by your device’s built-in voices. For the best Spanish or Hebrew voice, install one in your device’s text-to-speech settings.',
   },
   es: {
     title: 'Para adultos',
-    about: 'Amiguitos de la Biblia es un juego bilingüe (español e inglés) de historias bíblicas para niños de 3 a 6 años. Todas las historias se leen en voz alta, así que no hace falta saber leer. Cada historia termina con un minijuego que practica contar, los colores, los números y palabras nuevas.',
+    about: 'Amiguitos de la Torá es un juego de historias en español, inglés y hebreo para niños de 3 a 6 años, con historias de la Torá, los Profetas y los Escritos. Todas las historias se leen en voz alta, así que no hace falta saber leer. Cada historia termina con un minijuego que practica contar, los colores, los números y palabras nuevas.',
     privacy: 'Privacidad: sin anuncios, sin compras dentro de la app, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo. Después de la primera visita funciona sin internet.',
     privacyApp: 'Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. Las primeras historias y dos oraciones guiadas son gratis. Las demás son compras únicas que hace un adulto en el App Store.',
-    supportTitle: 'Apoye a Amiguitos de la Biblia',
+    supportTitle: 'Apoye a Amiguitos de la Torá',
     support: 'Este juego es gratis y sin anuncios. Si bendice a su familia, una ofrenda nos ayuda a crear más historias.',
     donate: 'Donar',
     tipsTitle: 'Consejos',
     tips: [
-      'Elija “EN + ES” para escuchar cada página en los dos idiomas.',
+      'Active dos idiomas para escuchar cada página en ambos.',
       'Haga una pausa y pregunte: “¿Cómo crees que se sintió Noé?”',
       'Señalen cosas en el dibujo y nómbrenlas juntos.',
     ],
     settings: 'Ajustes', narration: 'Leer las historias en voz alta', sfx: 'Efectos de sonido', lang: 'Idioma',
-    reset: 'Borrar estrellas', resetAsk: 'Toque otra vez para borrar todas las estrellas', resetDone: 'Estrellas borradas', storiesTitle: 'Historias y pasajes bíblicos', back: 'Volver a las historias',
-    prayersTitle: 'Oraciones guiadas y pasajes bíblicos',
-    voices: 'La narración usa las voces del dispositivo. Para una mejor voz en español, instale una voz de español (México o EE. UU.) en los ajustes de texto a voz.',
+    reset: 'Borrar estrellas', resetAsk: 'Toque otra vez para borrar todas las estrellas', resetDone: 'Estrellas borradas', storiesTitle: 'Las historias y de dónde vienen', back: 'Volver a las historias',
+    prayersTitle: 'Las oraciones guiadas y sus versículos',
+    voices: 'Las líneas sin voz grabada las lee la voz del dispositivo. Para una mejor voz en español o en hebreo, instale una en los ajustes de texto a voz.',
+  },
+  he: {
+    title: 'למבוגרים',
+    about: 'חברים לסיפורי התורה הוא משחק סיפורים בעברית, באנגלית ובספרדית לילדים בני 3 עד 6, עם סיפורים מהתורה, מהנביאים ומהכתובים. כל סיפור מוקרא בקול, כך שלא צריך לדעת לקרוא. כל סיפור מסתיים במשחקון עדין שמתרגל ספירה, צבעים, מספרים ומילים חדשות.',
+    privacy: 'פרטיות: בלי פרסומות, בלי רכישות בתוך האפליקציה, בלי חשבונות ובלי מעקב. שום דבר שהילד עושה לא יוצא מהמכשיר. אחרי הביקור הראשון המשחק עובד גם בלי אינטרנט.',
+    privacyApp: 'פרטיות: בלי פרסומות, בלי חשבונות ובלי מעקב. שום דבר שהילד עושה לא יוצא מהמכשיר, והמשחק עובד גם בלי אינטרנט. הסיפורים הראשונים ושתי תפילות מודרכות הם חינם. את האחרים רוכש מבוגר פעם אחת דרך ה-App Store.',
+    supportTitle: 'תמיכה בחברים לסיפורי התורה',
+    support: 'המשחק הזה חינמי ובלי פרסומות. אם הוא מביא ברכה למשפחה שלכם, תרומה תעזור לנו ליצור עוד סיפורים.',
+    donate: 'תרומה',
+    tipsTitle: 'טיפים',
+    tips: [
+      'הפעילו שתי שפות כדי לשמוע כל עמוד בשתיהן.',
+      'עצרו ושאלו: "איך לדעתך נח הרגיש?"',
+      'הצביעו על דברים בציור ואמרו יחד איך קוראים להם.',
+    ],
+    settings: 'הגדרות', narration: 'הקראת הסיפורים בקול', sfx: 'צלילים', lang: 'שפה',
+    reset: 'איפוס הכוכבים', resetAsk: 'לחצו שוב כדי למחוק את כל הכוכבים', resetDone: 'הכוכבים אופסו', storiesTitle: 'הסיפורים והמקורות שלהם', back: 'חזרה לסיפורים',
+    prayersTitle: 'התפילות המודרכות והפסוקים שלהן',
+    voices: 'שורות שאין להן הקלטה מוקראות בקולות המובנים במכשיר. כדי לשמוע קול עברי טוב יותר, התקינו קול בעברית בהגדרות ההקראה של המכשיר.',
   },
 };
 
+// Shown in the grown-ups area of a tester build (OPEN_FOR_TESTERS in config.js), so nobody mistakes it for the store build.
+const TESTER_NOTE = {
+  en: 'Tester build: every story and prayer is open, and nothing can be bought.',
+  es: 'Versión de prueba: todas las historias y oraciones están abiertas, y no se puede comprar nada.',
+  he: 'גרסת בדיקה: כל הסיפורים והתפילות פתוחים, ואי אפשר לקנות דבר.',
+};
+
 // The full policy, shown in the app so no one has to follow a link out of it. Keep in step with privacy.html.
+// There is no Hebrew policy yet: a legal text wants a native speaker, so Hebrew readers get the English one.
 const POLICY = {
   en: {
     title: 'Privacy policy',
-    effective: 'Effective November 6, 2026',
-    intro: "Bible Story Pals collects no data. We don't ask for, collect, store or share personal information from children or adults.",
+    effective: 'Effective November 13, 2026',
+    intro: "Torah Story Pals collects no data. We don't ask for, collect, store or share personal information from children or adults.",
     sections: [
       ['What the app does', [
         'No accounts, sign-in, ads, analytics or tracking. The app contains no advertising or analytics software.',
@@ -909,17 +932,17 @@ const POLICY = {
         'What you buy stays with your Apple Account, so you can restore it after deleting the app. With Apple\'s Family Sharing, people in your family group can use it too; Apple manages that group, and we never see who is in it. For a refund, ask Apple at reportaproblem.apple.com.',
       ]],
       ['Children', [
-        'Bible Story Pals is made for children ages 3 to 6. Because we collect nothing, we hold no personal information to review or delete, and there is no consent to withdraw. The grown-ups area is behind a press-and-hold gate, and purchases are behind a question for grown-ups.',
+        'Torah Story Pals is made for children ages 3 to 6. Because we collect nothing, we hold no personal information to review or delete, and there is no consent to withdraw. The grown-ups area is behind a press-and-hold gate, and purchases are behind a question for grown-ups.',
       ]],
       ['Changes and contact', [
-        'If a future version changes any of this, we will update this policy first. It is also online, with a note about our website, at dan8nod.github.io/bible-story-pals/privacy.html. Questions: negotiatorsondemand@gmail.com.',
+        `If a future version changes any of this, we will update this policy first. It is also online, with a note about our website, at ${POLICY_URL}. Questions: negotiatorsondemand@gmail.com.`,
       ]],
     ],
   },
   es: {
     title: 'Política de privacidad',
-    effective: 'Vigente desde el 6 de noviembre de 2026',
-    intro: 'Amiguitos de la Biblia no recopila ningún dato. No pedimos, recopilamos, guardamos ni compartimos información personal de niños ni de adultos.',
+    effective: 'Vigente desde el 13 de noviembre de 2026',
+    intro: 'Amiguitos de la Torá no recopila ningún dato. No pedimos, recopilamos, guardamos ni compartimos información personal de niños ni de adultos.',
     sections: [
       ['Lo que hace la app', [
         'Sin cuentas, inicio de sesión, anuncios, analítica ni rastreo. La app no incluye software de publicidad ni de analítica.',
@@ -934,16 +957,16 @@ const POLICY = {
         'Lo que compra queda en su Cuenta de Apple, así que puede restaurarlo después de borrar la app. Con Compartir en familia de Apple, las personas de su grupo familiar también pueden usarlo; Apple administra ese grupo y nunca vemos quién lo forma. Para pedir un reembolso, escriba a Apple en reportaproblem.apple.com.',
       ]],
       ['Niños', [
-        'Amiguitos de la Biblia está hecho para niños de 3 a 6 años. Como no recopilamos nada, no guardamos información personal que revisar ni borrar, y no hay consentimiento que retirar. El área para adultos está protegida: hay que mantener presionado para entrar. Las compras están protegidas con una pregunta para adultos.',
+        'Amiguitos de la Torá está hecho para niños de 3 a 6 años. Como no recopilamos nada, no guardamos información personal que revisar ni borrar, y no hay consentimiento que retirar. El área para adultos está protegida: hay que mantener presionado para entrar. Las compras están protegidas con una pregunta para adultos.',
       ]],
       ['Cambios y contacto', [
-        'Si una versión futura cambia algo de esto, primero actualizaremos esta política. También está en internet, con una nota sobre nuestro sitio web, en dan8nod.github.io/bible-story-pals/privacy.html. Preguntas: negotiatorsondemand@gmail.com.',
+        `Si una versión futura cambia algo de esto, primero actualizaremos esta política. También está en internet, con una nota sobre nuestro sitio web, en ${POLICY_URL}. Preguntas: negotiatorsondemand@gmail.com.`,
       ]],
     ],
   },
 };
 
-const policyHtml = () => langs().map((l) => {
+const policyHtml = () => [...new Set(langs().map((l) => (POLICY[l] ? l : 'en')))].map((l) => {
   const p = POLICY[l];
   return `<details class="policy" lang="${l}"><summary>${esc(p.title)}</summary>
     <p class="policy-date">${esc(p.effective)}</p>
@@ -960,12 +983,12 @@ function parentsScreen() {
   const T = BUY_TEXT[langs()[0]];
   const showDonate = DONATE_URL && !isNativeApp();
   const toggle = (key, label) => `<div class="setting"><span>${esc(label)}</span><button class="toggle" role="switch" data-key="${key}" aria-checked="${!!store.get(key)}" aria-label="${esc(label)}"></button></div>`;
-  const lang = store.get('lang');
-  app.innerHTML = `<main class="parents"><div class="inner">
-    <button class="link-btn" data-act="home">‹ ${esc(P.back)}</button>
+  app.innerHTML = `<main class="parents"${rtl() ? ' dir="rtl"' : ''}><div class="inner">
+    <button class="link-btn" data-act="home">${rtl() ? '›' : '‹'} ${esc(P.back)}</button>
     <h2>${esc(P.title)}</h2>
     <p>${esc(P.about)}</p>
     <p><strong>${esc(paywalled ? P.privacyApp : P.privacy)}</strong></p>
+    ${OPEN_FOR_TESTERS && isNativeApp() ? `<p class="tester-note">${esc(TESTER_NOTE[langs()[0]])}</p>` : ''}
     ${paywalled ? policyHtml() : ''}
     ${paywalled ? `<h3>${esc(T.title)}</h3><div class="world-offers"></div>
       <p class="unlock-note" aria-live="polite"></p>
@@ -975,20 +998,14 @@ function parentsScreen() {
     <h3>${esc(P.settings)}</h3>
     ${toggle('narration', P.narration)}
     ${toggle('sfx', P.sfx)}
-    <div class="setting"><span>${esc(P.lang)}</span>
-      <div class="chips">
-        <button class="chip" data-lang="en" aria-pressed="${lang === 'en'}">English</button>
-        <button class="chip" data-lang="es" aria-pressed="${lang === 'es'}">Español</button>
-        <button class="chip" data-lang="both" aria-pressed="${lang === 'both'}">EN + ES</button>
-      </div>
-    </div>
+    <div class="setting"><span>${esc(P.lang)}</span>${langChips()}</div>
     <p>${esc(P.voices)}</p>
     <h3>${esc(P.tipsTitle)}</h3>
     <ul>${P.tips.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
     <h3>${esc(P.storiesTitle)}</h3>
-    <ul data-refs="stories">${STORIES.map((s) => `<li>${esc(s.title.en)} / ${esc(s.title.es)} — ${esc(REFS[s.id])}</li>`).join('')}</ul>
+    <ul data-refs="stories">${STORIES.map((s) => `<li>${esc(both(s.title))} — ${esc(both(REFS[s.id] || {}))}</li>`).join('')}</ul>
     <h3>${esc(P.prayersTitle)}</h3>
-    <ul data-refs="prayers">${PRAYERS.map((p) => `<li>${esc(p.title.en)} / ${esc(p.title.es)} — ${esc(p.ref)}</li>`).join('')}</ul>
+    <ul data-refs="prayers">${PRAYERS.map((p) => `<li>${esc(both(p.title))} — ${esc(both(p.ref))}</li>`).join('')}</ul>
     <p><button class="link-btn" data-act="reset">${esc(P.reset)}</button></p>
   </div></main>`;
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
@@ -998,7 +1015,7 @@ function parentsScreen() {
     store.set(b.dataset.key, v);
     b.setAttribute('aria-checked', v);
   }));
-  app.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => { store.set('lang', c.dataset.lang); gatePassed = true; route(); }));
+  app.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => { toggleLang(c.dataset.lang); gatePassed = true; route(); }));
   // Two taps instead of confirm(), which some app views block.
   const reset = app.querySelector('[data-act=reset]');
   reset.addEventListener('click', () => {

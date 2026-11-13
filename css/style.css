@@ -14,6 +14,7 @@
   --grass: #7cb342;
   --berry: #e9546b;
   --es: #c2185b;
+  --he: #283593;
   --card: #ffffff;
   --shadow: 0 6px 0 rgba(74, 51, 38, 0.18);
   --radius: 22px;
@@ -83,6 +84,15 @@ button {
 a.big-btn { text-decoration: none; color: var(--ink); }
 .big-btn.green { background: #7bd389; box-shadow: 0 6px 0 #43a047; }
 
+/* ---------- Hebrew ---------- */
+/* Hebrew reads right to left. Each piece of Hebrew turns itself around, while the screen
+   keeps its layout: buttons and arrows stay where a child already knows them. */
+#app [lang='he'], .gate [lang='he'] { direction: rtl; unicode-bidi: isolate; }
+/* When Hebrew is the first language, untagged words (buttons, notes) follow their own first letter. */
+.he-first :is(h1, h2, h3, h4, p, li, span, small, summary, button, output, a) { unicode-bidi: plaintext; }
+/* The second language's smaller line under a title is pink for Spanish and blue for Hebrew. */
+#app small[lang='he'] { color: var(--he); }
+
 /* ---------- home ---------- */
 .home {
   flex: 1;
@@ -147,7 +157,7 @@ a.big-btn { text-decoration: none; color: var(--ink); }
   font-size: 20px;
   font-weight: 800;
   line-height: 1.05;
-  text-align: left;
+  text-align: start;
 }
 .world-tab svg { width: 44px; height: 44px; flex: none; overflow: visible; }
 .world-tab small { display: block; color: var(--es); font-size: 0.78em; font-weight: 700; }
@@ -180,6 +190,7 @@ a.big-btn { text-decoration: none; color: var(--ink); }
   text-shadow: 0 3px 0 #fff, 3px 0 0 #fff, -3px 0 0 #fff, 0 -3px 0 #fff, 2px 2px 0 #fff, -2px 2px 0 #fff, 2px -2px 0 #fff, -2px -2px 0 #fff;
 }
 .map-title h2 [lang='es'] { color: var(--es); }
+.map-title h2 [lang='he'] { color: var(--he); }
 .map-title p { margin: 0.4cqw 0 0; font-size: clamp(14px, 2.2cqw, 26px); font-weight: 700; text-shadow: 0 2px 0 #fff8; }
 
 .stop {
@@ -291,7 +302,8 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 }
 .caption { flex: 1; min-width: 0; font-size: clamp(17px, 2.5vw, 26px); line-height: 1.22; text-align: center; }
 .caption .es { color: var(--es); }
-.caption .en + .es { margin-top: 2px; font-size: 0.92em; }
+.caption .he { color: var(--he); }
+.caption .line + .line { margin-top: 2px; font-size: 0.92em; }
 .caption.speaking .line { animation: glow 1.2s ease-in-out infinite; }
 
 /* ---------- reward ---------- */
@@ -312,7 +324,9 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 .reward h2 { margin: 0; font-size: clamp(28px, 5vw, 46px); line-height: 1.05; font-weight: 800; }
 .reward h2 small { display: block; color: var(--es); font-size: 0.7em; }
 .reward p { margin: 0; font-size: clamp(18px, 3vw, 26px); max-width: 760px; }
-.reward p .es { display: block; color: var(--es); }
+.reward p span + span { display: block; }
+.reward p .es { color: var(--es); }
+.reward p .he { color: var(--he); }
 .reward .row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
 
 .confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
@@ -336,11 +350,12 @@ a.big-btn { text-decoration: none; color: var(--ink); }
     radial-gradient(circle at 50% 0%, #fff3d6 0 140px, transparent 141px),
     linear-gradient(#ffe0b2, #fff3e0 55%, #fff8ec);
 }
-.prayers h1 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: clamp(24px, 4vw, 38px); line-height: 1; font-weight: 800; text-align: left; }
+.prayers h1 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: clamp(24px, 4vw, 38px); line-height: 1; font-weight: 800; text-align: start; }
 .prayers h1 svg { width: 48px; height: 48px; flex: none; color: var(--es); }
 .prayers h1 small { display: block; font-size: 0.62em; color: var(--es); font-weight: 700; margin-top: 4px; }
 .prayers-hint { margin: 0 auto 14px; text-align: center; font-size: clamp(18px, 2.6vw, 24px); font-weight: 700; }
 .prayers-hint [lang='es'] { color: var(--es); }
+.prayers-hint [lang='he'] { color: var(--he); }
 .prayer-list { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(14px, 3vw, 34px); max-width: 1100px; margin: 0 auto; }
 .prayer-card {
   display: flex;
@@ -428,6 +443,7 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 .parents h2 { font-size: 32px; margin: 8px 0; }
 .parents h3 { margin: 22px 0 6px; font-size: 22px; }
 .parents p, .parents li { font-size: 18px; line-height: 1.45; font-weight: 500; }
+.parents .tester-note { background: #fff3c4; border-radius: 14px; padding: 10px 14px; font-weight: 700; }
 .parents .policy { margin: 10px 0; }
 .parents .policy summary { min-height: 44px; display: flex; align-items: center; font-size: 18px; font-weight: 700; text-decoration: underline; cursor: pointer; }
 .parents .policy h4 { margin: 16px 0 4px; font-size: 19px; }

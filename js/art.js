@@ -27,6 +27,8 @@ export function face(cx, cy, k = 1, mood = 'happy') {
     mouth = `<path d="M${cx - 6 * k} ${my} Q${cx} ${my + 7 * k} ${cx + 6 * k} ${my}" fill="none"/>`;
   } else if (mood === 'open') {
     mouth = `<ellipse cx="${cx}" cy="${my + 3 * k}" rx="${5 * k}" ry="${6 * k}" fill="#a3423a"/>`;
+  } else if (mood === 'sad') {
+    mouth = `<path d="M${cx - 6 * k} ${my + 5 * k} Q${cx} ${my} ${cx + 6 * k} ${my + 5 * k}" fill="none"/>`;
   } else if (mood === 'grumpy') {
     mouth = `<path d="M${cx - 6 * k} ${my + 5 * k} Q${cx} ${my} ${cx + 6 * k} ${my + 5 * k}" fill="none"/>` +
       `<path d="M${cx - dx - 5 * k} ${ey - 8 * k} L${cx - dx + 4 * k} ${ey - 5 * k} M${cx + dx + 5 * k} ${ey - 8 * k} L${cx + dx - 4 * k} ${ey - 5 * k}" fill="none"/>`;
@@ -38,11 +40,17 @@ export function face(cx, cy, k = 1, mood = 'happy') {
 
 /* ---------------- people ---------------- */
 
+const ROBE = 'M-15 -8 Q-20 22 -28 50 L28 50 Q20 22 15 -8 Q0 -2 -15 -8 Z';
+export const COAT_COLORS = ['#ef5350', '#ffa726', '#ffee58', '#66bb6a', '#42a5f5', '#ab47bc'];
+// Equal horizontal bands of color filling a box.
+const bands = (colors, x, y, w, h) => colors.map((c, i) =>
+  `<rect x="${x}" y="${(y + (i * h) / colors.length).toFixed(1)}" width="${w}" height="${(h / colors.length + 0.6).toFixed(1)}" fill="${c}"/>`).join('');
+
 export function person(o = {}) {
   const {
     skin = '#e9b98a', robe = '#5b8def', sash = null, hair = '#4a2f1b', beard = null,
     scarf = null, crown = false, mood = 'happy', arms = 'down', staff = false,
-    helmet = false, halo = false, wings = false, bald = false,
+    helmet = false, wings = false, bald = false, stripes = null,
   } = o;
   let out = '';
   if (wings) {
@@ -50,7 +58,9 @@ export function person(o = {}) {
   }
   if (scarf) out += `<path d="M-25 -22 Q-28 -54 0 -54 Q28 -54 25 -22 L24 4 L-24 4 Z" fill="${scarf}"/>`;
   if (staff) out += `<path d="M30 50 L30 -34 Q30 -48 20 -46" fill="none" stroke="${INK}" stroke-width="8"/><path d="M30 50 L30 -34 Q30 -48 20 -46" fill="none" stroke="#a0703f" stroke-width="4"/>`;
-  out += `<path d="M-15 -8 Q-20 22 -28 50 L28 50 Q20 22 15 -8 Q0 -2 -15 -8 Z" fill="${robe}"/>`;
+  out += `<path d="${ROBE}" fill="${robe}"/>`;
+  // Bands of color across the robe (Joseph's coat), clipped to the robe's own outline.
+  if (stripes) out += `<clipPath id="robe-clip"><path d="${ROBE}"/></clipPath><g clip-path="url(#robe-clip)" stroke="none">${bands(stripes, -30, -8, 60, 58)}</g><path d="${ROBE}" fill="none"/>`;
   if (sash) out += `<path d="M-19 14 Q0 20 19 14 L20 22 Q0 28 -20 22 Z" fill="${sash}"/>`;
   const armColor = robe;
   if (arms === 'down') {
@@ -79,11 +89,11 @@ export function person(o = {}) {
   }
   out += face(0, -26, 1, mood);
   if (crown) out += `<path d="M-14 -44 L-14 -58 L-7 -51 L0 -60 L7 -51 L14 -58 L14 -44 Z" fill="#ffd54f"/>`;
-  if (halo) out += `<ellipse cx="0" cy="-54" rx="15" ry="4.5" fill="none" stroke="#ffc107" stroke-width="4"/>`;
   return wrap(out);
 }
 
-export const angel = (o = {}) => person({ robe: '#ffffff', sash: '#ffd54f', hair: '#f3c26b', wings: true, halo: true, arms: 'up', ...o });
+// A messenger of Hashem: white robe and wings, and no halo.
+export const angel = (o = {}) => person({ robe: '#ffffff', sash: '#ffd54f', hair: '#f3c26b', wings: true, arms: 'up', ...o });
 
 export function baby(o = {}) {
   const { skin = '#e9b98a', blanket = '#9fd3f5', mood = 'sleep' } = o;
@@ -174,15 +184,16 @@ export function bunny() {
 }
 
 export function bird(o = {}) {
-  const { color = '#64b5f6', branch = false } = o;
-  return wrap(
+  const { color = '#64b5f6', branch = false, bread: carries = false, flip = false } = o;
+  return (flip ? '<g transform="scale(-1 1)">' : '<g>') + wrap(
     `<path d="M22 0 L42 -10 L40 8 Z" fill="${color}"/>` +
     `<ellipse cx="0" cy="0" rx="26" ry="18" fill="${color}"/>` +
     `<path d="M-2 -2 Q14 -26 24 -6 Q12 4 -2 -2 Z" fill="#fff" opacity=".85"/>` +
     `<path d="M-26 -4 L-38 0 L-26 5 Z" fill="#ffb300"/>` +
     `<circle cx="-14" cy="-5" r="3" fill="${INK}" stroke="none"/>` +
-    (branch ? `<path d="M-38 2 Q-48 10 -54 22" fill="none" stroke="#6d8f3a"/><ellipse cx="-48" cy="12" rx="5" ry="3" fill="#8bc34a"/><ellipse cx="-54" cy="20" rx="5" ry="3" fill="#8bc34a"/>` : ''),
-  );
+    (branch ? `<path d="M-38 2 Q-48 10 -54 22" fill="none" stroke="#6d8f3a"/><ellipse cx="-48" cy="12" rx="5" ry="3" fill="#8bc34a"/><ellipse cx="-54" cy="20" rx="5" ry="3" fill="#8bc34a"/>` : '') +
+    (carries ? `<path d="M-58 6 Q-60 -8 -46 -9 Q-32 -8 -34 6 Z" fill="#e0a458"/>` : ''),
+  ) + '</g>';
 }
 
 export function fish(o = {}) {
@@ -210,7 +221,7 @@ export function bigFish(o = {}) {
     `<path d="M-36 -64 Q-40 -80 -48 -88 M-36 -64 Q-34 -82 -30 -92 M-36 -64 Q-28 -78 -18 -84" fill="none" stroke="#9fd3f5" stroke-width="5"/>`;
   if (jonah) {
     out += `<circle cx="10" cy="-6" r="30" fill="#2c5a8f"/>` +
-      `<g transform="translate(10 0) scale(.42)">${person({ robe: '#8d6e63', beard: '#5d4037', arms: 'pray', mood: 'sleep' })}</g>`;
+      `<g transform="translate(10 0) scale(.42)">${person({ robe: '#8d6e63', beard: '#5d4037', arms: 'up', mood: 'sleep' })}</g>`;
   }
   return wrap(out);
 }
@@ -345,8 +356,8 @@ export function bush(o = {}) {
   return wrap(out);
 }
 
-// Light pouring down from heaven: how the game shows God the Father, who is
-// heard as a voice and never drawn as a person. Origin is the top of the beam.
+// Light pouring down from heaven: how the game shows that Hashem is speaking.
+// Hashem is heard as a voice and never drawn. Origin is the top of the beam.
 export function heavenLight(o = {}) {
   const { h = 420 } = o;
   return `<g class="a-twinkle" style="animation-duration:5s">` +
@@ -370,12 +381,6 @@ export function donkey() {
   );
 }
 
-export function bandage() {
-  return wrap(`<path d="M-30 12 Q-44 22 -54 14" fill="none" stroke="#fff" stroke-width="10"/>` +
-    `<rect x="-30" y="-20" width="44" height="40" rx="9" fill="#ffffff"/>` +
-    `<ellipse cx="14" cy="0" rx="11" ry="20" fill="#f5f5f5"/><ellipse cx="14" cy="0" rx="4" ry="8" fill="#e0e0e0"/>`);
-}
-
 export function jar() {
   return wrap(`<path d="M-16 -28 L16 -28 L13 -18 Q34 0 22 30 L-22 30 Q-34 0 -13 -18 Z" fill="#d38b5d"/>` +
     `<rect x="-19" y="-36" width="38" height="9" rx="3" fill="#b86f45"/>` +
@@ -395,7 +400,7 @@ export function fig() {
     `<ellipse cx="-7" cy="0" rx="4" ry="7" fill="#fff" opacity=".35" stroke="none"/>`);
 }
 
-// Someone lying on the ground (the hurt man in the Good Samaritan story).
+// Someone lying down: Samuel on his mat, and the children at bedtime.
 export const lying = (o = {}) => `<g transform="rotate(-80)">${person({ mood: 'sleep', ...o })}</g>`;
 
 // A soft warm glow around someone who is kept safe (Psalm 23). Protection, not magic.
@@ -412,11 +417,12 @@ export function lantern() {
     `<rect x="-17" y="-36" width="34" height="7" rx="3" fill="#8d6e63"/><rect x="-17" y="5" width="34" height="7" rx="3" fill="#8d6e63"/>`);
 }
 
-export function cup() {
+export function cup(o = {}) {
+  const drink = o.wine ? '#8e24aa' : '#64b5f6';
   return wrap(`<path d="M0 6 L0 30" stroke-width="8"/><ellipse cx="0" cy="33" rx="20" ry="6" fill="#ffd54f"/>` +
     `<path d="M-28 -28 L28 -28 Q26 6 0 10 Q-26 6 -28 -28 Z" fill="#ffd54f"/>` +
-    `<ellipse cx="0" cy="-28" rx="28" ry="8" fill="#64b5f6"/>` +
-    `<path d="M24 -26 Q32 -16 28 -8 Q24 -14 24 -26 Z" fill="#64b5f6"/>`);
+    `<ellipse cx="0" cy="-28" rx="28" ry="8" fill="${drink}"/>` +
+    `<path d="M24 -26 Q32 -16 28 -8 Q24 -14 24 -26 Z" fill="${drink}"/>`);
 }
 
 export function pond() {
@@ -437,7 +443,6 @@ export function hand(o = {}) {
     `<rect x="-28" y="26" width="56" height="22" rx="6" fill="${sleeve}"/>`);
 }
 
-// Someone lying on the ground (the hurt man in the Good Samaritan story).
 /* ---------------- objects & places ---------------- */
 
 export function ark() {
@@ -460,8 +465,11 @@ export function boat() {
 }
 
 export function basket(o = {}) {
-  const { handle = true, color = '#c8914b' } = o;
+  const { handle = true, color = '#c8914b', full = false } = o;
+  const heap = full === true ? '#fffdf5' : full;
   return wrap(
+    (heap ? `<path d="M-42 -6 Q-40 -30 -20 -26 Q-10 -42 6 -30 Q24 -40 30 -24 Q44 -24 42 -6 Z" fill="${heap}"/>` +
+      `<path d="M-20 -26 Q-12 -18 -16 -10 M6 -30 Q12 -20 8 -12 M30 -24 Q26 -16 28 -10" fill="none" opacity=".4"/>` : '') +
     (handle ? `<path d="M-34 -6 Q0 -56 34 -6" fill="none" stroke="${INK}" stroke-width="9"/><path d="M-34 -6 Q0 -56 34 -6" fill="none" stroke="${color}" stroke-width="5"/>` : '') +
     `<path d="M-44 -6 L44 -6 L34 34 L-34 34 Z" fill="${color}"/>` +
     `<path d="M-40 8 L40 8 M-36 22 L36 22 M-20 -6 L-16 34 M0 -6 L0 34 M20 -6 L16 34" fill="none" opacity=".45"/>` +
@@ -497,14 +505,6 @@ export function stable() {
   );
 }
 
-export function manger() {
-  return wrap(
-    `<path d="M-40 30 L-30 50 M40 30 L30 50" stroke-width="5"/>` +
-    `<path d="M-40 0 L40 0 L30 30 L-30 30 Z" fill="#a1744a"/>` +
-    `<path d="M-38 2 L-30 -10 L-20 0 L-10 -12 L0 0 L10 -12 L20 0 L30 -10 L38 2 Z" fill="#ffe082"/>`,
-  ) + `<g transform="translate(4 -10) scale(.8)">${baby({ blanket: '#fffde7' })}</g>`;
-}
-
 export function cave() {
   return wrap(`<path d="M-150 60 Q-150 -100 0 -100 Q150 -100 150 60 Z" fill="#8d6e63"/><path d="M-100 60 Q-100 -56 0 -56 Q100 -56 100 60 Z" fill="#3e2723"/>`);
 }
@@ -529,6 +529,116 @@ export const waves = (o = {}) => {
   for (let x = -w / 2; x < w / 2; x += 40) d += ` q10 -12 20 0 t20 0`;
   return `<path d="${d}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round"/>`;
 };
+
+
+/* ---------------- Torah Story Pals pieces ---------------- */
+
+// A tent in the desert: Abraham and Sarah's home, and the tents of the camp.
+export function tent(o = {}) {
+  const { color = '#e2c08d', trim = '#b5793f', door = '#5d4037' } = o;
+  return wrap(
+    `<path d="M0 -62 L0 -76" stroke-width="5"/>` +
+    `<path d="M-80 50 L0 -62 L80 50 Z" fill="${color}"/>` +
+    `<path d="M-37 -10 L37 -10 M-60 22 L60 22" fill="none" stroke="${trim}" stroke-width="6" opacity=".75"/>` +
+    `<path d="M0 -14 L-24 50 L24 50 Z" fill="${door}"/>` +
+    `<path d="M-80 50 L0 -62 L80 50" fill="none"/>`,
+  );
+}
+
+export function pyramid(o = {}) {
+  const { color = '#ecc98b' } = o;
+  return wrap(
+    `<path d="M-72 50 L0 -52 L72 50 Z" fill="${color}"/>` +
+    `<path d="M0 -52 L26 50 L72 50 Z" fill="#cfa25c" stroke="none"/>` +
+    `<path d="M-72 50 L0 -52 L72 50 Z M0 -52 L26 50" fill="none"/>`,
+  );
+}
+
+// Joseph's coat. With no color it has all its stripes; with one, it is that color (the matching game).
+export function coat(o = {}) {
+  const shape = 'M-20 -40 Q0 -30 20 -40 L52 -24 L42 -2 L27 -10 L31 46 L-31 46 L-27 -10 L-42 -2 L-52 -24 Z';
+  return wrap(
+    `<clipPath id="coat-clip"><path d="${shape}"/></clipPath>` +
+    `<g clip-path="url(#coat-clip)" stroke="none">${bands(o.color ? [o.color] : COAT_COLORS, -56, -40, 112, 86)}</g>` +
+    `<path d="${shape}" fill="none"/>` +
+    `<path d="M-29 12 Q0 19 29 12" fill="none" opacity=".45"/>`,
+  );
+}
+
+// Ears of grain standing in a field.
+export function wheat() {
+  let out = '';
+  [[-18, -9], [0, 0], [18, 9]].forEach(([x, tilt]) => {
+    out += `<g transform="translate(${x} 0) rotate(${tilt} 0 50)"><path d="M0 50 L0 -14" fill="none" stroke="#b08d3a" stroke-width="4"/>`;
+    for (let i = 0; i < 4; i++) {
+      const y = -14 - i * 10;
+      out += `<ellipse cx="-6" cy="${y}" rx="6.5" ry="4" fill="#f2c94c" transform="rotate(-35 -6 ${y})"/>` +
+        `<ellipse cx="6" cy="${y}" rx="6.5" ry="4" fill="#f2c94c" transform="rotate(35 6 ${y})"/>`;
+    }
+    out += `<ellipse cx="0" cy="-55" rx="4.5" ry="7" fill="#f2c94c"/></g>`;
+  });
+  return wrap(out);
+}
+
+// Manna lying on the ground: small, round and white.
+export function manna() {
+  let out = '';
+  [[-24, 8, 9], [-6, -2, 11], [15, 5, 9], [2, 13, 8], [-13, 16, 7], [27, 15, 6]].forEach(([x, y, r]) => {
+    out += `<circle cx="${x}" cy="${y}" r="${r}" fill="#fffdf5"/>`;
+  });
+  return wrap(out);
+}
+
+// Two Shabbat candles in their candlesticks.
+export function candles() {
+  const one = (x) => `<path d="M${x - 13} 6 L${x + 13} 6 L${x + 6} 22 L${x + 17} 46 L${x - 17} 46 L${x - 6} 22 Z" fill="#cfd8dc"/>` +
+    `<rect x="${x - 5}" y="-36" width="10" height="42" rx="3" fill="#fffdf5"/>` +
+    `<path class="a-twinkle" d="M${x} -62 Q${x - 10} -47 ${x} -38 Q${x + 10} -47 ${x} -62 Z" fill="#ffb300" stroke="#f57c00" stroke-width="2"/>`;
+  return wrap(one(-24) + one(24));
+}
+
+// A braided Shabbat loaf.
+export function challah() {
+  return wrap(`<path d="M-44 14 Q-50 -8 -28 -12 Q-14 -26 0 -13 Q14 -26 28 -12 Q50 -8 44 14 Q0 24 -44 14 Z" fill="#d99548"/>` +
+    `<path d="M-28 -12 Q-12 2 -20 16 M0 -13 Q14 2 6 18 M28 -12 Q40 0 32 15" fill="none" opacity=".55"/>` +
+    `<ellipse cx="-10" cy="-6" rx="7" ry="3" fill="#fff" opacity=".35" stroke="none"/>`);
+}
+
+// An open Torah scroll on its two wooden rollers.
+export function scroll() {
+  return wrap(
+    `<path d="M-38 -54 V52 M38 -54 V52" fill="none" stroke-width="10"/>` +
+    `<path d="M-38 -54 V52 M38 -54 V52" fill="none" stroke="#a1683a" stroke-width="5"/>` +
+    `<rect x="-30" y="-34" width="60" height="66" fill="#fff8e1"/>` +
+    `<rect x="-48" y="-38" width="20" height="74" rx="9" fill="#ffecb3"/><rect x="28" y="-38" width="20" height="74" rx="9" fill="#ffecb3"/>` +
+    `<path d="M-18 -18 H18 M-18 -5 H18 M-18 8 H18 M-18 21 H8" fill="none" stroke="#b08d57" stroke-width="3.5" opacity=".75"/>` +
+    `<circle cx="-38" cy="-56" r="6" fill="#ffd54f"/><circle cx="38" cy="-56" r="6" fill="#ffd54f"/>`,
+  );
+}
+
+export function crown(o = {}) {
+  const { color = '#ffd54f' } = o;
+  return wrap(`<path d="M-36 22 L-42 -22 L-19 0 L0 -32 L19 0 L42 -22 L36 22 Z" fill="${color}"/>` +
+    `<rect x="-38" y="16" width="76" height="14" rx="5" fill="#ffb300"/>` +
+    `<circle cx="0" cy="-34" r="6" fill="#ef5350"/><circle cx="-42" cy="-24" r="5" fill="#42a5f5"/><circle cx="42" cy="-24" r="5" fill="#42a5f5"/>`);
+}
+
+// A music note, for singing and dancing.
+export function note(o = {}) {
+  const { color = '#7e57c2' } = o;
+  return wrap(`<path d="M2 20 L2 -34 L28 -26 L28 -10 L2 -18" fill="${color}"/>` +
+    `<ellipse cx="-9" cy="22" rx="13" ry="9" fill="${color}" transform="rotate(-20 -9 22)"/>`);
+}
+
+// Miriam's hand drum.
+export function tambourine() {
+  let jingles = '';
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    jingles += `<circle cx="${(Math.cos(a) * 26).toFixed(1)}" cy="${(Math.sin(a) * 26).toFixed(1)}" r="5.5" fill="#ffd54f"/>`;
+  }
+  return wrap(`<circle r="30" fill="#e8a05c"/><circle r="20" fill="#fff8e1"/>` + jingles);
+}
 
 /* ---------------- backgrounds ---------------- */
 // Backgrounds are drawn far past the 1000x600 stage so letterboxing never shows.
@@ -575,6 +685,19 @@ export function bg(kind) {
     case 'river':
       return sky('g-sky', '#7cc6f2', '#d8f1ff', 360) +
         `<rect ${BIG} y="330" height="3000" fill="#7cb342"/><rect ${BIG} y="400" height="130" fill="#4fa3e0"/><rect ${BIG} y="400" height="12" fill="#81c4f0"/><rect ${BIG} y="530" height="3000" fill="#8bc34a"/>`;
+    case 'split': {
+      // The far shore sits on the horizon; the dry path widens toward us between two walls of water.
+      const ripple = (x, y) => `<path d="M${x - 26} ${y} q13 -11 26 0 q13 -11 26 0" fill="none" stroke="#bfe3fb" stroke-width="5" stroke-linecap="round" opacity=".8"/>`;
+      return sky('g-sky', '#7cc6f2', '#d8f1ff', 300) +
+        `<ellipse cx="500" cy="262" rx="150" ry="20" fill="#f2d49b"/>` +
+        `<path d="M430 262 L570 262 L3900 3000 L-2900 3000 Z" fill="#f2d49b"/>` +
+        `<path d="M-3000 196 Q-600 176 180 190 Q340 150 414 214 Q452 236 430 262 L-2900 3000 L-3000 3000 Z" fill="#3f8fd2"/>` +
+        `<path d="M4000 196 Q1600 176 820 190 Q660 150 586 214 Q548 236 570 262 L3900 3000 L4000 3000 Z" fill="#3f8fd2"/>` +
+        `<path d="M414 214 Q452 236 430 262 L-2900 3000 L-3060 3000 Z" fill="#2f78bd"/>` +
+        `<path d="M586 214 Q548 236 570 262 L3900 3000 L4060 3000 Z" fill="#2f78bd"/>` +
+        `<path d="M180 190 Q340 150 414 214 M820 190 Q660 150 586 214" fill="none" stroke="#e3f4ff" stroke-width="8" stroke-linecap="round"/>` +
+        [[90, 290], [230, 250], [150, 380], [40, 470], [910, 290], [770, 250], [850, 380], [960, 470]].map(([x, y]) => ripple(x, y)).join('');
+    }
     case 'desert':
       return sky('g-desert', '#ffcc80', '#fff3e0', 420) +
         hills(450, '#e8c07d', '#dcae62');
@@ -592,9 +715,10 @@ export function bg(kind) {
 const raw = (o) => o.svg;
 
 export const ART = {
-  raw, bush, heavenLight, glow, lantern, cup, pond, hand, donkey, bandage, jar, blanket, fig, lying, person, angel, baby, lion, elephant, giraffe, sheep, bunny, bird, fish, bigFish, sun, moon, star,
+  raw, bush, heavenLight, glow, lantern, cup, pond, hand, donkey, jar, blanket, fig, lying, person, angel, baby, lion, elephant, giraffe, sheep, bunny, bird, fish, bigFish, sun, moon, star,
   sparkle, cloud, rainbow, tree, palm, flower, lily, grass, reeds, rock, stone, bubble, heart, ark,
-  boat, basket, basketBoat, bread, bag, stable, manger, cave, city, hammer, waves,
+  boat, basket, basketBoat, bread, bag, stable, cave, city, hammer, waves,
+  tent, pyramid, coat, wheat, manna, candles, challah, scroll, crown, note, tambourine,
 };
 
 // Wrap one piece of art at a position. `anim` is a CSS animation class name.

@@ -1,6 +1,6 @@
 // End-to-end check: opens every story, reads every page, plays every mini-game
 // to the reward screen, and fails on any console error.
-// Run: node tests/play-through.mjs [--shots <dir>]
+// Run: node tests/play-through.mjs [--shots <dir>] [--lang en|es|he|en+he|…]
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { mkdirSync } from 'node:fs';
@@ -15,6 +15,9 @@ const { chromium } = require('playwright');
 const shotsArg = process.argv.indexOf('--shots');
 const shots = shotsArg > 0 ? process.argv[shotsArg + 1] : null;
 if (shots) mkdirSync(shots, { recursive: true });
+// --lang plays the stories in another language (for screenshots); the language checks need the default.
+const langArg = process.argv.indexOf('--lang');
+const playLang = langArg > 0 ? process.argv[langArg + 1] : null;
 
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json' };
 const server = createServer(async (req, res) => {
@@ -37,6 +40,11 @@ page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', (e) => errors.push(String(e)));
 const shot = async (name) => { if (shots) await page.screenshot({ path: join(shots, `${name}.png`) }); };
 const hash = () => page.evaluate(() => location.hash);
+if (playLang) {
+  await page.addInitScript((lang) => {
+    if (!localStorage.getItem('tsp:v1')) localStorage.setItem('tsp:v1', JSON.stringify({ lang, narration: false, sfx: false, stars: {} }));
+  }, playLang);
+}
 
 await page.goto(base);
 await page.waitForSelector('.stop');
@@ -45,7 +53,7 @@ await shot('00-home');
 
 const ids = WORLDS.flatMap((w) => w.stories);
 if (ids.length !== 15) throw new Error(`expected 15 stories, got ${ids.length}`);
-if (WORLDS[1].stories.length !== 3) throw new Error('Friendship Sea should have exactly 3 ports');
+if (WORLDS[0].stories.length !== 7 || WORLDS[1].stories.length !== 8) throw new Error('expected 7 stories on Torah Trail and 8 in Kings and Prophets');
 
 for (const id of ids) {
   await page.goto(`${base}#/`);
@@ -113,15 +121,38 @@ await page.waitForSelector('.stop');
 const stars = await page.locator('.star-count span').textContent();
 if (stars !== `${ids.length}/${ids.length}`) throw new Error(`expected all stars, got ${stars}`);
 
-// Language switching updates titles.
-await page.click('.chip[data-lang=es]');
-if (!(await page.locator('.brand h1').textContent()).startsWith('Amiguitos')) throw new Error('Spanish title missing');
-await page.click('.chip[data-lang=both]');
-await page.click('.world-tab[data-world=island]');
-await page.click('.stop[data-id=noah]');
-await page.waitForSelector('.caption .line');
-if ((await page.locator('.caption .line').count()) !== 2) throw new Error('both-language captions missing');
-await shot('zz-both-languages');
+// Language chips are switches: one or two languages can be on, and a third replaces the oldest.
+if (!playLang) {
+  const pressed = () => page.$$eval('.chip[aria-pressed=true]', (cs) => cs.map((c) => c.dataset.lang).join('+'));
+  if ((await pressed()) !== 'en') throw new Error(`expected English only at first, got ${await pressed()}`);
+  await page.click('.chip[data-lang=en]');
+  if ((await pressed()) !== 'en') throw new Error('the last language must stay on');
+  await page.click('.chip[data-lang=es]');
+  if ((await pressed()) !== 'en+es') throw new Error(`expected en+es, got ${await pressed()}`);
+  await page.click('.chip[data-lang=en]');
+  if (!(await page.locator('.brand h1').textContent()).startsWith('Amiguitos')) throw new Error('Spanish title missing');
+  await page.click('.chip[data-lang=he]');
+  if ((await pressed()) !== 'es+he') throw new Error(`expected es+he, got ${await pressed()}`);
+  await page.click('.world-tab[data-world=torah]');
+  await page.click('.stop[data-id=noah]');
+  await page.waitForSelector('.caption .line');
+  if ((await page.locator('.caption .line').count()) !== 2) throw new Error('two-language captions missing');
+  if ((await page.$eval('.caption .line.he', (el) => getComputedStyle(el).direction)) !== 'rtl') throw new Error('Hebrew caption should read right to left');
+  await shot('zz-two-languages');
+  // Hebrew alone: the app's Hebrew name, and English coming back in pushes Spanish out.
+  await page.goto(`${base}#/`);
+  await page.waitForSelector('.stop');
+  await page.click('.chip[data-lang=es]');
+  if ((await pressed()) !== 'he') throw new Error(`expected Hebrew only, got ${await pressed()}`);
+  if (!(await page.locator('.brand h1').textContent()).startsWith('חברים')) throw new Error('Hebrew title missing');
+  if ((await page.evaluate(() => document.documentElement.lang)) !== 'he') throw new Error('page language should be Hebrew');
+  await page.waitForTimeout(700); // the stops pop in one after another
+  await shot('zz-hebrew-home');
+  await page.click('.chip[data-lang=es]');
+  await page.click('.chip[data-lang=en]');
+  if ((await pressed()) !== 'en+es') throw new Error(`a third language should replace the first one picked, got ${await pressed()}`);
+  await page.click('.chip[data-lang=es]');
+}
 
 // Grown-ups area opens after the 3-second hold.
 await page.goto(`${base}#/`);
@@ -149,9 +180,9 @@ for (const [w, h, name] of [[844, 390, 'phone-landscape'], [390, 844, 'phone-por
   await page.goto(`${base}#/`);
   await page.waitForTimeout(400);
   await shot(`zz-${name}-home`);
-  await page.click('.world-tab[data-world=sea]');
+  await page.click('.world-tab[data-world=prophets]');
   await page.waitForTimeout(300);
-  await shot(`zz-${name}-sea`);
+  await shot(`zz-${name}-prophets`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   if (overflow) throw new Error(`${name}: horizontal overflow`);
 }

@@ -1,8 +1,8 @@
 {
-  "name": "bible-story-pals",
+  "name": "torah-story-pals",
   "version": "1.0.0",
   "private": true,
-  "description": "Bilingual (English/Spanish) Bible story game for pre-K and kindergarten.",
+  "description": "Torah stories in English, Spanish and Hebrew for pre-K and kindergarten.",
   "type": "module",
   "scripts": {
     "start": "python3 -m http.server 8080",
@@ -10,6 +10,7 @@
     "test:voices": "node tests/voices.test.mjs",
     "voices": "node tools/voices.mjs",
     "icons": "node tools/make-icons.mjs",
+    "storekit": "node tools/make-storekit.mjs",
     "ios": "node tools/stage-www.mjs && cap sync ios",
     "ios:open": "cap open ios"
   },
