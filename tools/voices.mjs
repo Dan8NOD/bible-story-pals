@@ -98,8 +98,17 @@ if (flag('dry-run')) {
 const save = () => writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 for (const l of LANGS) await mkdir(join(OUT, l), { recursive: true });
 let spent = 0;
+let estimated = 0;
 for (const [i, j] of plan.entries()) {
   const id = clipId(j.text);
+  // Hard stop on what ElevenLabs actually charges: the plan above is only an estimate,
+  // so scale the next clip's estimate by how far off the estimates have been so far.
+  const est = Math.ceil(j.text.length * RATE);
+  const ratio = estimated ? Math.max(1, spent / estimated) : 1;
+  if (spent + est * ratio > BUDGET) {
+    console.log(`Stopping before clip ${i + 1}/${plan.length} to stay within ${BUDGET} credits (spent ${spent}).`);
+    break;
+  }
   const body = { text: j.text, model_id: MODEL, voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0.2 } };
   if (/flash|turbo/.test(MODEL)) body.language_code = j.lang;
   const r = await api(`/v1/text-to-speech/${VOICES[j.lang]}?output_format=mp3_44100_64`, {
@@ -116,7 +125,8 @@ for (const [i, j] of plan.entries()) {
   manifest.model = MODEL;
   manifest.voices = VOICES;
   await save();
-  spent += Number(r.headers.get('character-cost')) || Math.ceil(j.text.length * RATE);
+  spent += Number(r.headers.get('character-cost')) || est;
+  estimated += est;
   console.log(`  ${i + 1}/${plan.length} [${j.lang}] ${j.text}`);
 }
 console.log(`Done. About ${spent} credits used. Bump VERSION in sw.js, then commit the audio/ folder.`);

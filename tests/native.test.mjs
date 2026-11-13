@@ -7,7 +7,9 @@ import { readFile } from 'node:fs/promises';
 import { join, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { byId } from '../js/stories.js';
+import { readFileSync } from 'node:fs';
+import { STORIES } from '../js/stories.js';
+import { clipId } from '../js/phrases.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2', '.svg': 'image/svg+xml' };
@@ -37,8 +39,13 @@ await page.addInitScript(() => {
   };
 });
 
-const line = byId('daniel').pages[0].text.en;
-await page.goto(`http://localhost:${server.address().port}/#/story/daniel/0`);
+// Pick a page whose English line has no recorded clip yet (recordings fill in over time).
+const recorded = new Set(JSON.parse(readFileSync(join(root, 'audio/manifest.json'), 'utf8')).clips.en);
+const target = STORIES.flatMap((s) => s.pages.map((p, i) => ({ id: s.id, i, text: p.text.en })))
+  .find((p) => !recorded.has(clipId(p.text)));
+assert.ok(target, 'every page is recorded: point this test at a line without a clip');
+const line = target.text;
+await page.goto(`http://localhost:${server.address().port}/#/story/${target.id}/${target.i}`);
 await page.waitForFunction((t) => window.__tts.some((c) => c.method === 'speak' && c.options.text === t), line, { timeout: 5000 });
 const call = await page.evaluate((t) => window.__tts.find((c) => c.method === 'speak' && c.options.text === t), line);
 assert.equal(call.plugin, 'TextToSpeech');
