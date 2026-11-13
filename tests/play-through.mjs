@@ -130,11 +130,14 @@ await page.click('#parents');
 await page.locator('.gate .hold').dispatchEvent('pointerdown');
 await page.waitForSelector('.parents h2', { timeout: 6000 });
 await shot('zz-parents');
-// Every story lists its Bible passage for grown-ups (a missing REFS line shows as "undefined").
-const refs = await page.$$eval('.parents li', (lis) => lis.map((li) => li.textContent));
-const storyRefs = refs.filter((t) => t.includes(' / '));
+// Every story and prayer lists its Bible passage for grown-ups (a missing one shows as "undefined").
+const storyRefs = await page.$$eval('.parents [data-refs=stories] li', (lis) => lis.map((li) => li.textContent));
 if (storyRefs.length !== ids.length || storyRefs.some((t) => t.includes('undefined'))) {
   throw new Error(`grown-ups screen should list a passage for all ${ids.length} stories, got: ${storyRefs.join(' | ')}`);
+}
+const prayerRefs = await page.$$eval('.parents [data-refs=prayers] li', (lis) => lis.map((li) => li.textContent));
+if (prayerRefs.length !== 3 || prayerRefs.some((t) => t.includes('undefined'))) {
+  throw new Error(`grown-ups screen should list a passage for all 3 prayers, got: ${prayerRefs.join(' | ')}`);
 }
 
 // Phone sizes.

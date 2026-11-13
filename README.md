@@ -29,6 +29,22 @@ a dove, and the Father as a voice from heaven. The Father is drawn as light pour
 
 Finishing a story earns a gold star on the home screen.
 
+### Voice-Guided Prayers · Oraciones guiadas
+
+Three short prayers a family says together, opened from the **Voice-Guided Prayers** tab above the map. The voice
+reads one line, then the screen shows **"Your turn! / ¡Ahora ustedes!"** with a filling bar while everyone says it
+back, then moves on by itself. Pause holds the current step, the arrows step through by hand, and Listen starts the
+line over. Every step has its own animated scene. With narration off, each line waits long enough for a grown-up to
+read it aloud.
+
+| Prayer | Passage | App Store build |
+|---|---|---|
+| Thank You, God · Gracias, Dios | Psalm 100:4 | Free |
+| Goodnight, God · Buenas noches, Dios | Psalm 4:8 | Free |
+| God Bless the People I Love · Dios bendiga a quienes amo (includes a pause to say the names of people you love) | Numbers 6:24 | $1, the price of one story |
+
+The prayers are data in `js/prayers.js`. They don't earn stars, and on the website all three are open.
+
 ## What makes it kid-, parent-, and store-friendly
 
 - **Three language modes:** English, Español, or **EN + ES**, which reads every page in both languages. That's great for bilingual homes and dual-language classrooms. On first launch it picks the device language.
@@ -84,7 +100,7 @@ voice) instead of the WebView's speech API, the Donate button stays hidden, and 
 
 **Unlocking stories (App Store build only).** God Made the World, Noah and Baby Moses are free. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering that story or everything left in its world. The grown-ups area sells the worlds too, and both screens can restore purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift` talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a reinstall, follow the family's Apple ID, and lock again after a refund. Ask to Buy approvals open the story as soon as they arrive. To try a purchase in the simulator without App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
 
-In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App Purchases → +** and create these 14 **Non-Consumable** products, each with English and Spanish display names and a review screenshot of the unlock screen. Submit them with the app version.
+In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App Purchases → +** and create these 15 **Non-Consumable** products, each with English and Spanish display names and a review screenshot of the unlock screen. Submit them with the app version.
 
 | Product ID (`com.dancruz.biblestorypals.` + …) | Unlocks | Price |
 |---|---|---|
@@ -92,6 +108,7 @@ In App Store Connect: accept the Paid Apps agreement (Business), then under the 
 | `world.sea` | Everything on Friendship Sea (3 stories) | $2.00 |
 | `story.david`, `story.psalm23`, `story.jonah`, `story.daniel`, `story.nativity`, `story.baptism`, `story.storm`, `story.loaves`, `story.sheep` | One Story Island story | $1.00 |
 | `story.bigcatch`, `story.samaritan`, `story.zacchaeus` | One Friendship Sea story | $1.00 |
+| `prayer.blessing` | The voice-guided prayer God Bless the People I Love | $1.00 |
 
 The game shows whatever price the App Store reports, so the buttons always match the tier you pick.
 
@@ -117,7 +134,8 @@ node tools/voices.mjs --budget 499             # record (never spends more than 
 
 Then bump `VERSION` in `sw.js` and commit `audio/`. Running it again continues where it stopped and never pays for
 a line twice. Lines are recorded in priority order: the whole Creation story first, then shared lines (praise and
-counting), then the other stories.
+counting), then the voice-guided prayers (about 710 credits on Flash for all three, both languages), then the other
+stories.
 
 | Model | Credits/character | First story (EN + ES) | All 14 stories |
 |---|---|---|---|
@@ -171,13 +189,14 @@ Add the new file names to `sw.js` if you add files, and bump `VERSION` there whe
 ```
 index.html            app shell
 css/style.css         all styles + animations
-js/main.js            screens: home, story, game, reward, grown-ups
+js/main.js            screens: home, story, game, reward, prayers, grown-ups
 js/stories.js         the 15 stories and the two worlds (bilingual text, scenes, game configs)
+js/prayers.js         the 3 voice-guided prayers (bilingual lines, echo steps, scenes)
 js/games.js           mini-game engine (collect / prompt / steer / memory / seek)
 js/art.js             SVG characters, animals, props, backgrounds
 js/audio.js           narration (Web Speech) + synthesized sound effects (Web Audio)
 js/i18n.js, store.js  UI words, settings & progress
-js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world
+js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world; 2 free prayers, then $1 a prayer
 ios/                  Capacitor iOS app (UnlocksPlugin.swift sells stories and worlds)
 sw.js, manifest.webmanifest, icons/   offline + install
 tests/play-through.mjs                end-to-end test

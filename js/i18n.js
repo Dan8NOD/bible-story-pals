@@ -17,6 +17,15 @@ export const UI = {
   sound: { en: 'Sound', es: 'Sonido' },
   worlds: { en: 'Choose a world', es: 'Escoge un mundo' },
   askGrownup: { en: 'Time to ask a grown-up!', es: '¡Hora de llamar a un adulto!' },
+  // Voice-guided prayers (js/prayers.js).
+  prayers: { en: 'Voice-Guided Prayers', es: 'Oraciones guiadas' },
+  prayTogether: { en: "Let's pray together!", es: '¡Vamos a orar juntos!' },
+  yourTurn: { en: 'Your turn!', es: '¡Ahora ustedes!' },
+  sayNames: { en: 'Say their names!', es: '¡Digan sus nombres!' },
+  amen: { en: 'Amen!', es: '¡Amén!' },
+  prayAgain: { en: 'Pray again', es: 'Orar otra vez' },
+  pause: { en: 'Pause', es: 'Pausa' },
+  resume: { en: 'Keep going', es: 'Seguir' },
 };
 
 export const COUNT = {

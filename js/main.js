@@ -5,7 +5,8 @@ import { store, langs } from './store.js';
 import { UI, PRAISE, COUNT, pick } from './i18n.js';
 import { startGame } from './games.js';
 import { DONATE_URL } from './config.js';
-import { paywalled, isOpen, lockedIn, storyProduct, worldProduct, priceOf, refresh, loadPrices, buy, restore, FREE_STORIES } from './unlocks.js';
+import { paywalled, isOpen, lockedIn, storyProduct, worldProduct, priceOf, refresh, loadPrices, buy, restore, FREE_STORIES, prayerProduct, prayerOpen } from './unlocks.js';
+import { PRAYERS, FREE_PRAYERS, prayerById } from './prayers.js';
 
 const app = document.getElementById('app');
 
@@ -20,6 +21,8 @@ const ICON = {
   replay: ic('<path d="M38 24 A14 14 0 1 1 33 13"/><path d="M34 5 V14 H25"/>'),
   play: ic('<path d="M15 9 L38 24 L15 39 Z" fill="currentColor"/>'),
   lock: ic('<rect x="10" y="21" width="28" height="20" rx="4"/><path d="M16 21 V15 A8 8 0 0 1 32 15 V21"/>'),
+  pause: ic('<path d="M17 11 V37 M31 11 V37"/>'),
+  pray: ic('<path d="M24 41 V12 Q24 6 19 9 L11 24 Q8 30 10 35 L14 41 M24 41 V12 Q24 6 29 9 L37 24 Q40 30 38 35 L34 41"/>'),
 };
 const starIcon = (fill = '#ffd54f') => `<svg viewBox="-50 -50 100 100" aria-hidden="true">${ART.star({ color: fill })}</svg>`;
 const logo = () => `<svg viewBox="-62 -62 124 124" aria-hidden="true"><circle r="58" fill="#ffd54f" stroke="${INK}" stroke-width="4"/>${place('sheep', 0, -2, 0.95)}</svg>`;
@@ -58,6 +61,11 @@ function route() {
   if (parts[0] === 'story' && story) return storyScreen(story, Math.max(0, Math.min(story.pages.length - 1, +parts[2] || 0)));
   if (parts[0] === 'play' && story) return gameScreen(story);
   if (parts[0] === 'yay' && story) return rewardScreen(story);
+  const prayer = prayerById(parts[1]);
+  if (parts[0] === 'prayers') return prayersScreen();
+  if ((parts[0] === 'pray' || parts[0] === 'amen') && prayer && !prayerOpen(prayer.id)) return prayerUnlockScreen(prayer);
+  if (parts[0] === 'pray' && prayer) return prayerScreen(prayer, Math.max(0, Math.min(prayer.steps.length - 1, +parts[2] || 0)));
+  if (parts[0] === 'amen' && prayer) return amenScreen(prayer);
   if (parts[0] === 'parents') {
     // Back, Forward or a reload can land here without the hold, so ask again.
     if (gatePassed) { gatePassed = false; return parentsScreen(); }
@@ -281,7 +289,9 @@ function homeScreen() {
         <button class="icon-btn small" id="parents" aria-label="${esc(t(UI.parents))}">${ICON.lock}</button>
       </div>
     </div>
-    <div class="world-tabs" role="group" aria-label="${esc(t(UI.worlds))}">${tabs}</div>
+    <div class="world-tabs" role="group" aria-label="${esc(t(UI.worlds))}">${tabs}
+      <button class="world-tab prayers-tab" data-act="prayers">${ICON.pray}<span>${titleHTML(UI.prayers)}</span></button>
+    </div>
     <nav class="map ${world.id}" aria-label="${esc(t(world.title))}" style="--wide-ar:${wide.w} / ${wide.h};--wide-r:${(wide.w / wide.h).toFixed(4)};--tall-ar:${tall.w} / ${tall.h}">
       ${art(wide, 'wide')}${art(tall, 'tall')}
       <div class="map-title"><h2>${heading}</h2>${langs().length === 1 ? `<p>${esc(t(UI.tapMap))}</p>` : ''}</div>
@@ -294,7 +304,8 @@ function homeScreen() {
     sfx.tap();
     go(`#/story/${c.dataset.id}/0`);
   }));
-  app.querySelectorAll('.world-tab').forEach((b) => b.addEventListener('click', () => {
+  app.querySelector('[data-act=prayers]').addEventListener('click', () => { sfx.tap(); go('#/prayers'); });
+  app.querySelectorAll('.world-tab[data-world]').forEach((b) => b.addEventListener('click', () => {
     if (b.dataset.world === world.id) return;
     store.set('world', b.dataset.world);
     sfx.page();
@@ -447,11 +458,159 @@ function rewardScreen(story) {
   speak([praise, story.lesson]);
 }
 
+/* ---------------- voice-guided prayers ---------------- */
+// The voice reads a line, then the screen says "Your turn!" and waits while the family
+// says it back, then moves on by itself. Pause stops the moving on; arrows still work.
+let prayerPaused = false;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// How long to wait for a family to repeat a line: longer lines, and both languages, take longer.
+const echoMs = (text) => Math.min(7000, Math.max(2500, 1500 + 70 * langs().reduce((n, l) => n + text[l].length, 0)));
+const NAMES_MS = 9000;
+
+function prayerCover(p) {
+  return sceneSVG(p.steps[p.cover].scene, { cls: 'still' }).replace('viewBox="0 0 1000 600"', 'viewBox="190 60 620 620"');
+}
+
+function prayersScreen() {
+  const cards = PRAYERS.map((p, i) => {
+    const open = prayerOpen(p.id);
+    return `<button class="prayer-card${open ? '' : ' locked'}" data-id="${p.id}" style="--ring:${p.color};animation-delay:${i * 0.06}s" aria-label="${esc(t(p.title))}">
+      <span class="disc">${prayerCover(p)}${open ? '' : `<span class="padlock">${ICON.lock}</span>`}</span>
+      <span class="name">${titleHTML(p.title)}</span>
+    </button>`;
+  }).join('');
+  app.innerHTML = `<main class="prayers">
+    <div class="home-top">
+      <button class="icon-btn small" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
+      <h1>${ICON.pray}${titleHTML(UI.prayers)}</h1>
+      ${soundButton()}
+    </div>
+    <p class="prayers-hint">${langs().map((l) => `<span lang="${l}">${esc(UI.prayTogether[l])}</span>`).join(' ')}</p>
+    <nav class="prayer-list" aria-label="${esc(t(UI.prayers))}">${cards}</nav>
+  </main>`;
+  wireSound(app);
+  app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
+  app.querySelectorAll('.prayer-card').forEach((c) => c.addEventListener('click', () => {
+    sfx.tap();
+    prayerPaused = false;
+    go(`#/pray/${c.dataset.id}/0`);
+  }));
+  speak(UI.prayTogether);
+}
+
+function prayerScreen(prayer, i) {
+  const step = prayer.steps[i];
+  const last = i === prayer.steps.length - 1;
+  const waits = step.echo || step.names;
+  const dots = prayer.steps.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('');
+  app.innerHTML = `<section class="screen praying">
+    <div class="stage">${sceneSVG(step.scene)}
+      <div class="hud">
+        <button class="icon-btn small" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
+        <div class="dots" aria-hidden="true">${dots}</div>
+        ${soundButton()}
+      </div>
+      <div class="your-turn" aria-live="polite">${ICON.pray}<span>${titleHTML(step.names ? UI.sayNames : UI.yourTurn)}</span><b class="turn-bar"><i></i></b></div>
+    </div>
+    <div class="bar">
+      <button class="icon-btn" data-act="prev" aria-label="${esc(t(UI.back))}" style="visibility:${i ? 'visible' : 'hidden'}">${ICON.left}</button>
+      <div class="caption" aria-live="polite">${lines(step.text)}</div>
+      <button class="icon-btn" data-act="pause" aria-label="${esc(t(prayerPaused ? UI.resume : UI.pause))}" aria-pressed="${prayerPaused}">${prayerPaused ? ICON.play : ICON.pause}</button>
+      <button class="icon-btn sun" data-act="listen" aria-label="${esc(t(UI.listen))}">${ICON.speaker}</button>
+      <button class="icon-btn go" data-act="next" aria-label="${esc(t(UI.next))}">${ICON.right}</button>
+    </div>
+  </section>`;
+  const gen = generation;
+  const screen = app.querySelector('.praying');
+  const turn = app.querySelector('.your-turn');
+  speakingCaption(app.querySelector('.caption'));
+  const prev = () => { if (i > 0) { sfx.page(); go(`#/pray/${prayer.id}/${i - 1}`); } };
+  const next = () => { sfx.page(); go(last ? `#/amen/${prayer.id}` : `#/pray/${prayer.id}/${i + 1}`); };
+  app.querySelector('[data-act=home]').addEventListener('click', () => go('#/prayers'));
+  app.querySelector('[data-act=prev]').addEventListener('click', prev);
+  app.querySelector('[data-act=next]').addEventListener('click', next);
+  app.querySelector('[data-act=pause]').addEventListener('click', (e) => {
+    prayerPaused = !prayerPaused;
+    e.currentTarget.innerHTML = prayerPaused ? ICON.play : ICON.pause;
+    e.currentTarget.setAttribute('aria-pressed', prayerPaused);
+    e.currentTarget.setAttribute('aria-label', t(prayerPaused ? UI.resume : UI.pause));
+    screen.classList.toggle('paused', prayerPaused);
+    if (!prayerPaused && screen.classList.contains('waited')) next();
+  });
+  screen.classList.toggle('paused', prayerPaused);
+  wireSound(app);
+
+  // "Listen again" starts the step over; `runs` lets only the newest run move on.
+  let runs = 0;
+  const run = async () => {
+    const id = ++runs;
+    const live = () => gen === generation && id === runs;
+    screen.classList.remove('turn', 'waited');
+    const started = Date.now();
+    await speak(step.text);
+    if (!live()) return;
+    // With narration off, leave time for a grown-up to read the line aloud.
+    if (!store.get('narration')) await sleep(Math.max(0, 900 + 55 * step.text[langs()[0]].length - (Date.now() - started)));
+    if (!live()) return;
+    if (waits) {
+      const ms = step.names ? NAMES_MS : echoMs(step.text);
+      turn.style.setProperty('--ms', `${ms}ms`);
+      screen.classList.add('turn');
+      sfx.tap();
+      await sleep(ms);
+      if (!live()) return;
+      screen.classList.remove('turn');
+    } else {
+      await sleep(700);
+      if (!live()) return;
+    }
+    screen.classList.add('waited');
+    if (!prayerPaused) next();
+  };
+  app.querySelector('[data-act=listen]').addEventListener('click', () => { run(); });
+  run();
+}
+
+function amenScreen(prayer) {
+  app.innerHTML = `<section class="reward amen">
+    <div class="confetti hearts"></div>
+    <svg class="big-star" viewBox="-60 -60 120 120" aria-hidden="true">
+      <circle r="56" fill="${prayer.color}" opacity=".55"/>
+      ${ART.glow({ color: '#ffb74d' })}
+      ${ART.heart({}).replace('<g', '<g transform="scale(1.2)"')}
+    </svg>
+    <h2>${titleHTML(UI.amen)}</h2>
+    <p>${langs().map((l) => `<span class="${l}" lang="${l}">${esc(prayer.closing[l])}</span>`).join(' ')}</p>
+    <div class="row">
+      <button class="icon-btn" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
+      <button class="icon-btn sun" data-act="again" aria-label="${esc(t(UI.prayAgain))}">${ICON.replay}</button>
+      <button class="big-btn green" data-act="more">${ICON.pray}<span>${esc(t(UI.prayers))}</span></button>
+    </div>
+  </section>`;
+  const conf = app.querySelector('.confetti');
+  const colors = ['#ef5350', '#ec407a', '#ffb74d', '#ffd54f', '#ffffff'];
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('i');
+    p.style.left = `${Math.random() * 100}%`;
+    p.style.background = colors[i % colors.length];
+    p.style.animationDuration = `${3.2 + Math.random() * 2.6}s`;
+    p.style.animationDelay = `${Math.random() * 1.2}s`;
+    conf.appendChild(p);
+  }
+  app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
+  app.querySelector('[data-act=again]').addEventListener('click', () => { prayerPaused = false; go(`#/pray/${prayer.id}/0`); });
+  app.querySelector('[data-act=more]').addEventListener('click', () => go('#/prayers'));
+  sfx.tada();
+  speak(prayer.closing);
+}
+
 /* ---------------- unlocking stories (App Store build) ---------------- */
 const BUY_TEXT = {
   en: {
     wall: (n) => `The first ${n} stories are free. Grown-ups can unlock this one, or every story left in this world. It's a one-time purchase and it's yours to keep.`,
     story: (p) => `This story · ${p}`,
+    prayerWall: (n) => `${n} prayers are free. Grown-ups can unlock this one for the same price as one story. It's a one-time purchase and it's yours to keep.`,
+    prayer: (p) => `This prayer · ${p}`,
     world: (name, n, p) => `${n === 1 ? 'The story' : `All ${n} stories`} left in ${name} · ${p}`,
     buying: 'Opening the App Store…',
     pending: 'Waiting for a parent to approve the purchase. The story opens as soon as it’s approved.',
@@ -469,6 +628,8 @@ const BUY_TEXT = {
   es: {
     wall: (n) => `Las primeras ${n} historias son gratis. Los adultos pueden desbloquear esta, o todas las que quedan en este mundo. Es una sola compra y es suya para siempre.`,
     story: (p) => `Esta historia · ${p}`,
+    prayerWall: (n) => `${n} oraciones son gratis. Los adultos pueden desbloquear esta por el mismo precio que una historia. Es una sola compra y es suya para siempre.`,
+    prayer: (p) => `Esta oración · ${p}`,
     world: (name, n, p) => `${n === 1 ? 'La historia que queda' : `Las ${n} historias que quedan`} en ${name} · ${p}`,
     buying: 'Abriendo el App Store…',
     pending: 'Esperando que un padre apruebe la compra. La historia se abre en cuanto se apruebe.',
@@ -544,6 +705,38 @@ function unlockScreen(story) {
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
   storyBtn.addEventListener('click', () => unlockFlow(storyProduct(story.id), btns, note, paid, route));
   worldBtn?.addEventListener('click', () => unlockFlow(worldProduct(world.id), btns, note, paid, route));
+  app.querySelector('[data-act=restore]').addEventListener('click', async () => {
+    const r = await restore();
+    if (gen !== generation) return;
+    if (paid()) route();
+    else note.textContent = r.error ? P.failed : P.restored;
+  });
+  speak(UI.askGrownup);
+}
+
+function prayerUnlockScreen(prayer) {
+  const P = BUY_TEXT[langs()[0]];
+  const product = prayerProduct(prayer.id);
+  app.innerHTML = `<section class="unlock-wall">
+    <svg class="unlock-art" viewBox="-62 -62 124 124" aria-hidden="true"><circle r="58" fill="${prayer.color}" stroke="${INK}" stroke-width="4"/>${place('heart', 0, 4, 1, {}, 'pulse')}</svg>
+    <h2>${titleHTML(UI.askGrownup)}</h2>
+    <p>${esc(P.prayerWall(FREE_PRAYERS.length))}</p>
+    <div class="row">
+      <button class="icon-btn" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
+      <button class="big-btn green" data-act="prayer">${ICON.lock}<span></span></button>
+    </div>
+    <p class="unlock-note" aria-live="polite"></p>
+    <p><button class="link-btn" data-act="restore">${esc(P.restore)}</button></p>
+  </section>`;
+  const btn = app.querySelector('[data-act=prayer]');
+  const note = app.querySelector('.unlock-note');
+  const showPrice = () => { btn.querySelector('span').textContent = P.prayer(priceOf(product)); };
+  const gen = generation;
+  showPrice();
+  loadPrices().then(() => { if (gen === generation) showPrice(); });
+  const paid = () => prayerOpen(prayer.id);
+  app.querySelector('[data-act=home]').addEventListener('click', () => go('#/prayers'));
+  btn.addEventListener('click', () => unlockFlow(product, [btn], note, paid, route));
   app.querySelector('[data-act=restore]').addEventListener('click', async () => {
     const r = await restore();
     if (gen !== generation) return;
@@ -660,7 +853,7 @@ const PARENT_TEXT = {
     title: 'For grown-ups',
     about: 'Bible Story Pals is a bilingual (English & Spanish) Bible story game for children ages 3–6. Every story is read aloud, so no reading is needed. Each story ends with a gentle mini-game that practices counting, colors, numbers and new words.',
     privacy: 'Privacy: no ads, no in-app purchases, no accounts, no tracking. Nothing your child does leaves this device. After the first visit it works offline.',
-    privacyApp: 'Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The first stories are free. Others are one-time purchases made by a grown-up through the App Store.',
+    privacyApp: 'Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The first stories and two voice-guided prayers are free. Others are one-time purchases made by a grown-up through the App Store.',
     supportTitle: 'Support Bible Story Pals',
     support: 'This game is free with no ads. If it blesses your family, a gift helps us make more stories.',
     donate: 'Donate',
@@ -672,13 +865,14 @@ const PARENT_TEXT = {
     ],
     settings: 'Settings', narration: 'Read stories aloud', sfx: 'Sound effects', lang: 'Language',
     reset: 'Reset stars', resetAsk: 'Tap again to remove all stars', resetDone: 'Stars reset', storiesTitle: 'Stories & Bible passages', back: 'Back to stories',
+    prayersTitle: 'Voice-guided prayers & Bible passages',
     voices: 'Narration uses your device’s built-in voices. For the best Spanish voice, install a Spanish (Mexico or US) voice in your device’s text-to-speech settings.',
   },
   es: {
     title: 'Para adultos',
     about: 'Amiguitos de la Biblia es un juego bilingüe (español e inglés) de historias bíblicas para niños de 3 a 6 años. Todas las historias se leen en voz alta, así que no hace falta saber leer. Cada historia termina con un minijuego que practica contar, los colores, los números y palabras nuevas.',
     privacy: 'Privacidad: sin anuncios, sin compras dentro de la app, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo. Después de la primera visita funciona sin internet.',
-    privacyApp: 'Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. Las primeras historias son gratis. Las demás son compras únicas que hace un adulto en el App Store.',
+    privacyApp: 'Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. Las primeras historias y dos oraciones guiadas son gratis. Las demás son compras únicas que hace un adulto en el App Store.',
     supportTitle: 'Apoye a Amiguitos de la Biblia',
     support: 'Este juego es gratis y sin anuncios. Si bendice a su familia, una ofrenda nos ayuda a crear más historias.',
     donate: 'Donar',
@@ -690,6 +884,7 @@ const PARENT_TEXT = {
     ],
     settings: 'Ajustes', narration: 'Leer las historias en voz alta', sfx: 'Efectos de sonido', lang: 'Idioma',
     reset: 'Borrar estrellas', resetAsk: 'Toque otra vez para borrar todas las estrellas', resetDone: 'Estrellas borradas', storiesTitle: 'Historias y pasajes bíblicos', back: 'Volver a las historias',
+    prayersTitle: 'Oraciones guiadas y pasajes bíblicos',
     voices: 'La narración usa las voces del dispositivo. Para una mejor voz en español, instale una voz de español (México o EE. UU.) en los ajustes de texto a voz.',
   },
 };
@@ -708,7 +903,7 @@ const POLICY = {
         'Stories play offline. Nothing your child does in the game is sent anywhere.',
       ]],
       ['In-app purchases', [
-        "The first three stories are free. A grown-up can buy other stories through Apple's App Store, after answering a question meant for grown-ups.",
+        "The first three stories and two voice-guided prayers are free. A grown-up can buy other stories and prayers through Apple's App Store, after answering a question meant for grown-ups.",
         "Apple handles every purchase, under Apple's privacy policy (apple.com/legal/privacy). We never see your name, Apple Account or payment details. Apple gives us sales totals that don't identify you.",
         'To show prices and check what your family owns, the app asks the App Store. These requests go only to Apple, and the app adds no information about your child to them.',
         'What you buy stays with your Apple Account, so you can restore it after deleting the app. With Apple\'s Family Sharing, people in your family group can use it too; Apple manages that group, and we never see who is in it. For a refund, ask Apple at reportaproblem.apple.com.',
@@ -733,7 +928,7 @@ const POLICY = {
         'Las historias funcionan sin internet. Nada de lo que hace su hijo en el juego se envía a ningún lugar.',
       ]],
       ['Compras dentro de la app', [
-        'Las primeras tres historias son gratis. Un adulto puede comprar otras historias en el App Store de Apple, después de responder una pregunta para adultos.',
+        'Las primeras tres historias y dos oraciones guiadas son gratis. Un adulto puede comprar otras historias y oraciones en el App Store de Apple, después de responder una pregunta para adultos.',
         'Apple se encarga de cada compra, según su política de privacidad (apple.com/legal/privacy). Nunca vemos su nombre, su Cuenta de Apple ni sus datos de pago. Apple nos da totales de ventas que no lo identifican.',
         'Para mostrar los precios y revisar lo que su familia ya tiene, la app le pregunta al App Store. Estas solicitudes van solo a Apple, y la app no les agrega información sobre su hijo.',
         'Lo que compra queda en su Cuenta de Apple, así que puede restaurarlo después de borrar la app. Con Compartir en familia de Apple, las personas de su grupo familiar también pueden usarlo; Apple administra ese grupo y nunca vemos quién lo forma. Para pedir un reembolso, escriba a Apple en reportaproblem.apple.com.',
@@ -791,7 +986,9 @@ function parentsScreen() {
     <h3>${esc(P.tipsTitle)}</h3>
     <ul>${P.tips.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
     <h3>${esc(P.storiesTitle)}</h3>
-    <ul>${STORIES.map((s) => `<li>${esc(s.title.en)} / ${esc(s.title.es)} — ${esc(REFS[s.id])}</li>`).join('')}</ul>
+    <ul data-refs="stories">${STORIES.map((s) => `<li>${esc(s.title.en)} / ${esc(s.title.es)} — ${esc(REFS[s.id])}</li>`).join('')}</ul>
+    <h3>${esc(P.prayersTitle)}</h3>
+    <ul data-refs="prayers">${PRAYERS.map((p) => `<li>${esc(p.title.en)} / ${esc(p.title.es)} — ${esc(p.ref)}</li>`).join('')}</ul>
     <p><button class="link-btn" data-act="reset">${esc(P.reset)}</button></p>
   </div></main>`;
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
