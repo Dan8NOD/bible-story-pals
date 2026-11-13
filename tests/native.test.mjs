@@ -39,12 +39,12 @@ await page.addInitScript(() => {
   };
 });
 
-// Pick a page whose English line has no recorded clip yet (recordings fill in over time).
-const recorded = new Set(JSON.parse(readFileSync(join(root, 'audio/manifest.json'), 'utf8')).clips.en);
-const target = STORIES.flatMap((s) => s.pages.map((p, i) => ({ id: s.id, i, text: p.text.en })))
-  .find((p) => !recorded.has(clipId(p.text)));
-assert.ok(target, 'every page is recorded: point this test at a line without a clip');
+// Every line may be recorded by now, so hide one clip from the game to check the fallback.
+const target = { id: 'daniel', i: 0, text: STORIES.find((s) => s.id === 'daniel').pages[0].text.en };
 const line = target.text;
+const manifest = JSON.parse(readFileSync(join(root, 'audio/manifest.json'), 'utf8'));
+manifest.clips.en = manifest.clips.en.filter((id) => id !== clipId(line));
+await page.route('**/audio/manifest.json', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify(manifest) }));
 await page.goto(`http://localhost:${server.address().port}/#/story/${target.id}/${target.i}`);
 await page.waitForFunction((t) => window.__tts.some((c) => c.method === 'speak' && c.options.text === t), line, { timeout: 5000 });
 const call = await page.evaluate((t) => window.__tts.find((c) => c.method === 'speak' && c.options.text === t), line);
