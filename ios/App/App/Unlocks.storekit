@@ -281,6 +281,26 @@
       "productID": "com.dancruz.biblestorypals.story.zacchaeus",
       "referenceName": "Story: zacchaeus",
       "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000114",
+      "localizations": [
+        {
+          "description": "Unlocks the voice-guided prayer God Bless the People I Love. One-time purchase.",
+          "displayName": "Prayer: God Bless the People I Love",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea la oración guiada Dios bendiga a quienes amo. Compra única.",
+          "displayName": "Oración: Dios bendiga a quienes amo",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.prayer.blessing",
+      "referenceName": "Prayer: God Bless the People I Love",
+      "type": "NonConsumable"
     }
   ],
   "settings": {
