@@ -5,7 +5,7 @@ import { store, langs } from './store.js';
 import { UI, PRAISE, COUNT, pick } from './i18n.js';
 import { startGame } from './games.js';
 import { DONATE_URL } from './config.js';
-import { paywalled, isOpen, lockedIn, storyProduct, worldProduct, priceOf, refresh, loadPrices, buy, restore, FREE_STORIES, prayerProduct, prayerOpen } from './unlocks.js';
+import { paywalled, isOpen, lockedIn, storyProduct, worldProduct, priceOf, refresh, loadPrices, buy, restore, FREE_STORIES, prayerProduct, prayerOpen, bundleProduct, offerBundle } from './unlocks.js';
 import { PRAYERS, FREE_PRAYERS, prayerById } from './prayers.js';
 
 const app = document.getElementById('app');
@@ -611,6 +611,8 @@ const BUY_TEXT = {
     story: (p) => `This story · ${p}`,
     prayerWall: (n) => `${n} prayers are free. Grown-ups can unlock this one for the same price as one story. It's a one-time purchase and it's yours to keep.`,
     prayer: (p) => `This prayer · ${p}`,
+    bundle: (p) => `Everything Pack: every story and prayer · ${p}`,
+    bundleNote: 'The Everything Pack costs half of buying every story and prayer one by one.',
     world: (name, n, p) => `${n === 1 ? 'The story' : `All ${n} stories`} left in ${name} · ${p}`,
     buying: 'Opening the App Store…',
     pending: 'Waiting for a parent to approve the purchase. The story opens as soon as it’s approved.',
@@ -630,6 +632,8 @@ const BUY_TEXT = {
     story: (p) => `Esta historia · ${p}`,
     prayerWall: (n) => `${n} oraciones son gratis. Los adultos pueden desbloquear esta por el mismo precio que una historia. Es una sola compra y es suya para siempre.`,
     prayer: (p) => `Esta oración · ${p}`,
+    bundle: (p) => `Paquete Completo: todas las historias y oraciones · ${p}`,
+    bundleNote: 'El Paquete Completo cuesta la mitad de comprar cada historia y oración por separado.',
     world: (name, n, p) => `${n === 1 ? 'La historia que queda' : `Las ${n} historias que quedan`} en ${name} · ${p}`,
     buying: 'Abriendo el App Store…',
     pending: 'Esperando que un padre apruebe la compra. La historia se abre en cuanto se apruebe.',
@@ -686,17 +690,21 @@ function unlockScreen(story) {
       <button class="icon-btn" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
       <button class="big-btn" data-act="story">${ICON.lock}<span></span></button>
       ${offerWorld ? `<button class="big-btn green" data-act="world">${ICON.lock}<span></span></button>` : ''}
+      ${offerBundle() ? `<button class="big-btn bundle" data-act="bundle">${ICON.lock}<span></span></button>` : ''}
     </div>
+    ${offerBundle() ? `<p class="bundle-note">${esc(P.bundleNote)}</p>` : ''}
     <p class="unlock-note" aria-live="polite"></p>
     <p><button class="link-btn" data-act="restore">${esc(P.restore)}</button></p>
   </section>`;
   const storyBtn = app.querySelector('[data-act=story]');
   const worldBtn = app.querySelector('[data-act=world]');
+  const bundleBtn = app.querySelector('[data-act=bundle]');
   const note = app.querySelector('.unlock-note');
-  const btns = [storyBtn, worldBtn].filter(Boolean);
+  const btns = [storyBtn, worldBtn, bundleBtn].filter(Boolean);
   const showPrices = () => {
     storyBtn.querySelector('span').textContent = P.story(priceOf(storyProduct(story.id)));
     if (worldBtn) worldBtn.querySelector('span').textContent = P.world(t(world.title), left, priceOf(worldProduct(world.id)));
+    if (bundleBtn) bundleBtn.querySelector('span').textContent = P.bundle(priceOf(bundleProduct));
   };
   const gen = generation;
   showPrices();
@@ -705,6 +713,7 @@ function unlockScreen(story) {
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
   storyBtn.addEventListener('click', () => unlockFlow(storyProduct(story.id), btns, note, paid, route));
   worldBtn?.addEventListener('click', () => unlockFlow(worldProduct(world.id), btns, note, paid, route));
+  bundleBtn?.addEventListener('click', () => unlockFlow(bundleProduct, btns, note, paid, route));
   app.querySelector('[data-act=restore]').addEventListener('click', async () => {
     const r = await restore();
     if (gen !== generation) return;
@@ -724,19 +733,27 @@ function prayerUnlockScreen(prayer) {
     <div class="row">
       <button class="icon-btn" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
       <button class="big-btn green" data-act="prayer">${ICON.lock}<span></span></button>
+      ${offerBundle() ? `<button class="big-btn bundle" data-act="bundle">${ICON.lock}<span></span></button>` : ''}
     </div>
+    ${offerBundle() ? `<p class="bundle-note">${esc(P.bundleNote)}</p>` : ''}
     <p class="unlock-note" aria-live="polite"></p>
     <p><button class="link-btn" data-act="restore">${esc(P.restore)}</button></p>
   </section>`;
   const btn = app.querySelector('[data-act=prayer]');
+  const bundleBtn = app.querySelector('[data-act=bundle]');
+  const btns = [btn, bundleBtn].filter(Boolean);
   const note = app.querySelector('.unlock-note');
-  const showPrice = () => { btn.querySelector('span').textContent = P.prayer(priceOf(product)); };
+  const showPrice = () => {
+    btn.querySelector('span').textContent = P.prayer(priceOf(product));
+    if (bundleBtn) bundleBtn.querySelector('span').textContent = P.bundle(priceOf(bundleProduct));
+  };
   const gen = generation;
   showPrice();
   loadPrices().then(() => { if (gen === generation) showPrice(); });
   const paid = () => prayerOpen(prayer.id);
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/prayers'));
-  btn.addEventListener('click', () => unlockFlow(product, [btn], note, paid, route));
+  btn.addEventListener('click', () => unlockFlow(product, btns, note, paid, route));
+  bundleBtn?.addEventListener('click', () => unlockFlow(bundleProduct, btns, note, paid, route));
   app.querySelector('[data-act=restore]').addEventListener('click', async () => {
     const r = await restore();
     if (gen !== generation) return;
@@ -1019,13 +1036,17 @@ function wireUnlockSettings(T) {
   const note = app.querySelector('.unlock-note');
   const gen = generation;
   const show = () => {
-    box.innerHTML = WORLDS.map((w) => {
+    box.innerHTML = (offerBundle()
+      ? `<p><button class="big-btn bundle" data-bundle>${ICON.lock}<span>${esc(T.bundle(priceOf(bundleProduct)))}</span></button></p>
+        <p class="bundle-note">${esc(T.bundleNote)}</p>`
+      : '') + WORLDS.map((w) => {
       const left = lockedIn(w).length;
       return `<p><strong>${esc(t(w.title))}:</strong> ${esc(T.open(w.stories.length - left, w.stories.length))}</p>
         ${left > 1 ? `<p><button class="big-btn green" data-world="${w.id}">${ICON.lock}<span>${esc(T.world(t(w.title), left, priceOf(worldProduct(w.id))))}</span></button></p>` : ''}`;
     }).join('');
-    const btns = [...box.querySelectorAll('[data-world]')];
+    const btns = [...box.querySelectorAll('[data-world], [data-bundle]')];
     btns.forEach((b) => b.addEventListener('click', () => {
+      if (b.hasAttribute('data-bundle')) { unlockFlow(bundleProduct, btns, note, () => !offerBundle(), show); return; }
       const w = worldById(b.dataset.world);
       unlockFlow(worldProduct(w.id), btns, note, () => !lockedIn(w).length, show);
     }));
