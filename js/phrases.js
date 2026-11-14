@@ -2,6 +2,7 @@
 // under. tools/voices.mjs records these; audio.js plays them.
 
 import { STORIES } from './stories.js';
+import { PRAYERS } from './prayers.js';
 import { UI, PRAISE, countWord } from './i18n.js';
 
 // Clips are named by a hash of their exact text, so editing a line simply
@@ -15,8 +16,9 @@ export function clipId(text) {
   return h.toString(36).padStart(7, '0');
 }
 
-// { en, es } entries in recording priority: whole stories first (so a small
-// budget still gives one fully voiced story), then lines every game shares.
+// { en, es } entries in recording priority: the first story (so a small budget
+// still gives one fully voiced story), the lines every game shares, the
+// voice-guided prayers, then the other stories.
 export function allPhrases() {
   const seen = new Set();
   const out = [];
@@ -41,8 +43,13 @@ export function allPhrases() {
     add(UI.tryAgain);
     add(UI.welcome);
   };
+  const prayers = () => {
+    add(UI.prayTogether);
+    PRAYERS.forEach((p) => { p.steps.forEach((st) => add(st.text)); add(p.closing); });
+  };
   story(STORIES[0]);
   shared();
+  prayers();
   STORIES.slice(1).forEach(story);
   return out;
 }

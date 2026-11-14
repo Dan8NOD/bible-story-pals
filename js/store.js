@@ -5,7 +5,8 @@ const KEY = 'bsp:v1';
 
 function defaults() {
   const nav = (typeof navigator !== 'undefined' && navigator.language) || 'en';
-  return { lang: nav.toLowerCase().startsWith('es') ? 'es' : 'en', narration: true, sfx: true, stars: {} };
+  // world: the map on screen. owned: App Store products bought, as last reported (see unlocks.js).
+  return { lang: nav.toLowerCase().startsWith('es') ? 'es' : 'en', narration: true, sfx: true, stars: {}, world: 'island', owned: [] };
 }
 
 let state = defaults();

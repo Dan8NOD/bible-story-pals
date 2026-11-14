@@ -82,6 +82,8 @@ button {
 .big-btn svg { width: 36px; height: 36px; }
 a.big-btn { text-decoration: none; color: var(--ink); }
 .big-btn.green { background: #7bd389; box-shadow: 0 6px 0 #43a047; }
+.big-btn.bundle { background: #f8bbd0; box-shadow: 0 6px 0 #ec407a; }
+.bundle-note { font-size: 0.85em; opacity: 0.85; }
 
 /* ---------- home ---------- */
 .home {
@@ -133,14 +135,34 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 }
 .star-count svg { width: 40px; height: 40px; }
 
+/* World tabs above the map. */
+.world-tabs { display: flex; justify-content: center; gap: 10px; margin: 0 auto 10px; flex-wrap: wrap; }
+.world-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 54px;
+  padding: 4px 18px 4px 8px;
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-align: left;
+}
+.world-tab svg { width: 44px; height: 44px; flex: none; overflow: visible; }
+.world-tab small { display: block; color: var(--es); font-size: 0.78em; font-weight: 700; }
+.world-tab[aria-pressed='true'] { background: var(--sun); }
+
 /* Island map. Stops are placed in % of the map box (--wx/--wy wide, --tx/--ty
    tall); margins in % resolve against the map's width, which centres each disc
    on its point. Text sizes use cqw so labels scale with the map. */
 .map {
   position: relative;
   container-type: inline-size;
-  width: min(100%, calc((100vh - 130px - var(--safe-t) - var(--safe-b)) * var(--wide-r)));
-  width: min(100%, calc((100dvh - 130px - var(--safe-t) - var(--safe-b)) * var(--wide-r)));
+  width: min(100%, calc((100vh - 196px - var(--safe-t) - var(--safe-b)) * var(--wide-r)));
+  width: min(100%, calc((100dvh - 196px - var(--safe-t) - var(--safe-b)) * var(--wide-r)));
   aspect-ratio: var(--wide-ar);
   margin: 0 auto;
   border-radius: 28px;
@@ -218,6 +240,21 @@ a.big-btn { text-decoration: none; color: var(--ink); }
   font-weight: 800;
   box-shadow: 0 3px 0 rgba(74, 51, 38, 0.25);
 }
+.stop.locked .disc svg.stage-svg, .stop.locked .disc > svg { filter: saturate(0.55) brightness(0.92); }
+.stop .padlock {
+  position: absolute;
+  right: 6%;
+  bottom: 6%;
+  width: 34%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 2px 0 rgba(74, 51, 38, 0.3);
+}
+.stop .padlock svg { width: 68%; height: 68%; }
 .stop .pal { position: absolute; left: 70%; top: 0; margin-top: 20%; width: 28%; aspect-ratio: 84 / 126; height: auto; overflow: visible; }
 
 /* ---------- story & game ---------- */
@@ -290,6 +327,98 @@ a.big-btn { text-decoration: none; color: var(--ink); }
   animation: fall linear forwards;
 }
 
+/* ---------- voice-guided prayers ---------- */
+.world-tab.prayers-tab { background: #fde7ef; }
+.world-tab.prayers-tab svg { width: 38px; height: 38px; padding: 3px; color: var(--es); }
+.prayers {
+  flex: 1;
+  overflow-y: auto;
+  padding: calc(12px + var(--safe-t)) calc(16px + var(--safe-r)) calc(24px + var(--safe-b)) calc(16px + var(--safe-l));
+  background:
+    radial-gradient(circle at 50% 0%, #fff3d6 0 140px, transparent 141px),
+    linear-gradient(#ffe0b2, #fff3e0 55%, #fff8ec);
+}
+.prayers h1 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: clamp(24px, 4vw, 38px); line-height: 1; font-weight: 800; text-align: left; }
+.prayers h1 svg { width: 48px; height: 48px; flex: none; color: var(--es); }
+.prayers h1 small { display: block; font-size: 0.62em; color: var(--es); font-weight: 700; margin-top: 4px; }
+.prayers-hint { margin: 0 auto 14px; text-align: center; font-size: clamp(18px, 2.6vw, 24px); font-weight: 700; }
+.prayers-hint [lang='es'] { color: var(--es); }
+.prayer-list { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(14px, 3vw, 34px); max-width: 1100px; margin: 0 auto; }
+.prayer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: clamp(130px, min(28vw, 46vh), 300px);
+  padding: 0;
+  background: none;
+  animation: pop-in 0.4s backwards;
+}
+.prayer-card .disc {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  border: 8px solid var(--ring);
+  box-shadow: 0 0 0 5px #fff, 0 8px 0 5px rgba(74, 51, 38, 0.2);
+  transition: transform 0.12s;
+}
+.prayer-card:active .disc { transform: translateY(3px) scale(0.96); }
+.prayer-card:focus-visible { outline: none; }
+.prayer-card:focus-visible .disc { outline: 4px solid var(--ink); outline-offset: 6px; }
+.prayer-card .name { margin-top: 12px; font-size: clamp(17px, 2.4vw, 26px); line-height: 1.08; font-weight: 800; text-align: center; }
+.prayer-card .name small { display: block; color: var(--es); font-size: 0.82em; font-weight: 700; }
+.prayer-card.locked .disc > svg { filter: saturate(0.55) brightness(0.92); }
+.prayer-card .padlock {
+  position: absolute;
+  right: 8%;
+  bottom: 8%;
+  width: 26%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 2px 0 rgba(74, 51, 38, 0.3);
+}
+.prayer-card .padlock svg { width: 66%; height: 66%; }
+
+/* "Your turn!" while the family says the line back, with a bar that fills while they do. */
+.your-turn {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 22px 14px 12px;
+  border-radius: 40px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  font-size: clamp(20px, 3vw, 30px);
+  font-weight: 800;
+  line-height: 1.05;
+  opacity: 0;
+  transform: translate(-50%, 20px) scale(0.9);
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+}
+.your-turn svg { width: 46px; height: 46px; flex: none; color: var(--es); }
+.your-turn small { display: block; color: var(--es); font-size: 0.78em; }
+.your-turn .turn-bar { position: absolute; left: 18px; right: 18px; bottom: 6px; height: 5px; border-radius: 3px; background: #f3e5d8; overflow: hidden; }
+.your-turn .turn-bar i { display: block; height: 100%; width: 0; background: var(--sun-deep); }
+.praying.turn .your-turn { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.praying.turn .your-turn svg { animation: pulse 1.4s ease-in-out infinite; }
+.praying.turn .your-turn .turn-bar i { animation: turn-fill var(--ms, 3s) linear forwards; }
+.praying [data-act='pause'][aria-pressed='true'] { background: var(--sun); }
+@keyframes turn-fill { to { width: 100%; } }
+
+.amen { background: radial-gradient(circle at 50% 30%, #fff3d6, #ffe0b2 60%, #ffcc80); }
+.confetti.hearts i { width: 14px; height: 14px; border-radius: 50%; }
+
 /* ---------- parents ---------- */
 .parents {
   flex: 1;
@@ -301,6 +430,10 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 .parents h2 { font-size: 32px; margin: 8px 0; }
 .parents h3 { margin: 22px 0 6px; font-size: 22px; }
 .parents p, .parents li { font-size: 18px; line-height: 1.45; font-weight: 500; }
+.parents .policy { margin: 10px 0; }
+.parents .policy summary { min-height: 44px; display: flex; align-items: center; font-size: 18px; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.parents .policy h4 { margin: 16px 0 4px; font-size: 19px; }
+.parents .policy-date { margin-top: 0; font-size: 16px; }
 .setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; border-radius: 16px; padding: 10px 16px; margin: 8px 0; box-shadow: var(--shadow); font-size: 20px; }
 .toggle { width: 74px; height: 42px; border-radius: 30px; background: #ccc; position: relative; flex: none; }
 .toggle::after { content: ''; position: absolute; top: 5px; left: 5px; width: 32px; height: 32px; border-radius: 50%; background: #fff; transition: left 0.2s; }
@@ -323,6 +456,33 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 .gate .hold { position: relative; overflow: hidden; }
 .gate .hold .fill { position: absolute; inset: 0; background: #66bb6a; transform-origin: left; transform: scaleX(0); }
 .gate .hold span { position: relative; }
+.gate .box:focus { outline: none; }
+.gate .answer { display: block; min-height: 52px; margin-bottom: 12px; border-radius: 14px; background: #fff; font-size: 36px; font-weight: 800; letter-spacing: 6px; line-height: 52px; }
+.keypad { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; justify-content: center; }
+.keypad button { height: 56px; border-radius: 16px; background: #fff; box-shadow: var(--shadow); font-size: 28px; font-weight: 800; }
+.keypad button:active { transform: translateY(3px); }
+.keypad [data-act] { background: #f1e6d6; }
+
+/* ---------- 12-hour pass (App Store build) ---------- */
+.unlock-wall {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: calc(16px + var(--safe-t)) calc(16px + var(--safe-r)) calc(16px + var(--safe-b)) calc(16px + var(--safe-l));
+  text-align: center;
+  background: radial-gradient(circle at 50% 35%, #eef9ff, #b3e0f8 55%, var(--sky));
+  overflow-y: auto;
+}
+.unlock-wall .unlock-art { width: min(30vh, 200px); height: min(30vh, 200px); flex: none; animation: star-in 0.9s cubic-bezier(.2, 1.6, .4, 1) both; }
+.unlock-wall h2 { margin: 0; font-size: clamp(28px, 5vw, 46px); line-height: 1.05; font-weight: 800; }
+.unlock-wall h2 small { display: block; color: var(--es); font-size: 0.7em; }
+.unlock-wall p { margin: 0; max-width: 680px; font-size: clamp(17px, 2.6vw, 22px); font-weight: 500; }
+.unlock-wall .row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; align-items: center; }
+.unlock-note:empty { display: none; }
+.big-btn:disabled { opacity: 0.6; }
 
 .rotate-hint { display: none; }
 
@@ -375,6 +535,11 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 
 /* Short landscape phones: shrink chrome so the picture stays big. */
 @media (max-height: 460px) {
+  /* Short landscape phones: keep "Your turn!" small and up top, clear of the family. */
+  .your-turn { top: 52px; bottom: auto; font-size: 18px; padding: 4px 14px 10px 8px; transform: translate(-50%, -12px) scale(0.9); }
+  .your-turn svg { width: 30px; height: 30px; }
+  .prayers h1 svg { width: 36px; height: 36px; }
+  .prayers-hint { margin-bottom: 8px; }
   .icon-btn { width: 54px; height: 54px; }
   .icon-btn svg { width: 28px; height: 28px; }
   .bar { min-height: 70px; padding-top: 6px; padding-bottom: calc(6px + var(--safe-b)); }
@@ -388,11 +553,22 @@ a.big-btn { text-decoration: none; color: var(--ink); }
   /* The map would be tiny if it had to fit the height, so let it scroll. */
   .map { width: 100%; }
   .home-top { margin-bottom: 8px; }
+  .world-tab { min-height: 46px; font-size: 17px; }
+  .world-tab svg { width: 36px; height: 36px; }
   .brand svg { width: 48px; height: 48px; }
   .brand h1 { font-size: 24px; }
   .chip { min-height: 44px; padding: 0 12px; font-size: 17px; }
   .star-count { min-height: 44px; font-size: 20px; padding: 4px 12px 4px 6px; }
   .star-count svg { width: 30px; height: 30px; }
+  .unlock-wall { gap: 6px; justify-content: flex-start; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+  .unlock-wall .unlock-art { display: none; }
+  .unlock-wall h2 { margin: 0; font-size: 26px; }
+  .unlock-wall p { margin: 0; font-size: 15px; line-height: 1.3; }
+  .unlock-wall .big-btn { min-height: 52px; font-size: 18px; }
+  /* Landscape phones: question on the left, keypad on the right. */
+  .gate .box.math { max-width: 600px; display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; padding: 16px 20px; }
+  .keypad { grid-template-columns: repeat(3, 64px); gap: 8px; }
+  .keypad button { height: 48px; }
 }
 
 /* Home-screen thumbnails stay still to save battery. */
