@@ -1,7 +1,8 @@
 // What's open in the App Store build: the first three stories are free, any other story
 // is a one-time purchase, and one purchase can unlock everything left in a world. Two
-// voice-guided prayers are free and each other one costs what a story does. The website
-// has nothing to buy with, so every story and prayer stays open there.
+// voice-guided prayers are free and each other one costs what a story does. The Everything
+// Pack opens every story and prayer for half of what buying them one by one costs. The
+// website has nothing to buy with, so every story and prayer stays open there.
 //
 // Products are sold by the native Unlocks plugin (ios/App/App/UnlocksPlugin.swift), which
 // reads what a family owns from the App Store's signed transactions. The last answer is
@@ -16,6 +17,7 @@ const BASE = 'com.dancruz.biblestorypals';
 export const storyProduct = (id) => `${BASE}.story.${id}`;
 export const worldProduct = (id) => `${BASE}.world.${id}`;
 export const prayerProduct = (id) => `${BASE}.prayer.${id}`;
+export const bundleProduct = `${BASE}.bundle.everything`;
 
 const cap = typeof window !== 'undefined' ? window.Capacitor : null;
 export const paywalled = !!(cap?.isNativePlatform?.() && cap.PluginHeaders?.some((h) => h.name === 'Unlocks'));
@@ -31,12 +33,17 @@ const owns = (product) => (store.get('owned') || []).includes(product);
 export const isOpen = (storyId) => !paywalled
   || FREE_STORIES.includes(storyId)
   || owns(storyProduct(storyId))
-  || owns(worldProduct(worldOf(storyId).id));
-export const prayerOpen = (id) => !paywalled || FREE_PRAYERS.includes(id) || owns(prayerProduct(id));
+  || owns(worldProduct(worldOf(storyId).id))
+  || owns(bundleProduct);
+export const prayerOpen = (id) => !paywalled || FREE_PRAYERS.includes(id) || owns(prayerProduct(id)) || owns(bundleProduct);
 export const lockedIn = (world) => world.stories.filter((id) => !isOpen(id));
+// The Everything Pack is offered while anything is still locked.
+export const offerBundle = () => paywalled
+  && (WORLDS.some((w) => lockedIn(w).length) || PRAYERS.some((p) => !prayerOpen(p.id)));
 
 // The App Store's own price once it has answered, otherwise the plain list price.
-export const priceOf = (product) => prices[product] || (product.includes('.world.') ? '$2' : '$1');
+const LIST_PRICE = { world: '$2', bundle: '$6.49' };
+export const priceOf = (product) => prices[product] || LIST_PRICE[product.split('.').at(-2)] || '$1';
 
 export async function refresh() {
   if (!paywalled) return;
@@ -48,6 +55,7 @@ export async function loadPrices() {
   const ids = [
     ...WORLDS.flatMap((w) => [worldProduct(w.id), ...w.stories.filter((id) => !FREE_STORIES.includes(id)).map(storyProduct)]),
     ...PRAYERS.filter((p) => !FREE_PRAYERS.includes(p.id)).map((p) => prayerProduct(p.id)),
+    bundleProduct,
   ];
   try { prices = { ...prices, ...(await call('products', { ids })).prices }; } catch { /* the list prices are fine */ }
 }

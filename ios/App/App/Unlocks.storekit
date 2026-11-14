@@ -301,6 +301,26 @@
       "productID": "com.dancruz.biblestorypals.prayer.blessing",
       "referenceName": "Prayer: God Bless the People I Love",
       "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "6.49",
+      "familyShareable": true,
+      "internalID": "6760000115",
+      "localizations": [
+        {
+          "description": "Unlocks every story in every world and every voice-guided prayer. One-time purchase.",
+          "displayName": "Everything Pack",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea todas las historias de todos los mundos y todas las oraciones guiadas. Compra única.",
+          "displayName": "Paquete Completo",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.bundle.everything",
+      "referenceName": "Everything Pack",
+      "type": "NonConsumable"
     }
   ],
   "settings": {

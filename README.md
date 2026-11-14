@@ -98,9 +98,9 @@ voice) instead of the WebView's speech API, the Donate button stays hidden, and 
 `ios/App/App/PrivacyInfo.xcprivacy` declares no tracking and no data collected. `npm run icons` also redraws the
 1024×1024 app icon and the launch image from the game art.
 
-**Unlocking stories (App Store build only).** God Made the World, Noah and Baby Moses are free. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering that story or everything left in its world. The grown-ups area sells the worlds too, and both screens can restore purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift` talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a reinstall, follow the family's Apple ID, and lock again after a refund. Ask to Buy approvals open the story as soon as they arrive. To try a purchase in the simulator without App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
+**Unlocking stories (App Store build only).** God Made the World, Noah and Baby Moses are free. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering that story, everything left in its world, or the **Everything Pack** ($6.49: every story and prayer, half of buying each one at $1). The grown-ups area sells the worlds and the pack too, and both screens can restore purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift` talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a reinstall, follow the family's Apple ID, and lock again after a refund. Ask to Buy approvals open the story as soon as they arrive. To try a purchase in the simulator without App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
 
-In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App Purchases → +** and create these 15 **Non-Consumable** products, each with English and Spanish display names and a review screenshot of the unlock screen. Submit them with the app version.
+In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App Purchases → +** and create these 16 **Non-Consumable** products, each with English and Spanish display names and a review screenshot of the unlock screen. Submit them with the app version.
 
 | Product ID (`com.dancruz.biblestorypals.` + …) | Unlocks | Price |
 |---|---|---|
@@ -109,6 +109,7 @@ In App Store Connect: accept the Paid Apps agreement (Business), then under the 
 | `story.david`, `story.psalm23`, `story.jonah`, `story.daniel`, `story.nativity`, `story.baptism`, `story.storm`, `story.loaves`, `story.sheep` | One Story Island story | $1.00 |
 | `story.bigcatch`, `story.samaritan`, `story.zacchaeus` | One Friendship Sea story | $1.00 |
 | `prayer.blessing` | The voice-guided prayer God Bless the People I Love | $1.00 |
+| `bundle.everything` | Everything Pack: every story in both worlds and every prayer (half of the $13 they cost one by one) | $6.49 |
 
 The game shows whatever price the App Store reports, so the buttons always match the tier you pick.
 
@@ -196,7 +197,7 @@ js/games.js           mini-game engine (collect / prompt / steer / memory / seek
 js/art.js             SVG characters, animals, props, backgrounds
 js/audio.js           narration (Web Speech) + synthesized sound effects (Web Audio)
 js/i18n.js, store.js  UI words, settings & progress
-js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world; 2 free prayers, then $1 a prayer
+js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world; 2 free prayers, then $1 a prayer; $6.49 Everything Pack
 ios/                  Capacitor iOS app (UnlocksPlugin.swift sells stories and worlds)
 sw.js, manifest.webmanifest, icons/   offline + install
 tests/play-through.mjs                end-to-end test
