@@ -24,7 +24,7 @@ export const UI = {
   prayTogether: { en: "Let's pray together!", es: '¡Vamos a rezar juntos!', he: 'בואו נתפלל יחד!' },
   yourTurn: { en: 'Your turn!', es: '¡Ahora ustedes!', he: 'עכשיו אתם!' },
   sayNames: { en: 'Say their names!', es: '¡Digan sus nombres!', he: 'אמרו את השמות שלהם!' },
-  amen: { en: 'Amen!', es: '¡Amén!', he: 'אמן!' },
+  amen: { en: 'Amen!', es: '¡Amén!', he: 'אָמֵן!' },
   prayAgain: { en: 'Pray again', es: 'Rezar otra vez', he: 'להתפלל שוב' },
   pause: { en: 'Pause', es: 'Pausa', he: 'השהיה' },
   resume: { en: 'Keep going', es: 'Seguir', he: 'להמשיך' },

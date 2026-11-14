@@ -1,5 +1,5 @@
 // Offline support: cache the whole (tiny) app on install, serve cache-first.
-const VERSION = 'tsp-v1';
+const VERSION = 'tsp-v2';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css', 'fonts/baloo2-latin.woff2',
   'js/main.js', 'js/art.js', 'js/audio.js', 'js/games.js', 'js/i18n.js', 'js/store.js', 'js/stories.js', 'js/config.js', 'js/phrases.js', 'js/unlocks.js', 'js/prayers.js',
@@ -13,7 +13,8 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      // Only this app's caches: the sister app (bsp-) shares the github.io origin.
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('tsp-') && k !== VERSION).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });

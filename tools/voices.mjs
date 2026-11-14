@@ -18,7 +18,7 @@
 //   --model-he <id>   model for Hebrew (default eleven_v3; Flash and Multilingual v2 don't speak Hebrew)
 //   --out <dir>       where the clips go (default audio/)
 //   --prune           delete clips no line uses any more (after editing or removing stories); needs no key
-//   --redo            re-record everything, e.g. after changing voices
+//   --redo            re-record everything, e.g. after changing voices (with --dry-run, only shows the plan)
 
 import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
@@ -35,11 +35,17 @@ const flag = (name) => args.includes(`--${name}`);
 
 const API = process.env.ELEVENLABS_BASE_URL || 'https://api.elevenlabs.io';
 const KEY = process.env.ELEVENLABS_API_KEY;
-const BUDGET = Number(opt('budget', 499));
 const OUT = opt('out', join(root, 'audio'));
 const ALL = ['en', 'es', 'he'];
 
 const die = (msg) => { console.error(msg); process.exit(1); };
+// "--budget=10" would be skipped silently and leave the default cap: insist on a space.
+const glued = args.find((a) => /^--[^=]+=/.test(a));
+if (glued) die(`Write ${glued.replace('=', ' ')} (a space, not "=").`);
+// The spending cap must be a real, positive number: a typo must never lift or ignore it.
+const budgetArg = opt('budget', '499');
+const BUDGET = /^\d+(\.\d+)?$/.test(budgetArg ?? '') ? Number(budgetArg) : NaN;
+if (!(BUDGET > 0)) die(`--budget needs a positive number of credits, e.g. --budget 499 (got ${budgetArg ?? 'nothing'}).`);
 const api = (path, init = {}) => fetch(`${API}${path}`, { ...init, headers: { 'xi-api-key': KEY, ...init.headers } });
 const needKey = () => { if (!KEY) die('Set ELEVENLABS_API_KEY first (elevenlabs.io → Profile → API keys).'); };
 
@@ -49,6 +55,9 @@ let manifest = blank();
 try { manifest = { ...blank(), ...JSON.parse(await readFile(manifestPath, 'utf8')) }; } catch { /* first run */ }
 for (const l of ALL) manifest.clips[l] ||= [];
 manifest.models ||= {};
+// Older manifests have one `model` for every language: pin it per language, so that redoing
+// one language with a new model can't silently switch another language's model (and rate).
+for (const l of ALL) if (manifest.clips[l].length && !manifest.models[l] && manifest.model) manifest.models[l] = manifest.model;
 const save = () => writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 // The model a language's existing clips were made with (older manifests have one `model` for all).
 const recordedWith = (l) => manifest.models[l] || (manifest.clips[l].length ? manifest.model : null);
@@ -56,17 +65,19 @@ const recordedWith = (l) => manifest.models[l] || (manifest.clips[l].length ? ma
 /* ---------------- --prune: drop clips no line uses any more ---------------- */
 if (flag('prune')) {
   const phrases = allPhrases();
+  const pretend = flag('dry-run');
   let gone = 0;
   for (const l of ALL) {
     const used = new Set(phrases.map((p) => clipId(p[l])));
     for (const id of manifest.clips[l].filter((x) => !used.has(x))) {
-      await rm(join(OUT, l, `${id}.mp3`), { force: true });
+      if (pretend) console.log(`  would remove ${l}/${id}.mp3`);
+      else await rm(join(OUT, l, `${id}.mp3`), { force: true });
       gone++;
     }
     manifest.clips[l] = manifest.clips[l].filter((x) => used.has(x));
   }
-  await save();
-  console.log(`Removed ${gone} unused clips. Kept ${ALL.map((l) => `${manifest.clips[l].length} ${l}`).join(', ')}.`);
+  if (!pretend) await save();
+  console.log(`${pretend ? 'Would remove' : 'Removed'} ${gone} unused clips. ${pretend ? 'Would keep' : 'Kept'} ${ALL.map((l) => `${manifest.clips[l].length} ${l}`).join(', ')}.`);
   process.exit(0);
 }
 
@@ -103,9 +114,9 @@ if (!dry) {
 if (dry && !LANGS.length) LANGS.push(...ALL);
 
 if (redo) {
-  // Start over, but only for the languages being recorded.
+  // Start over, but only for the languages being recorded. This only plans in memory:
+  // nothing is deleted or saved until the run is real and the models have checked out (below).
   for (const l of LANGS) {
-    await rm(join(OUT, l), { recursive: true, force: true });
     manifest.clips[l] = [];
     delete manifest.models[l];
   }
@@ -167,6 +178,11 @@ try {
   }
 } catch { /* the recording call below reports any real problem */ }
 
+if (redo) {
+  // Now it is real: drop the old clips. The manifest goes first, so it never lists a missing file.
+  await save();
+  for (const l of LANGS) await rm(join(OUT, l), { recursive: true, force: true });
+}
 for (const l of LANGS) await mkdir(join(OUT, l), { recursive: true });
 let spent = 0;
 let estimated = 0;
@@ -181,7 +197,8 @@ for (const [i, j] of plan.entries()) {
     console.log(`Stopping before clip ${i + 1}/${plan.length} to stay within ${BUDGET} credits (spent ${spent}).`);
     break;
   }
-  const body = { text: j.text, model_id: model, voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0.2 } };
+  // Eleven v3 (Hebrew) only takes stability 0.0, 0.5 or 1.0; the others take any value.
+  const body = { text: j.text, model_id: model, voice_settings: { stability: /v3/.test(model) ? 0.5 : 0.6, similarity_boost: 0.75, style: 0.2 } };
   if (/flash|turbo|v3/.test(model)) body.language_code = j.lang;
   const r = await api(`/v1/text-to-speech/${VOICES[j.lang]}?output_format=mp3_44100_64`, {
     method: 'POST',

@@ -24,7 +24,7 @@ const sparkles = [['sparkle', 220, 150, 0.8, {}, 'twinkle'], ['sparkle', 780, 13
 const stars = [['star', 140, 110, 0.35, {}, 'twinkle'], ['star', 330, 70, 0.28, {}, 'twinkle'], ['star', 640, 90, 0.3, {}, 'twinkle'], ['star', 880, 160, 0.32, {}, 'twinkle']];
 
 const DEAR_HASHEM = { en: 'Dear Hashem,', es: 'Querido Hashem,', he: 'השם הטוב,' };
-const AMEN = { en: 'Amen!', es: '¡Amén!', he: 'אמן!' };
+const AMEN = { en: 'Amen!', es: '¡Amén!', he: 'אָמֵן!' };
 
 export const PRAYERS = [
   {
@@ -84,7 +84,7 @@ export const PRAYERS = [
     cover: 2,
     steps: [
       { text: { en: "Let's ask Hashem to bless the people we love. Hold hands, and say each line after me.", es: 'Vamos a pedirle a Hashem que bendiga a las personas que amamos. Tómense de las manos y repitan después de mí.', he: 'בואו נבקש מהשם לברך את האנשים שאנחנו אוהבים. תנו ידיים וחזרו אחריי על כל שורה.' },
-        scene: { bg: 'day', items: [['tree', 140, 430, 2], ['tree', 870, 440, 1.8], warmth(500, 420, 3.6), ...family(500, 440, 1).map((p) => { p[4] = { ...p[4], arms: 'hold' }; return p; })] } },
+        scene: { bg: 'day', items: [['tree', 140, 430, 2], ['tree', 870, 440, 1.8], warmth(500, 420, 3.6), ...family(500, 440, 1)] } },
       { echo: true, text: DEAR_HASHEM,
         scene: { bg: 'day', items: [['heavenLight', 500, 0, 1, { h: 420 }], warmth(), ...family()] } },
       { echo: true, text: { en: 'Please bless my family.', es: 'Por favor, bendice a mi familia.', he: 'בבקשה, ברך את המשפחה שלי.' },
@@ -93,7 +93,7 @@ export const PRAYERS = [
         scene: { bg: 'day', items: [['person', 150, 420, 1, { robe: '#4db6ac', hair: '#212121', arms: 'up' }, 'hop'], ['person', 300, 425, 0.9, { robe: '#ef9a9a', hair: '#6d4c41', arms: 'up' }, 'hop'], ['person', 700, 410, 1.2, { robe: '#a1887f', scarf: '#ffcc80', arms: 'up' }, ''], ['person', 860, 425, 0.9, { robe: '#90caf9', hair: '#3e2723', arms: 'up' }, 'hop'], ['heart', 500, 200, 0.8, {}, 'pulse'], ...sparkles] } },
       { text: { en: 'Now, say the names of people you love.', es: 'Ahora, digan los nombres de las personas que aman.', he: 'עכשיו, אמרו את השמות של האנשים שאתם אוהבים.' }, names: true,
         scene: { bg: 'day', items: [warmth(500, 420, 3.6), ['heart', 180, 170, 0.5, {}, 'bob'], ['heart', 340, 110, 0.4, { color: '#ec407a' }, 'pulse'], ['heart', 500, 150, 0.6, {}, 'bob'], ['heart', 660, 110, 0.4, { color: '#ec407a' }, 'pulse'], ['heart', 820, 170, 0.5, {}, 'bob'], ...family(500, 450)] } },
-      { echo: true, text: { en: 'Help them feel your love.', es: 'Que sientan tu amor.', he: 'עזור להם להרגיש את האהבה שלך.' },
+      { echo: true, text: { en: 'Help them feel your love.', es: 'Que sientan tu amor.', he: 'עזור להם להרגיש את האהבה שֶׁלְּךָ.' },
         scene: { bg: 'day', items: [['heavenLight', 500, 0, 1, { h: 420 }], ['cup', 500, 210, 1, {}, 'pulse'], warmth(500, 420, 4), ...family()] } },
       { echo: true, text: AMEN,
         scene: { bg: 'day', items: [['rainbow', 500, 330, 1.6], ...sparkles, ...hearts(150), ...family(500, 440, 1, 'hop').map((p) => { p[4] = { ...p[4], arms: 'up' }; return p; })] } },

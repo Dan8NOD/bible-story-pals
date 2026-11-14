@@ -10,15 +10,16 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
 
 // `pad` shrinks the artwork for maskable icons, whose edges may be cropped.
+// The artwork is clipped to the tile so the grass never squares off the rounded corners.
 const icon = (pad = 1, rounded = true) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc6f2"/><stop offset="1" stop-color="#d8f1ff"/></linearGradient></defs>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc6f2"/><stop offset="1" stop-color="#d8f1ff"/></linearGradient><clipPath id="tile"><rect width="512" height="512" rx="${rounded ? 112 : 0}"/></clipPath></defs>
   <rect width="512" height="512" rx="${rounded ? 112 : 0}" fill="url(#bg)"/>
-  <g transform="translate(256 256) scale(${pad}) translate(-256 -256)">
+  <g clip-path="url(#tile)"><g transform="translate(256 256) scale(${pad}) translate(-256 -256)">
     <g transform="translate(256 330) scale(2.3)">${ART.rainbow()}</g>
     <path d="M0 400 Q256 340 512 400 L512 512 L0 512 Z" fill="#8bc34a"/>
     ${place('scroll', 398, 118, 1.25)}
     ${place('sheep', 236, 306, 2.5)}
-  </g>
+  </g></g>
 </svg>`;
 
 writeFileSync(join(root, 'icons/icon.svg'), icon());

@@ -34,7 +34,7 @@ const t = (entry) => entry[langs()[0]];
 // Hebrew reads right to left. Anything tagged lang="he" turns itself around (see style.css).
 const rtl = () => langs()[0] === 'he';
 // A title or a passage in the language(s) in use, e.g. "Baby Moses / משה התינוק".
-const both = (entry) => langs().map((l) => entry[l]).join(' / ');
+const both = (entry) => [...new Set(langs().map((l) => entry[l]))].join(' / ');
 const lines = (entry) => langs().map((l) => `<div class="line ${l}" lang="${l}">${esc(entry[l])}</div>`).join('');
 // One chip per language. Each is a switch: one or two can be on at a time (see store.js).
 const langChips = () => `<div class="chips" role="group" aria-label="${esc(LANGS.map((l) => UI.language[l]).join(' / '))}">${
@@ -829,8 +829,8 @@ function parentGate() {
 const REFS = {
   creation: { en: 'Genesis 1–2', es: 'Génesis 1–2', he: 'בראשית א–ב' },
   noah: { en: 'Genesis 6–9', es: 'Génesis 6–9', he: 'בראשית ו–ט' },
-  abraham: { en: 'Genesis 12 and 15', es: 'Génesis 12 y 15', he: 'בראשית יב, טו' },
-  joseph: { en: 'Genesis 37 and 41–45', es: 'Génesis 37 y 41–45', he: 'בראשית לז, מא–מה' },
+  abraham: { en: 'Genesis 12 and 15', es: 'Génesis 12 y 15', he: 'בראשית, פרקים יב ו־טו' },
+  joseph: { en: 'Genesis 37 and 41–45', es: 'Génesis 37 y 41–45', he: 'בראשית, פרקים לז ו־מא–מה' },
   moses: { en: 'Exodus 2', es: 'Éxodo 2', he: 'שמות ב' },
   redsea: { en: 'Exodus 14–15', es: 'Éxodo 14–15', he: 'שמות יד–טו' },
   manna: { en: 'Exodus 16', es: 'Éxodo 16', he: 'שמות טז' },
@@ -968,7 +968,7 @@ const POLICY = {
 
 const policyHtml = () => [...new Set(langs().map((l) => (POLICY[l] ? l : 'en')))].map((l) => {
   const p = POLICY[l];
-  return `<details class="policy" lang="${l}"><summary>${esc(p.title)}</summary>
+  return `<details class="policy" lang="${l}" dir="${l === 'he' ? 'rtl' : 'ltr'}"><summary>${esc(p.title)}</summary>
     <p class="policy-date">${esc(p.effective)}</p>
     <p><strong>${esc(p.intro)}</strong></p>
     ${p.sections.map(([h, items]) => `<h4>${esc(h)}</h4>${items.length > 1 ? `<ul>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(items[0])}</p>`}`).join('')}
@@ -983,8 +983,9 @@ function parentsScreen() {
   const T = BUY_TEXT[langs()[0]];
   const showDonate = DONATE_URL && !isNativeApp();
   const toggle = (key, label) => `<div class="setting"><span>${esc(label)}</span><button class="toggle" role="switch" data-key="${key}" aria-checked="${!!store.get(key)}" aria-label="${esc(label)}"></button></div>`;
+  // The back chevron is always ‹: inside dir="rtl" the browser mirrors it to point right.
   app.innerHTML = `<main class="parents"${rtl() ? ' dir="rtl"' : ''}><div class="inner">
-    <button class="link-btn" data-act="home">${rtl() ? '›' : '‹'} ${esc(P.back)}</button>
+    <button class="link-btn" data-act="home">‹ ${esc(P.back)}</button>
     <h2>${esc(P.title)}</h2>
     <p>${esc(P.about)}</p>
     <p><strong>${esc(paywalled ? P.privacyApp : P.privacy)}</strong></p>

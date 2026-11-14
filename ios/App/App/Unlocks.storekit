@@ -18,7 +18,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את כל הסיפורים: שביל התורה. רכישה חד-פעמית.",
+          "description": "כל הסיפורים: שביל התורה. רכישה חד-פעמית.",
           "displayName": "כל הסיפורים: שביל התורה",
           "locale": "he"
         }
@@ -43,7 +43,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את כל הסיפורים: מלכים ונביאים. רכישה חד-פעמית.",
+          "description": "כל הסיפורים: מלכים ונביאים. רכישה חד-פעמית.",
           "displayName": "כל הסיפורים: מלכים ונביאים",
           "locale": "he"
         }
@@ -58,17 +58,17 @@
       "internalID": "6770000102",
       "localizations": [
         {
-          "description": "Unlocks Story: Joseph's Colorful Coat. One-time purchase.",
+          "description": "Unlocks Joseph's Colorful Coat. One-time purchase.",
           "displayName": "Story: Joseph's Colorful Coat",
           "locale": "en_US"
         },
         {
-          "description": "Desbloquea Historia: La Túnica de Colores de José. Compra única.",
-          "displayName": "Historia: La Túnica de Colores de José",
+          "description": "Desbloquea La Túnica de Colores de José. Compra única.",
+          "displayName": "La Túnica de Colores de José",
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: כתונת הפסים של יוסף. רכישה חד-פעמית.",
+          "description": "סיפור: כתונת הפסים של יוסף. רכישה חד-פעמית.",
           "displayName": "סיפור: כתונת הפסים של יוסף",
           "locale": "he"
         }
@@ -93,7 +93,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: משה התינוק. רכישה חד-פעמית.",
+          "description": "סיפור: משה התינוק. רכישה חד-פעמית.",
           "displayName": "סיפור: משה התינוק",
           "locale": "he"
         }
@@ -118,7 +118,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: קריעת ים סוף. רכישה חד-פעמית.",
+          "description": "סיפור: קריעת ים סוף. רכישה חד-פעמית.",
           "displayName": "סיפור: קריעת ים סוף",
           "locale": "he"
         }
@@ -143,7 +143,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: לחם מן השמיים. רכישה חד-פעמית.",
+          "description": "סיפור: לחם מן השמיים. רכישה חד-פעמית.",
           "displayName": "סיפור: לחם מן השמיים",
           "locale": "he"
         }
@@ -163,12 +163,12 @@
           "locale": "en_US"
         },
         {
-          "description": "Desbloquea Historia: Samuel Escucha una Voz. Compra única.",
+          "description": "Desbloquea Samuel Escucha una Voz. Compra única.",
           "displayName": "Historia: Samuel Escucha una Voz",
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: שמואל שומע קול. רכישה חד-פעמית.",
+          "description": "סיפור: שמואל שומע קול. רכישה חד-פעמית.",
           "displayName": "סיפור: שמואל שומע קול",
           "locale": "he"
         }
@@ -193,7 +193,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: דוד האמיץ. רכישה חד-פעמית.",
+          "description": "סיפור: דוד האמיץ. רכישה חד-פעמית.",
           "displayName": "סיפור: דוד האמיץ",
           "locale": "he"
         }
@@ -208,7 +208,7 @@
       "internalID": "6770000108",
       "localizations": [
         {
-          "description": "Unlocks Story: Elijah and the Ravens. One-time purchase.",
+          "description": "Unlocks Elijah and the Ravens. One-time purchase.",
           "displayName": "Story: Elijah and the Ravens",
           "locale": "en_US"
         },
@@ -218,7 +218,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: אליהו והעורבים. רכישה חד-פעמית.",
+          "description": "סיפור: אליהו והעורבים. רכישה חד-פעמית.",
           "displayName": "סיפור: אליהו והעורבים",
           "locale": "he"
         }
@@ -233,7 +233,7 @@
       "internalID": "6770000109",
       "localizations": [
         {
-          "description": "Unlocks Story: Jonah and the Big Fish. One-time purchase.",
+          "description": "Unlocks Jonah and the Big Fish. One-time purchase.",
           "displayName": "Story: Jonah and the Big Fish",
           "locale": "en_US"
         },
@@ -243,7 +243,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: יונה והדג הגדול. רכישה חד-פעמית.",
+          "description": "סיפור: יונה והדג הגדול. רכישה חד-פעמית.",
           "displayName": "סיפור: יונה והדג הגדול",
           "locale": "he"
         }
@@ -258,7 +258,7 @@
       "internalID": "6770000110",
       "localizations": [
         {
-          "description": "Unlocks Story: Hashem Is My Shepherd. One-time purchase.",
+          "description": "Unlocks Hashem Is My Shepherd. One-time purchase.",
           "displayName": "Story: Hashem Is My Shepherd",
           "locale": "en_US"
         },
@@ -268,7 +268,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: השם רועי. רכישה חד-פעמית.",
+          "description": "סיפור: השם רועי. רכישה חד-פעמית.",
           "displayName": "סיפור: השם רועי",
           "locale": "he"
         }
@@ -293,7 +293,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: רות ונעמי. רכישה חד-פעמית.",
+          "description": "סיפור: רות ונעמי. רכישה חד-פעמית.",
           "displayName": "סיפור: רות ונעמי",
           "locale": "he"
         }
@@ -318,7 +318,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: אסתר המלכה. רכישה חד-פעמית.",
+          "description": "סיפור: אסתר המלכה. רכישה חד-פעמית.",
           "displayName": "סיפור: אסתר המלכה",
           "locale": "he"
         }
@@ -343,7 +343,7 @@
           "locale": "es_MX"
         },
         {
-          "description": "פותח את סיפור: דניאל והאריות. רכישה חד-פעמית.",
+          "description": "סיפור: דניאל והאריות. רכישה חד-פעמית.",
           "displayName": "סיפור: דניאל והאריות",
           "locale": "he"
         }
@@ -358,23 +358,23 @@
       "internalID": "6770000114",
       "localizations": [
         {
-          "description": "Unlocks Prayer: Hashem Bless the People I Love. One-time purchase.",
-          "displayName": "Prayer: Hashem Bless the People I Love",
+          "description": "Unlocks this prayer. One-time purchase.",
+          "displayName": "Hashem Bless the People I Love",
           "locale": "en_US"
         },
         {
-          "description": "Desbloquea Oración: Hashem bendiga a quienes amo. Compra única.",
-          "displayName": "Oración: Hashem bendiga a quienes amo",
+          "description": "Desbloquea Hashem bendiga a quienes amo. Compra única.",
+          "displayName": "Hashem bendiga a quienes amo",
           "locale": "es_MX"
         },
         {
-          "description": "פותח את תפילה: ברכה לאהובים שלנו. רכישה חד-פעמית.",
+          "description": "תפילה: ברכה לאהובים שלנו. רכישה חד-פעמית.",
           "displayName": "תפילה: ברכה לאהובים שלנו",
           "locale": "he"
         }
       ],
       "productID": "com.dancruz.torahstorypals.prayer.blessing",
-      "referenceName": "Prayer: Hashem Bless the People I Love",
+      "referenceName": "Hashem Bless the People I Love",
       "type": "NonConsumable"
     }
   ],

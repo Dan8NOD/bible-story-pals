@@ -122,6 +122,6 @@ Answer **None** to every content item. The stories are gentle: the lions sleep, 
   6. The reward screen with stars
 
 ## App Review notes (paste into "Notes")
-> Torah Story Pals is an offline story game for ages 3–6, in English, Spanish and Hebrew. There is no sign-in, no ads and no data collection. The only network use is the App Store, for prices and purchases. Grown-ups area: tap "For grown-ups", then press and hold "Hold" for 3 seconds. Purchases sit behind a times-table question written out in words. Narration uses recorded clips bundled with the app, plus the iOS text-to-speech voice for lines that have no recording yet.
+> Torah Story Pals is an offline story game for ages 3–6, in English, Spanish and Hebrew. There is no sign-in, no ads and no data collection. The only network use is the App Store, for prices and purchases. Grown-ups area: tap the padlock button at the top of the home screen, then press and hold "Hold" for 3 seconds. Purchases sit behind a times-table question written out in words. Narration uses recorded clips bundled with the app, plus the iOS text-to-speech voice for lines that have no recording yet.
 
 Sign-in required: **No** (leave the demo account empty).

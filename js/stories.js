@@ -53,7 +53,7 @@ const ALL = [
     id: 'creation',
     color: '#ffd54f',
     title: { en: 'Hashem Made the World', es: 'Hashem Creó el Mundo', he: 'השם ברא את העולם' },
-    lesson: { en: 'Hashem made everything, and He made you too!', es: '¡Hashem hizo todo, y también te hizo a ti!', he: 'השם ברא את הכול, וגם אותך!' },
+    lesson: { en: 'Hashem made everything, and He made you too!', es: '¡Hashem hizo todo, y también te hizo a ti!', he: 'השם ברא את הכול, וגם אתכם!' },
     cover: 2,
     pages: [
       {
@@ -102,16 +102,16 @@ const ALL = [
   {
     id: 'noah',
     color: '#81d4fa',
-    title: { en: "Noah's Big Boat", es: 'El Gran Barco de Noé', he: 'התיבה הגדולה של נח' },
+    title: { en: "Noah's Big Boat", es: 'El Gran Barco de Noé', he: 'התיבה הגדולה של נֹחַ' },
     lesson: { en: 'Hashem keeps His promises.', es: 'Hashem cumple sus promesas.', he: 'השם מקיים את ההבטחות שלו.' },
     cover: 4,
     pages: [
       {
-        text: { en: "Hashem told Noah, 'Build a big boat called an ark.'", es: "Hashem le dijo a Noé: 'Construye un barco grande llamado arca.'", he: 'השם אמר לנח: "בנה סירה גדולה שנקראת תיבה."' },
+        text: { en: "Hashem told Noah, 'Build a big boat called an ark.'", es: "Hashem le dijo a Noé: 'Construye un barco grande llamado arca.'", he: 'השם אמר לְנֹחַ: "בְּנֵה סירה גדולה שנקראת תיבה."' },
         scene: { bg: 'day', items: [['cloud', 660, 150, 1.6, {}, ''], ['sparkle', 660, 140, 1.3, {}, 'pulse'], ['person', 360, 390, 1.6, { ...NOAH, arms: 'up' }, 'bob'], ['tree', 140, 400, 1.2, {}, 'sway'], ['sheep', 860, 450, 0.7, {}, 'hop']] },
       },
       {
-        text: { en: 'Noah worked and worked. Bang, bang, bang!', es: 'Noé trabajó y trabajó. ¡Pum, pum, pum!', he: 'נח עבד ועבד. טוק, טוק, טוק!' },
+        text: { en: 'Noah worked and worked. Bang, bang, bang!', es: 'Noé trabajó y trabajó. ¡Pum, pum, pum!', he: 'נֹחַ עבד ועבד. טוק, טוק, טוק!' },
         scene: { bg: 'day', items: [['ark', 680, 380, 1.7], ['person', 260, 390, 1.6, NOAH, 'hop'], ['hammer', 310, 420, 0.8, {}, 'wiggle'], ['sun', 120, 100, 0.9, {}, '']] },
       },
       {
@@ -119,7 +119,7 @@ const ALL = [
         scene: { bg: 'day', items: [['ark', 780, 350, 1.6], ['giraffe', 120, 360, 1.1, {}, 'sway'], ['giraffe', 210, 360, 1.1, {}, 'sway'], ['elephant', 360, 380, 0.9, {}, 'bob'], ['elephant', 470, 380, 0.9, {}, 'bob'], ['lion', 150, 480, 0.8, {}, 'hop'], ['lion', 250, 480, 0.8, {}, 'hop'], ['sheep', 400, 490, 0.8, {}, 'hop'], ['sheep', 500, 490, 0.8, {}, 'hop'], ['person', 620, 430, 1.1, { ...NOAH, arms: 'up' }, '']] },
       },
       {
-        text: { en: 'It rained and rained! But everyone was safe inside the ark.', es: '¡Llovió y llovió! Pero todos estaban a salvo dentro del arca.', he: 'ירד גשם, ועוד גשם! אבל כולם היו בטוחים בתוך התיבה.' },
+        text: { en: 'It rained and rained! But everyone was safe inside the ark.', es: '¡Llovió y llovió! Pero todos estaban a salvo dentro del arca.', he: 'ירד גשם, ועוד גשם! אבל כולם היו מוגנים בתוך התיבה.' },
         scene: { bg: 'storm', items: [['ark', 500, 330, 2, {}, 'rock'], ['cloud', 240, 90, 1.4, rainCloud, 'drift'], ['cloud', 720, 80, 1.6, rainCloud, 'drift'], ['waves', 300, 420, 1, { color: '#5aa8e6', w: 700 }, 'drift'], ['waves', 700, 470, 1, { color: '#5aa8e6', w: 700 }, 'drift']] },
       },
       {
@@ -155,11 +155,11 @@ const ALL = [
     cover: 3,
     pages: [
       {
-        text: { en: 'Abraham and Sarah lived in a tent. They loved Hashem.', es: 'Abraham y Sara vivían en una tienda. Ellos amaban a Hashem.', he: 'אברהם ושרה גרו באוהל. הם אהבו את השם.' },
+        text: { en: 'Abraham and Sarah lived in a tent. They loved Hashem.', es: 'Abraham y Sara vivían en una tienda de campaña. Ellos amaban a Hashem.', he: 'אברהם ושרה גרו באוהל. הם אהבו את השם.' },
         scene: { bg: 'desert', items: [['sun', 120, 100, 0.9, {}, ''], ['tent', 700, 370, 2.2], ['palm', 930, 380, 1.4, {}, 'sway'], ['person', 290, 400, 1.5, ABRAHAM, ''], ['person', 440, 405, 1.4, SARAH, ''], ['sheep', 140, 465, 0.7, {}, 'hop']] },
       },
       {
-        text: { en: "Hashem said, 'Go to a new land. I will show you the way.'", es: "Hashem dijo: 'Ve a una tierra nueva. Yo te mostraré el camino.'", he: 'השם אמר: "לֶךְ לְךָ אל ארץ חדשה. אני אראה לך את הדרך."' },
+        text: { en: "Hashem said, 'Go to a new land. I will show you the way.'", es: "Hashem dijo: 'Ve a una tierra nueva. Yo te mostraré el camino.'", he: 'השם אמר: "לֶךְ לְךָ אל ארץ חדשה. אני אראה לְךָ את הדרך."' },
         scene: { bg: 'desert', items: [['heavenLight', 520, 0, 1, { h: 430 }], ['tent', 170, 390, 1.6], ['person', 520, 400, 1.6, { ...ABRAHAM, staff: false, arms: 'up' }, 'bob'], ['sheep', 820, 465, 0.7, {}, 'hop']] },
       },
       {
@@ -171,7 +171,7 @@ const ALL = [
         scene: { bg: 'night', items: [['tent', 190, 420, 1.8], ['star', 330, 120, 0.4, {}, 'twinkle'], ['star', 470, 70, 0.3, {}, 'twinkle'], ['star', 640, 130, 0.45, {}, 'twinkle'], ['star', 790, 80, 0.35, {}, 'twinkle'], ['star', 900, 200, 0.4, {}, 'twinkle'], ['star', 730, 240, 0.28, {}, 'twinkle'], ['person', 540, 410, 1.6, { ...ABRAHAM, staff: false, arms: 'up' }, '']] },
       },
       {
-        text: { en: "'Your family will be as many as the stars!' And Hashem kept His promise.", es: "'¡Tu familia será tan grande como las estrellas!' Y Hashem cumplió su promesa.", he: '"המשפחה שלך תהיה גדולה כמו כוכבי השמיים!" והשם קיים את ההבטחה שלו.' },
+        text: { en: "'Your family will be as many as the stars!' And Hashem kept His promise.", es: "'¡Tu familia será tan numerosa como las estrellas!' Y Hashem cumplió su promesa.", he: '"המשפחה שֶׁלְּךָ תהיה גדולה כמו כוכבי השמיים!" והשם קיים את ההבטחה שלו.' },
         scene: { bg: 'night', items: [['star', 200, 120, 0.4, {}, 'twinkle'], ['star', 350, 70, 0.3, {}, 'twinkle'], ['star', 680, 80, 0.35, {}, 'twinkle'], ['star', 840, 150, 0.45, {}, 'twinkle'], ['heavenLight', 500, 0, 1, { h: 440 }], ['person', 420, 410, 1.5, { ...ABRAHAM, staff: false, arms: 'up' }, 'hop'], ['person', 580, 415, 1.4, { ...SARAH, arms: 'hold' }, ''], ['baby', 590, 425, 0.8, {}, 'bob'], ['heart', 500, 200, 0.7, {}, 'pulse']] },
       },
     ],
@@ -278,7 +278,7 @@ const ALL = [
         scene: { bg: 'desert', items: [['sun', 120, 100, 1, {}, ''], ['pyramid', 790, 380, 2.8], ['person', 240, 410, 1.4, { robe: '#a1887f', hair: '#4e342e', arms: 'hold', mood: 'sad' }, ''], ['bag', 240, 436, 0.6], ['person', 420, 415, 1.3, { robe: '#90a4ae', scarf: '#cfd8dc', arms: 'hold', mood: 'sad' }, ''], ['bag', 420, 438, 0.55]] },
       },
       {
-        text: { en: "Hashem told Moses, 'Lead My people out of Egypt.'", es: "Hashem le dijo a Moisés: 'Saca a mi pueblo de Egipto.'", he: 'השם אמר למשה: "הוצא את העם שלי ממצרים."' },
+        text: { en: "Hashem told Moses, 'Lead My people out of Egypt.'", es: "Hashem le dijo a Moisés: 'Saca a mi pueblo de Egipto.'", he: 'השם אמר למשה: "הוֹצֵא את העם שלי ממצרים."' },
         scene: { bg: 'desert', items: [['heavenLight', 500, 0, 1, { h: 430 }], ['bush', 790, 450, 1.1, { color: '#558b2f' }], ['sparkle', 790, 410, 1.5, { color: '#ffb74d' }, 'pulse'], ['person', 500, 400, 1.6, { ...MOSES, staff: false, arms: 'up' }, ''], ['sheep', 200, 465, 0.8, {}, 'hop']] },
       },
       {
@@ -286,7 +286,7 @@ const ALL = [
         scene: { bg: 'beach', items: [['waves', 190, 395, 1, { color: '#bfe3fb', w: 340 }, 'drift'], ['person', 470, 385, 1.4, MOSES, ''], ['person', 630, 400, 1.2, { ...MIRIAM, mood: 'open' }, ''], ['person', 760, 405, 1.1, { ...KID('#81c784'), mood: 'open', arms: 'up' }, 'hop'], ['person', 880, 405, 1.1, { ...UNCLE, mood: 'open', arms: 'up' }, 'hop']] },
       },
       {
-        text: { en: 'Moses lifted his staff, and Hashem opened a path through the sea!', es: '¡Moisés levantó su vara, y Hashem abrió un camino en medio del mar!', he: 'משה הרים את המטה, והשם פתח דרך בתוך הים!' },
+        text: { en: 'Moses lifted his staff, and Hashem opened a path through the sea!', es: '¡Moisés levantó su vara, y Hashem abrió un camino en medio del mar!', he: 'משה הֵרִים את המטה, והשם פתח דרך בתוך הים!' },
         scene: { bg: 'split', items: [['fish', 150, 330, 0.7, {}, 'bob'], ['fish', 860, 310, 0.6, { color: '#ffd54f' }, 'bob'], ['sparkle', 500, 170, 1.2, {}, 'pulse'], ['person', 500, 400, 1.6, { ...MOSES, arms: 'up' }, '']] },
       },
       {
@@ -331,7 +331,7 @@ const ALL = [
         scene: { bg: 'desert', items: [['sun', 130, 110, 1, {}, 'bob'], ['tent', 860, 390, 1.7], ['person', 400, 385, 1.3, { ...KID('#81c784'), arms: 'up' }, 'hop'], ['person', 570, 385, 1.4, { ...MIRIAM, arms: 'up' }, 'hop'], ['manna', 190, 490, 1], ['manna', 330, 530, 0.9], ['manna', 480, 500, 1], ['manna', 630, 535, 0.9], ['manna', 750, 495, 0.8]] },
       },
       {
-        text: { en: 'Every day they gathered just enough. On Friday they gathered extra for Shabbat!', es: 'Cada día recogían justo lo necesario. ¡El viernes recogían más para Shabat!', he: 'בכל יום הם אספו בדיוק מה שצריך. ביום שישי הם אספו מנה כפולה לשבת!' },
+        text: { en: 'Every day they gathered just enough. On Friday they gathered extra for Shabbat!', es: 'Cada día recogían justo lo necesario. ¡El viernes recogían más para Shabat!', he: 'בכל יום הם אספו בדיוק מה שצריך. ביום שישי הם אספו מנה כפולה לְשַׁבָּת!' },
         scene: { bg: 'desert', items: [['tent', 170, 395, 1.7], ['person', 420, 390, 1.4, { ...MIRIAM, arms: 'up' }, ''], ['person', 570, 400, 1.2, { ...KID('#ffb74d'), arms: 'up' }, 'hop'], ['basket', 700, 480, 1.1, { full: true }], ['basket', 840, 490, 1.1, { full: true }], ['sparkle', 770, 380, 0.8, {}, 'twinkle']] },
       },
     ],
@@ -340,7 +340,7 @@ const ALL = [
       mode: 'transform',
       bg: 'desert',
       prompt: { en: 'Tap each basket to fill it with manna!', es: '¡Toca cada canasta para llenarla de maná!', he: 'לחצו על כל סל ומלאו אותו בְּמָן!' },
-      decor: [['sun', 880, 90, 0.8, {}, ''], ['tent', 500, 250, 1.3]],
+      decor: [['sun', 880, 90, 0.8, {}, ''], ['tent', 500, 370, 1.3]],
       items: [
         { art: 'basket', x: 150, y: 410, s: 1.1, after: { full: true }, anim: 'bob' },
         { art: 'basket', x: 380, y: 400, s: 1.1, after: { full: true }, anim: 'bob' },
@@ -367,15 +367,15 @@ const ALL = [
         scene: { bg: 'night', items: [['moon', 850, 110, 0.8], ['star', 190, 120, 0.35, {}, 'twinkle'], ['sparkle', 610, 200, 1.4, {}, 'pulse'], ['blanket', 420, 505, 2.2], ['lying', 420, 478, 0.9, { ...SAMUEL, mood: 'open' }, ''], ['lantern', 650, 460, 1, {}, 'sway']] },
       },
       {
-        text: { en: "He ran to Eli. 'Here I am!' But Eli said, 'I did not call you.'", es: "Corrió hacia Elí. '¡Aquí estoy!' Pero Elí dijo: 'Yo no te llamé.'", he: 'הוא רץ אל עֵלִי. "הנני!" אבל עֵלִי אמר: "לא קראתי לך."' },
+        text: { en: "He ran to Eli. 'Here I am!' But Eli said, 'I did not call you.'", es: "Corrió hacia Elí. '¡Aquí estoy!' Pero Elí dijo: 'Yo no te llamé.'", he: 'הוא רץ אל עֵלִי. "הנני!" אבל עֵלִי אמר: "לא קראתי לְךָ."' },
         scene: { bg: 'night', items: [['moon', 850, 110, 0.8], ['person', 380, 425, 1.2, { ...SAMUEL, arms: 'up' }, 'hop'], ['lantern', 500, 465, 0.9, {}, 'sway'], ['person', 640, 405, 1.6, { ...ELI, mood: 'sleep' }, '']] },
       },
       {
-        text: { en: "Then Eli understood. 'It is Hashem who is calling you!'", es: "Entonces Elí comprendió. '¡Es Hashem quien te llama!'", he: 'אז עֵלִי הבין. "זה השם שקורא לך!"' },
+        text: { en: "Then Eli understood. 'It is Hashem who is calling you!'", es: "Entonces Elí comprendió. '¡Es Hashem quien te llama!'", he: 'אז עֵלִי הבין. "זה השם שקורא לְךָ!"' },
         scene: { bg: 'night', items: [['moon', 850, 110, 0.8], ['sparkle', 500, 180, 1.2, {}, 'pulse'], ['person', 400, 425, 1.2, SAMUEL, ''], ['person', 620, 405, 1.6, { ...ELI, arms: 'up' }, '']] },
       },
       {
-        text: { en: "The voice called again. Samuel said, 'Speak, Hashem. I am listening!'", es: "La voz llamó otra vez. Samuel dijo: 'Habla, Hashem. ¡Te escucho!'", he: 'הקול קרא שוב. שמואל אמר: "דבר, השם, אני מקשיב!"' },
+        text: { en: "The voice called again. Samuel said, 'Speak, Hashem. I am listening!'", es: "La voz llamó otra vez. Samuel dijo: 'Habla, Hashem. ¡Te escucho!'", he: 'הקול קרא שוב. שמואל אמר: "דַּבֵּר, השם, אני מקשיב!"' },
         scene: { bg: 'night', items: [['moon', 870, 110, 0.7], ['heavenLight', 500, 0, 1, { h: 440 }], ['glow', 500, 425, 2.4, { color: '#ffb300', strength: 2 }, 'pulse'], ['blanket', 240, 520, 1.6], ['person', 500, 415, 1.4, { ...SAMUEL, arms: 'up' }, ''], ['lantern', 760, 465, 0.9, {}, 'sway']] },
       },
     ],
@@ -404,12 +404,12 @@ const ALL = [
   {
     id: 'david',
     color: '#c5e1a5',
-    title: { en: 'David the Brave', es: 'David el Valiente', he: 'דוד האמיץ' },
+    title: { en: 'David the Brave', es: 'David el Valiente', he: 'דָּוִד האמיץ' },
     lesson: { en: "With Hashem's help, you can be brave too!", es: '¡Con la ayuda de Hashem, tú también puedes ser valiente!', he: 'בעזרת השם, גם אתם יכולים להיות אמיצים!' },
     cover: 1,
     pages: [
       {
-        text: { en: 'David was a shepherd boy. He took care of his sheep.', es: 'David era un pastorcito. Él cuidaba a sus ovejas.', he: 'דוד היה רועה צאן צעיר. הוא שמר על הכבשים שלו.' },
+        text: { en: 'David was a shepherd boy. He took care of his sheep.', es: 'David era un pastorcito. Él cuidaba a sus ovejas.', he: 'דָּוִד היה רועה צאן צעיר. הוא שמר על הכבשים שלו.' },
         scene: { bg: 'day', items: [['person', 280, 400, 1.3, { ...DAVID, staff: true }, ''], ['sheep', 500, 440, 0.9, {}, 'hop'], ['sheep', 650, 450, 0.8, {}, 'hop'], ['sheep', 800, 440, 0.9, {}, 'hop'], ['sun', 860, 100, 0.9, {}, ''], ['cloud', 400, 100, 0.8, {}, 'drift']] },
       },
       {
@@ -417,15 +417,15 @@ const ALL = [
         scene: { bg: 'desert', items: [['person', 660, 330, 2.6, GOLIATH, 'sway'], ['person', 180, 420, 0.9, { robe: '#e57373', mood: 'open', arms: 'up' }, 'hop'], ['person', 290, 425, 0.9, { robe: '#64b5f6', mood: 'open', arms: 'up' }, 'hop']] },
       },
       {
-        text: { en: "But David said, 'Hashem will help me!'", es: "Pero David dijo: '¡Hashem me ayudará!'", he: 'אבל דוד אמר: "השם יעזור לי!"' },
+        text: { en: "But David said, 'Hashem will help me!'", es: "Pero David dijo: '¡Hashem me ayudará!'", he: 'אבל דָּוִד אמר: "השם יעזור לי!"' },
         scene: { bg: 'day', items: [['sparkle', 500, 170, 1.3, {}, 'pulse'], ['person', 500, 400, 1.5, { ...DAVID, arms: 'up' }, 'hop'], ['heart', 330, 220, 0.6, {}, 'pulse'], ['heart', 680, 230, 0.6, {}, 'pulse'], ['sheep', 840, 450, 0.7, {}, 'hop']] },
       },
       {
-        text: { en: 'David picked five smooth stones from the stream.', es: 'David tomó cinco piedras lisas del arroyo.', he: 'דוד בחר חמש אבנים חלקות מהנחל.' },
+        text: { en: 'David picked five smooth stones from the stream.', es: 'David tomó cinco piedras lisas del arroyo.', he: 'דָּוִד בחר חמש אבנים חֲלָקוֹת מהנחל.' },
         scene: { bg: 'river', items: [['person', 200, 330, 1.2, DAVID, ''], ['stone', 420, 470, 0.9], ['stone', 540, 455, 0.8, { color: '#cfd8dc' }], ['stone', 650, 480, 0.9], ['stone', 760, 460, 0.8, { color: '#d7ccc8' }], ['stone', 870, 478, 0.9], ['bag', 280, 380, 0.6]] },
       },
       {
-        text: { en: 'Plop! The giant fell down. Hashem helped David be brave!', es: '¡Pum! El gigante se cayó. ¡Hashem ayudó a David a ser valiente!', he: 'בום! הענק נפל. השם עזר לדוד להיות אמיץ!' },
+        text: { en: 'Plop! The giant fell down. Hashem helped David be brave!', es: '¡Pum! El gigante se cayó. ¡Hashem ayudó a David a ser valiente!', he: 'בום! הענק נפל. השם עזר לְדָוִד להיות אמיץ!' },
         scene: { bg: 'desert', items: [['person', 700, 330, 2.4, { ...GOLIATH, mood: 'sleep' }, 'fall-over'], ['person', 240, 400, 1.4, { ...DAVID, arms: 'up' }, 'hop'], ['star', 760, 200, 0.3, {}, 'twinkle'], ['star', 820, 240, 0.25, {}, 'twinkle']] },
       },
     ],
@@ -433,7 +433,7 @@ const ALL = [
       type: 'collect',
       mode: 'fly',
       bg: 'river',
-      prompt: { en: 'Tap five smooth stones for David!', es: '¡Toca cinco piedras lisas para David!', he: 'לחצו על חמש אבנים חלקות בשביל דוד!' },
+      prompt: { en: 'Tap five smooth stones for David!', es: '¡Toca cinco piedras lisas para David!', he: 'לחצו על חמש אבנים חֲלָקוֹת בשביל דָּוִד!' },
       decor: [['person', 110, 330, 1.1, DAVID, ''], ['reeds', 930, 410, 1.2, {}, 'sway'], ['sun', 880, 90, 0.8, {}, '']],
       target: ['bag', 230, 545, 1.2],
       targetPoint: [230, 540],
@@ -458,7 +458,7 @@ const ALL = [
         scene: { bg: 'desert', items: [['sun', 500, 150, 1.9, {}, 'pulse'], ['rock', 190, 480, 1], ['rock', 820, 490, 0.8, { color: '#bcaaa4' }], ['person', 500, 415, 1.4, { ...ELIJAH, mood: 'sad' }, '']] },
       },
       {
-        text: { en: "Hashem told Elijah, 'Go to the little brook. I will take care of you there.'", es: "Hashem le dijo a Elías: 'Ve al arroyo. Allí yo te cuidaré.'", he: 'השם אמר לאליהו: "לֵךְ אל הנחל הקטן. שם אדאג לך."' },
+        text: { en: "Hashem told Elijah, 'Go to the little brook. I will take care of you there.'", es: "Hashem le dijo a Elías: 'Ve al arroyo. Allí yo te cuidaré.'", he: 'השם אמר לאליהו: "לֵךְ אל הנחל הקטן. שם אדאג לְךָ."' },
         scene: { bg: 'day', items: [['heavenLight', 480, 0, 1, { h: 430 }], ['tree', 150, 400, 1.4, {}, 'sway'], ['bush', 850, 455, 1, {}], ['person', 480, 400, 1.6, { ...ELIJAH, arms: 'up' }, '']] },
       },
       {
@@ -492,7 +492,7 @@ const ALL = [
     pages: [
       {
         text: { en: 'Hashem asked Jonah to go to the city of Nineveh. But Jonah ran away on a boat.', es: 'Hashem le pidió a Jonás que fuera a la ciudad de Nínive. Pero Jonás huyó en un barco.', he: 'השם ביקש מיונה ללכת לעיר נינוה. אבל יונה ברח באונייה.' },
-        scene: { bg: 'sea', items: [['city', 140, 330, 0.9], ['person', 610, 312, 0.8, JONAH, ''], ['boat', 600, 360, 1.6, {}, 'rock'], ['sun', 880, 100, 0.9, {}, ''], ['bird', 380, 140, 0.6, {}, 'drift']] },
+        scene: { bg: 'sea', items: [['city', 140, 330, 0.9], ['person', 498, 312, 0.8, JONAH, ''], ['boat', 600, 360, 1.6, {}, 'rock'], ['sun', 880, 100, 0.9, {}, ''], ['bird', 380, 140, 0.6, {}, 'drift']] },
       },
       {
         text: { en: 'A big storm came! Splash! Jonah fell into the sea.', es: '¡Vino una gran tormenta! ¡Splash! Jonás cayó al mar.', he: 'באה סערה גדולה! פלופ! יונה נפל לים.' },
@@ -582,7 +582,7 @@ const ALL = [
     cover: 1,
     pages: [
       {
-        text: { en: 'Naomi was sad. She was going back to her home, far away.', es: 'Noemí estaba triste. Iba a regresar a su hogar, muy lejos.', he: 'נעמי הייתה עצובה. היא חזרה אל הבית שלה, הרחק משם.' },
+        text: { en: 'Naomi was sad. She was going back to her home, far away.', es: 'Noemí estaba triste. Iba a regresar a su hogar, muy lejos.', he: 'נעמי הייתה עצובה. היא החליטה לחזור אל הבית שלה, רחוק רחוק.' },
         scene: { bg: 'desert', items: [['cloud', 300, 110, 1, { color: '#e0e0e0' }, 'drift'], ['rock', 820, 490, 0.8], ['person', 450, 400, 1.6, { ...NAOMI, mood: 'sad' }, ''], ['bag', 580, 480, 0.8]] },
       },
       {
@@ -611,9 +611,9 @@ const ALL = [
       target: ['basket', 250, 500, 1.3],
       targetPoint: [250, 480],
       items: [
-        { art: 'wheat', x: 420, y: 300, s: 1, anim: 'sway' },
+        { art: 'wheat', x: 420, y: 385, s: 1, anim: 'sway' },
         { art: 'wheat', x: 560, y: 430, s: 1, anim: 'sway' },
-        { art: 'wheat', x: 700, y: 300, s: 1, anim: 'sway' },
+        { art: 'wheat', x: 700, y: 385, s: 1, anim: 'sway' },
         { art: 'wheat', x: 850, y: 430, s: 1, anim: 'sway' },
         { art: 'wheat', x: 440, y: 520, s: 1, anim: 'sway' },
         { art: 'wheat', x: 720, y: 530, s: 1, anim: 'sway' },
@@ -657,7 +657,7 @@ const ALL = [
       found: { en: 'You found Queen Esther!', es: '¡Encontraste a la reina Ester!', he: 'מצאתם את אסתר המלכה!' },
       hide: { art: 'person', opts: { ...ESTHER, arms: 'up' }, s: 0.55 },
       decoys: ['bunny', 'bird'],
-      decor: [['city', 500, 240, 1.5, PALACE], ['person', 100, 430, 1.1, KING, ''], ['flower', 930, 520, 1, {}, 'sway']],
+      decor: [['city', 500, 380, 1.5, PALACE], ['person', 100, 430, 1.1, KING, ''], ['flower', 930, 520, 1, {}, 'sway']],
       spots: SEEK_SPOTS,
     },
   },
