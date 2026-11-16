@@ -1,6 +1,6 @@
 # App Store listing: Bilingual Bible Story Pals 1.0 (draft for Dan to check)
 
-Replaces the earlier draft, which described a free 1.0 with no in-app purchases. Version 1.0 now has **3 free stories, then 14 one-time purchases** ($1.00 a story, $2.00 a world).
+Replaces the earlier draft, which described a free 1.0 with no in-app purchases. Version 1.0 now has **3 free stories and 2 free prayers, then 16 one-time purchases**: 12 stories and 1 prayer at $1.00 each, 2 worlds at $2.00, and the Everything Pack at $6.49.
 
 Paste these into App Store Connect. This repo is public, so keep your reviewer phone number out of this file and enter it only in App Store Connect.
 
@@ -9,12 +9,12 @@ Paste these into App Store Connect. This repo is public, so keep your reviewer p
 | Decision | Why it matters | Suggested |
 |---|---|---|
 | **Made for Kids, ages 5 and under** | Apple locks this once the app is approved, and all later updates must follow the Kids rules. Apps outside the Kids Category can't describe children as the main audience, so this copy only works inside it. | Yes |
-| **ElevenLabs plan** | Clips made on a free plan can't be used commercially, even if you upgrade later. Check which plan recorded the 66 clips in `audio/`. | Confirm it was a paid plan, or re-record them |
+| **ElevenLabs plan** | Clips made on a free plan can't be used commercially, even if you upgrade later. All 326 clips in `audio/` come from one ElevenLabs account, which was on the paid Creator plan when the last batch was recorded (Nov 13). | Confirm every batch was recorded on a paid plan, or re-record that batch |
 | **Age rating answers** | They are your statement to Apple. See the two judgment calls below. | None, as listed |
 
 ## Before submitting
 
-- **Submit build 6 or later.** The review notes below describe the recordings added after build 5. Build 4 also lacks the Nov 1 fixes from `main`, and on its code the regression test fails with "memory game got stuck after fast taps". Build 5 has those fixes and shows the full privacy policy in the grown-ups area, as guideline 5.1.1(i) asks, with no link out of the app.
+- **Submit build 9 or later.** Build 9 is the first with the Everything Pack, and the first where every line is recorded. The review notes below describe both. Build 4 also lacks the Nov 1 fixes from `main`, and on its code the regression test fails with "memory game got stuck after fast taps". Build 5 has those fixes and shows the full privacy policy in the grown-ups area, as guideline 5.1.1(i) asks, with no link out of the app.
 - **Publish the new pages first:** the live privacy page still says "No in-app purchases in version 1.0", and App Review will read it.
 
 ## App Information
@@ -204,7 +204,7 @@ God Made the World, Noah's Big Boat and Baby Moses open right away from the Stor
 
 IN-APP PURCHASES (all non-consumable, with Family Sharing on)
 1. Tap any stop with a padlock, for example David the Brave.
-2. "Time to ask a grown-up!" offers that story or every story left in that world.
+2. "Time to ask a grown-up!" offers that story, every story left in that world, or the Everything Pack (every story and prayer).
 3. Choosing one opens the parental gate: a multiplication question written in words, such as "What is seven times four?", answered on a keypad. A wrong answer does not continue.
 4. The App Store sheet then appears, and the story opens after the purchase.
 
@@ -214,7 +214,7 @@ GROWN-UPS AREA
 Tap "For grown-ups", then press and hold "Hold" for 3 seconds. It has the language setting (English, Español, EN + ES), narration and sound settings, purchases, the privacy policy, tips, and the Bible reference for each story. Any purchase made here goes through the same multiplication gate.
 
 NARRATION
-The first five stories (God Made the World through God Is My Shepherd) and common phrases are recorded clips bundled with the app. All other lines use the iOS text-to-speech voice.
+Every line in all 15 stories, in English and Spanish, is a recorded clip bundled with the app. The iOS text-to-speech voice is only a fallback for a line without a clip.
 
 NETWORK
 All game content is bundled and plays offline. The app's only network use is StoreKit, for prices, purchases and restoring.
@@ -225,4 +225,4 @@ In Jesus Is Baptized, God the Father appears only as light and a voice, never as
 
 ## In-app purchases
 
-All 14 exist in App Store Connect with English and Spanish (Mexico) names, 175 regions, a review screenshot and Family Sharing on, which Apple does not allow to be turned off. Add all of them to this version's submission, since a first purchase can only be reviewed with an app version.
+There are **16**: the 14 set up on Nov 7, plus `com.dancruz.biblestorypals.prayer.blessing` ($1.00) and `com.dancruz.biblestorypals.bundle.everything` ($6.49), which were added later. Check that both exist in App Store Connect like the others: English and Spanish (Mexico) names, 175 regions, a review screenshot, and Family Sharing on (Apple does not allow turning it off). Add all 16 to this version's submission, since a first purchase can only be reviewed with an app version. `ios/App/App/Unlocks.storekit` lists the same 16 for testing in Xcode.
