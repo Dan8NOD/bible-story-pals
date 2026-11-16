@@ -7,6 +7,7 @@ import { mkdirSync } from 'node:fs';
 import { join, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { WORLDS, worldOf } from '../js/stories.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
@@ -42,11 +43,13 @@ await page.waitForSelector('.stop');
 await page.waitForTimeout(600);
 await shot('00-home');
 
-const ids = await page.$$eval('.stop', (cs) => cs.map((c) => c.dataset.id));
-if (ids.length !== 14) throw new Error(`expected 14 stories, got ${ids.length}`);
+const ids = WORLDS.flatMap((w) => w.stories);
+if (ids.length !== 15) throw new Error(`expected 15 stories, got ${ids.length}`);
+if (WORLDS[1].stories.length !== 3) throw new Error('Friendship Sea should have exactly 3 ports');
 
 for (const id of ids) {
   await page.goto(`${base}#/`);
+  await page.click(`.world-tab[data-world="${worldOf(id).id}"]`);
   await page.click(`.stop[data-id="${id}"]`);
   let p = 0;
   while ((await hash()).startsWith('#/story/')) {
@@ -114,6 +117,7 @@ if (stars !== `${ids.length}/${ids.length}`) throw new Error(`expected all stars
 await page.click('.chip[data-lang=es]');
 if (!(await page.locator('.brand h1').textContent()).startsWith('Amiguitos')) throw new Error('Spanish title missing');
 await page.click('.chip[data-lang=both]');
+await page.click('.world-tab[data-world=island]');
 await page.click('.stop[data-id=noah]');
 await page.waitForSelector('.caption .line');
 if ((await page.locator('.caption .line').count()) !== 2) throw new Error('both-language captions missing');
@@ -126,11 +130,14 @@ await page.click('#parents');
 await page.locator('.gate .hold').dispatchEvent('pointerdown');
 await page.waitForSelector('.parents h2', { timeout: 6000 });
 await shot('zz-parents');
-// Every story lists its Bible passage for grown-ups (a missing REFS line shows as "undefined").
-const refs = await page.$$eval('.parents li', (lis) => lis.map((li) => li.textContent));
-const storyRefs = refs.filter((t) => t.includes(' / '));
+// Every story and prayer lists its Bible passage for grown-ups (a missing one shows as "undefined").
+const storyRefs = await page.$$eval('.parents [data-refs=stories] li', (lis) => lis.map((li) => li.textContent));
 if (storyRefs.length !== ids.length || storyRefs.some((t) => t.includes('undefined'))) {
   throw new Error(`grown-ups screen should list a passage for all ${ids.length} stories, got: ${storyRefs.join(' | ')}`);
+}
+const prayerRefs = await page.$$eval('.parents [data-refs=prayers] li', (lis) => lis.map((li) => li.textContent));
+if (prayerRefs.length !== 3 || prayerRefs.some((t) => t.includes('undefined'))) {
+  throw new Error(`grown-ups screen should list a passage for all 3 prayers, got: ${prayerRefs.join(' | ')}`);
 }
 
 // Phone sizes.
@@ -142,6 +149,9 @@ for (const [w, h, name] of [[844, 390, 'phone-landscape'], [390, 844, 'phone-por
   await page.goto(`${base}#/`);
   await page.waitForTimeout(400);
   await shot(`zz-${name}-home`);
+  await page.click('.world-tab[data-world=sea]');
+  await page.waitForTimeout(300);
+  await shot(`zz-${name}-sea`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   if (overflow) throw new Error(`${name}: horizontal overflow`);
 }

@@ -7,7 +7,9 @@ import { readFile } from 'node:fs/promises';
 import { join, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { byId } from '../js/stories.js';
+import { readFileSync } from 'node:fs';
+import { STORIES } from '../js/stories.js';
+import { clipId } from '../js/phrases.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2', '.svg': 'image/svg+xml' };
@@ -37,8 +39,13 @@ await page.addInitScript(() => {
   };
 });
 
-const line = byId('daniel').pages[0].text.en;
-await page.goto(`http://localhost:${server.address().port}/#/story/daniel/0`);
+// Every line may be recorded by now, so hide one clip from the game to check the fallback.
+const target = { id: 'daniel', i: 0, text: STORIES.find((s) => s.id === 'daniel').pages[0].text.en };
+const line = target.text;
+const manifest = JSON.parse(readFileSync(join(root, 'audio/manifest.json'), 'utf8'));
+manifest.clips.en = manifest.clips.en.filter((id) => id !== clipId(line));
+await page.route('**/audio/manifest.json', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify(manifest) }));
+await page.goto(`http://localhost:${server.address().port}/#/story/${target.id}/${target.i}`);
 await page.waitForFunction((t) => window.__tts.some((c) => c.method === 'speak' && c.options.text === t), line, { timeout: 5000 });
 const call = await page.evaluate((t) => window.__tts.find((c) => c.method === 'speak' && c.options.text === t), line);
 assert.equal(call.plugin, 'TextToSpeech');

@@ -437,6 +437,7 @@ export function hand(o = {}) {
     `<rect x="-28" y="26" width="56" height="22" rx="6" fill="${sleeve}"/>`);
 }
 
+// Someone lying on the ground (the hurt man in the Good Samaritan story).
 /* ---------------- objects & places ---------------- */
 
 export function ark() {

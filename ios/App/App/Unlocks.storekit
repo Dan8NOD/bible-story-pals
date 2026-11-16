@@ -1,0 +1,336 @@
+{
+  "identifier": "B5A0C0DE",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "2.00",
+      "familyShareable": true,
+      "internalID": "6760000100",
+      "localizations": [
+        {
+          "description": "Unlocks All of Story Island. One-time purchase.",
+          "displayName": "All of Story Island",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Toda la Isla de las Historias. Compra única.",
+          "displayName": "Toda la Isla de las Historias",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.world.island",
+      "referenceName": "All of Story Island",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.00",
+      "familyShareable": true,
+      "internalID": "6760000101",
+      "localizations": [
+        {
+          "description": "Unlocks All of Friendship Sea. One-time purchase.",
+          "displayName": "All of Friendship Sea",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Todo el Mar de la Amistad. Compra única.",
+          "displayName": "Todo el Mar de la Amistad",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.world.sea",
+      "referenceName": "All of Friendship Sea",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000102",
+      "localizations": [
+        {
+          "description": "Unlocks Story: david. One-time purchase.",
+          "displayName": "Story: david",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: david. Compra única.",
+          "displayName": "Historia: david",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.david",
+      "referenceName": "Story: david",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000103",
+      "localizations": [
+        {
+          "description": "Unlocks Story: psalm23. One-time purchase.",
+          "displayName": "Story: psalm23",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: psalm23. Compra única.",
+          "displayName": "Historia: psalm23",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.psalm23",
+      "referenceName": "Story: psalm23",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000104",
+      "localizations": [
+        {
+          "description": "Unlocks Story: jonah. One-time purchase.",
+          "displayName": "Story: jonah",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: jonah. Compra única.",
+          "displayName": "Historia: jonah",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.jonah",
+      "referenceName": "Story: jonah",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000105",
+      "localizations": [
+        {
+          "description": "Unlocks Story: daniel. One-time purchase.",
+          "displayName": "Story: daniel",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: daniel. Compra única.",
+          "displayName": "Historia: daniel",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.daniel",
+      "referenceName": "Story: daniel",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000106",
+      "localizations": [
+        {
+          "description": "Unlocks Story: nativity. One-time purchase.",
+          "displayName": "Story: nativity",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: nativity. Compra única.",
+          "displayName": "Historia: nativity",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.nativity",
+      "referenceName": "Story: nativity",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000107",
+      "localizations": [
+        {
+          "description": "Unlocks Story: baptism. One-time purchase.",
+          "displayName": "Story: baptism",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: baptism. Compra única.",
+          "displayName": "Historia: baptism",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.baptism",
+      "referenceName": "Story: baptism",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000108",
+      "localizations": [
+        {
+          "description": "Unlocks Story: storm. One-time purchase.",
+          "displayName": "Story: storm",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: storm. Compra única.",
+          "displayName": "Historia: storm",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.storm",
+      "referenceName": "Story: storm",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000109",
+      "localizations": [
+        {
+          "description": "Unlocks Story: loaves. One-time purchase.",
+          "displayName": "Story: loaves",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: loaves. Compra única.",
+          "displayName": "Historia: loaves",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.loaves",
+      "referenceName": "Story: loaves",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000110",
+      "localizations": [
+        {
+          "description": "Unlocks Story: sheep. One-time purchase.",
+          "displayName": "Story: sheep",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: sheep. Compra única.",
+          "displayName": "Historia: sheep",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.sheep",
+      "referenceName": "Story: sheep",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000111",
+      "localizations": [
+        {
+          "description": "Unlocks Story: bigcatch. One-time purchase.",
+          "displayName": "Story: bigcatch",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: bigcatch. Compra única.",
+          "displayName": "Historia: bigcatch",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.bigcatch",
+      "referenceName": "Story: bigcatch",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000112",
+      "localizations": [
+        {
+          "description": "Unlocks Story: samaritan. One-time purchase.",
+          "displayName": "Story: samaritan",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: samaritan. Compra única.",
+          "displayName": "Historia: samaritan",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.samaritan",
+      "referenceName": "Story: samaritan",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000113",
+      "localizations": [
+        {
+          "description": "Unlocks Story: zacchaeus. One-time purchase.",
+          "displayName": "Story: zacchaeus",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea Historia: zacchaeus. Compra única.",
+          "displayName": "Historia: zacchaeus",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.story.zacchaeus",
+      "referenceName": "Story: zacchaeus",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.00",
+      "familyShareable": true,
+      "internalID": "6760000114",
+      "localizations": [
+        {
+          "description": "Unlocks the voice-guided prayer God Bless the People I Love. One-time purchase.",
+          "displayName": "Prayer: God Bless the People I Love",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea la oración guiada Dios bendiga a quienes amo. Compra única.",
+          "displayName": "Oración: Dios bendiga a quienes amo",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.prayer.blessing",
+      "referenceName": "Prayer: God Bless the People I Love",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "6.49",
+      "familyShareable": true,
+      "internalID": "6760000115",
+      "localizations": [
+        {
+          "description": "Unlocks every story in every world and every voice-guided prayer. One-time purchase.",
+          "displayName": "Everything Pack",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea todas las historias de todos los mundos y todas las oraciones guiadas. Compra única.",
+          "displayName": "Paquete Completo",
+          "locale": "es_MX"
+        }
+      ],
+      "productID": "com.dancruz.biblestorypals.bundle.everything",
+      "referenceName": "Everything Pack",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_locale": "en_US",
+    "_storefront": "USA"
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}
