@@ -80,6 +80,20 @@ const fromUrl = () => { if (location.hash !== current) { current = location.hash
 window.addEventListener('hashchange', fromUrl);
 window.addEventListener('popstate', fromUrl);
 
+// Android's Back button (the website keeps the browser's own Back; iOS has none). Listening
+// replaces the App plugin's default, which walks back through every page, game and reward
+// screen and then does nothing on the first screen. Instead: close a grown-up gate, step up
+// to the menu, or leave the app from home.
+if (window.Capacitor?.getPlatform?.() === 'android') {
+  window.Capacitor.addListener?.('App', 'backButton', () => {
+    const gate = document.querySelector('.gate');
+    if (gate) { gate.remove(); return; }
+    const top = current.replace(/^#\/?/, '').split('/')[0];
+    if (!top) { window.Capacitor.nativePromise('App', 'minimizeApp').catch(() => {}); return; }
+    go(top === 'pray' || top === 'amen' ? '#/prayers' : '#/');
+  });
+}
+
 function speakingCaption(el) {
   cleanups.push(onSpeaking((on) => el.classList.toggle('speaking', on)));
 }
@@ -871,6 +885,7 @@ const PARENT_TEXT = {
     about: 'Bible Story Pals is a bilingual (English & Spanish) Bible story game for children ages 3–6. Every story is read aloud, so no reading is needed. Each story ends with a gentle mini-game that practices counting, colors, numbers and new words.',
     privacy: 'Privacy: no ads, no in-app purchases, no accounts, no tracking. Nothing your child does leaves this device. After the first visit it works offline.',
     privacyApp: 'Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The first stories and two voice-guided prayers are free. Others are one-time purchases made by a grown-up through the App Store.',
+    privacyAppFree: 'Privacy: no ads, no purchases, no accounts, no tracking. Nothing your child does leaves this device, and it works offline.',
     supportTitle: 'Support Bible Story Pals',
     support: 'This game is free with no ads. If it blesses your family, a gift helps us make more stories.',
     donate: 'Donate',
@@ -890,6 +905,7 @@ const PARENT_TEXT = {
     about: 'Amiguitos de la Biblia es un juego bilingüe (español e inglés) de historias bíblicas para niños de 3 a 6 años. Todas las historias se leen en voz alta, así que no hace falta saber leer. Cada historia termina con un minijuego que practica contar, los colores, los números y palabras nuevas.',
     privacy: 'Privacidad: sin anuncios, sin compras dentro de la app, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo. Después de la primera visita funciona sin internet.',
     privacyApp: 'Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. Las primeras historias y dos oraciones guiadas son gratis. Las demás son compras únicas que hace un adulto en el App Store.',
+    privacyAppFree: 'Privacidad: sin anuncios, sin compras, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet.',
     supportTitle: 'Apoye a Amiguitos de la Biblia',
     support: 'Este juego es gratis y sin anuncios. Si bendice a su familia, una ofrenda nos ayuda a crear más historias.',
     donate: 'Donar',
@@ -916,17 +932,22 @@ const POLICY = {
       ['What the app does', [
         'No accounts, sign-in, ads, analytics or tracking. The app contains no advertising or analytics software.',
         "Stories are read aloud by recorded clips that come with the app, or by your device's own built-in voice. The words are spoken on the device and never sent anywhere.",
-        'The stars your child earns, your settings (language, sound) and a note of which stories are unlocked are saved only on your device. Deleting the app deletes them. You can also clear the stars in the grown-ups area.',
+        { paid: 'The stars your child earns, your settings (language, sound) and a note of which stories are unlocked are saved only on your device. Deleting the app deletes them. You can also clear the stars in the grown-ups area.',
+          free: 'The stars your child earns and your settings (language, sound) are saved only on your device. Deleting the app deletes them. You can also clear the stars in the grown-ups area.' },
         'Stories play offline. Nothing your child does in the game is sent anywhere.',
       ]],
-      ['In-app purchases', [
+      ['In-app purchases', 'paid', [
         "The first three stories and two voice-guided prayers are free. A grown-up can buy other stories and prayers through Apple's App Store, after answering a question meant for grown-ups.",
         "Apple handles every purchase, under Apple's privacy policy (apple.com/legal/privacy). We never see your name, Apple Account or payment details. Apple gives us sales totals that don't identify you.",
         'To show prices and check what your family owns, the app asks the App Store. These requests go only to Apple, and the app adds no information about your child to them.',
         'What you buy stays with your Apple Account, so you can restore it after deleting the app. With Apple\'s Family Sharing, people in your family group can use it too; Apple manages that group, and we never see who is in it. For a refund, ask Apple at reportaproblem.apple.com.',
       ]],
+      ['Purchases', 'free', [
+        'This version of the app has no purchases. Every story and prayer is included.',
+      ]],
       ['Children', [
-        'Bible Story Pals is made for children ages 3 to 6. Because we collect nothing, we hold no personal information to review or delete, and there is no consent to withdraw. The grown-ups area is behind a press-and-hold gate, and purchases are behind a question for grown-ups.',
+        { paid: 'Bible Story Pals is made for children ages 3 to 6. Because we collect nothing, we hold no personal information to review or delete, and there is no consent to withdraw. The grown-ups area is behind a press-and-hold gate, and purchases are behind a question for grown-ups.',
+          free: 'Bible Story Pals is made for children ages 3 to 6. Because we collect nothing, we hold no personal information to review or delete, and there is no consent to withdraw. The grown-ups area is behind a press-and-hold gate.' },
       ]],
       ['Changes and contact', [
         'If a future version changes any of this, we will update this policy first. It is also online, with a note about our website, at dan8nod.github.io/bible-story-pals/privacy.html. Questions: negotiatorsondemand@gmail.com.',
@@ -941,17 +962,22 @@ const POLICY = {
       ['Lo que hace la app', [
         'Sin cuentas, inicio de sesión, anuncios, analítica ni rastreo. La app no incluye software de publicidad ni de analítica.',
         'Las historias se leen en voz alta con grabaciones incluidas en la app o con la voz integrada de su dispositivo. Las palabras se pronuncian en el dispositivo y nunca se envían a ningún lugar.',
-        'Las estrellas que gana su hijo, sus ajustes (idioma, sonido) y una nota de las historias desbloqueadas se guardan solo en su dispositivo. Al borrar la app se borran. También puede borrar las estrellas en el área para adultos.',
+        { paid: 'Las estrellas que gana su hijo, sus ajustes (idioma, sonido) y una nota de las historias desbloqueadas se guardan solo en su dispositivo. Al borrar la app se borran. También puede borrar las estrellas en el área para adultos.',
+          free: 'Las estrellas que gana su hijo y sus ajustes (idioma, sonido) se guardan solo en su dispositivo. Al borrar la app se borran. También puede borrar las estrellas en el área para adultos.' },
         'Las historias funcionan sin internet. Nada de lo que hace su hijo en el juego se envía a ningún lugar.',
       ]],
-      ['Compras dentro de la app', [
+      ['Compras dentro de la app', 'paid', [
         'Las primeras tres historias y dos oraciones guiadas son gratis. Un adulto puede comprar otras historias y oraciones en el App Store de Apple, después de responder una pregunta para adultos.',
         'Apple se encarga de cada compra, según su política de privacidad (apple.com/legal/privacy). Nunca vemos su nombre, su Cuenta de Apple ni sus datos de pago. Apple nos da totales de ventas que no lo identifican.',
         'Para mostrar los precios y revisar lo que su familia ya tiene, la app le pregunta al App Store. Estas solicitudes van solo a Apple, y la app no les agrega información sobre su hijo.',
         'Lo que compra queda en su Cuenta de Apple, así que puede restaurarlo después de borrar la app. Con Compartir en familia de Apple, las personas de su grupo familiar también pueden usarlo; Apple administra ese grupo y nunca vemos quién lo forma. Para pedir un reembolso, escriba a Apple en reportaproblem.apple.com.',
       ]],
+      ['Compras', 'free', [
+        'Esta versión de la app no tiene compras. Incluye todas las historias y oraciones.',
+      ]],
       ['Niños', [
-        'Amiguitos de la Biblia está hecho para niños de 3 a 6 años. Como no recopilamos nada, no guardamos información personal que revisar ni borrar, y no hay consentimiento que retirar. El área para adultos está protegida: hay que mantener presionado para entrar. Las compras están protegidas con una pregunta para adultos.',
+        { paid: 'Amiguitos de la Biblia está hecho para niños de 3 a 6 años. Como no recopilamos nada, no guardamos información personal que revisar ni borrar, y no hay consentimiento que retirar. El área para adultos está protegida: hay que mantener presionado para entrar. Las compras están protegidas con una pregunta para adultos.',
+          free: 'Amiguitos de la Biblia está hecho para niños de 3 a 6 años. Como no recopilamos nada, no guardamos información personal que revisar ni borrar, y no hay consentimiento que retirar. El área para adultos está protegida: hay que mantener presionado para entrar.' },
       ]],
       ['Cambios y contacto', [
         'Si una versión futura cambia algo de esto, primero actualizaremos esta política. También está en internet, con una nota sobre nuestro sitio web, en dan8nod.github.io/bible-story-pals/privacy.html. Preguntas: negotiatorsondemand@gmail.com.',
@@ -960,12 +986,18 @@ const POLICY = {
   },
 };
 
+// A section or line marked 'paid'/'free' applies only to the build with (iOS) or without (Android) purchases.
 const policyHtml = () => langs().map((l) => {
   const p = POLICY[l];
+  const build = paywalled ? 'paid' : 'free';
+  const sections = p.sections
+    .map((s) => (s.length === 3 ? s : [s[0], null, s[1]]))
+    .filter(([, only]) => !only || only === build)
+    .map(([h, , items]) => [h, items.map((x) => (typeof x === 'string' ? x : x[build]))]);
   return `<details class="policy" lang="${l}"><summary>${esc(p.title)}</summary>
     <p class="policy-date">${esc(p.effective)}</p>
     <p><strong>${esc(p.intro)}</strong></p>
-    ${p.sections.map(([h, items]) => `<h4>${esc(h)}</h4>${items.length > 1 ? `<ul>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(items[0])}</p>`}`).join('')}
+    ${sections.map(([h, items]) => `<h4>${esc(h)}</h4>${items.length > 1 ? `<ul>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(items[0])}</p>`}`).join('')}
   </details>`;
 }).join('');
 
@@ -982,8 +1014,8 @@ function parentsScreen() {
     <button class="link-btn" data-act="home">‹ ${esc(P.back)}</button>
     <h2>${esc(P.title)}</h2>
     <p>${esc(P.about)}</p>
-    <p><strong>${esc(paywalled ? P.privacyApp : P.privacy)}</strong></p>
-    ${paywalled ? policyHtml() : ''}
+    <p><strong>${esc(paywalled ? P.privacyApp : isNativeApp() ? P.privacyAppFree : P.privacy)}</strong></p>
+    ${isNativeApp() ? policyHtml() : ''}
     ${paywalled ? `<h3>${esc(T.title)}</h3><div class="world-offers"></div>
       <p class="unlock-note" aria-live="polite"></p>
       <p><button class="link-btn" data-act="restore">${esc(T.restore)}</button></p>` : ''}
@@ -1065,6 +1097,18 @@ function wireUnlockSettings(T) {
 unlockAudio();
 // An Ask to Buy approval or a purchase on another device can land while the app is away.
 if (paywalled) document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refresh(); });
+// Android keeps the app's page running in the background, so going Home or locking the screen
+// would leave a story talking and a prayer stepping on to Amen. Hush it, and leave a prayer
+// paused where it was.
+document.addEventListener('visibilitychange', () => {
+  const praying = /^#\/?pray\//.test(current);
+  if (document.hidden) {
+    stopSpeaking();
+    if (praying && !prayerPaused) { prayerPaused = true; generation++; }
+  } else if (praying) {
+    route();
+  }
+});
 // Wait briefly for the App Store's answer, so a paid-up family never sees a lock by mistake.
 Promise.race([refresh(), new Promise((r) => setTimeout(r, 1500))]).then(route);
 
