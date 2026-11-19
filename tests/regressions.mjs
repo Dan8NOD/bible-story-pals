@@ -148,6 +148,69 @@ for (const [width, height] of [[667, 375], [844, 390]]) {
 }
 console.log('✓ reward screen fits short landscape phones');
 
+// 7. On a phone held sideways the star counter sat on things to tap and took the taps itself.
+//    On a Galaxy S23+ the fifth lion in Daniel's game was wholly under it, so the game never ended.
+//    The third number is the status bar's height, which pushes the counter further down the picture.
+const PHONES = [[832, 384, 29], [667, 375, 0], [852, 393, 0], [1024, 600, 0]];
+for (const [width, height, statusBar] of PHONES) {
+  const page = await freshPage({ width, height });
+  await page.goto(`${base}#/`);
+  await page.addStyleTag({ content: `:root { --safe-t: ${statusBar}px; }` });
+  const ids = await page.evaluate(async () => (await import('/js/stories.js')).STORIES.map((s) => s.id));
+  for (const id of ids) {
+    await page.goto(`${base}#/play/${id}`);
+    await page.waitForFunction(() => document.querySelector('.counter')?.children.length > 0);
+    const hidden = await page.evaluate(() => {
+      const c = document.querySelector('.counter').getBoundingClientRect();
+      const N = 9;
+      return [...document.querySelectorAll('.stage-svg .item')].filter((el) => {
+        const r = el.getBoundingClientRect();
+        for (let a = 0; a < N; a++) for (let b = 0; b < N; b++) {
+          const x = r.left + ((a + 0.5) * r.width) / N, y = r.top + ((b + 0.5) * r.height) / N;
+          const under = x >= c.left && x <= c.right && y >= c.top && y <= c.bottom;
+          if (under && document.elementsFromPoint(x, y).some((e) => e.closest('.item') === el)) return true;
+        }
+        return false;
+      }).length;
+    });
+    if (hidden) fail(`${id} at ${width}x${height}: the star counter covers ${hidden} thing(s) to tap`);
+  }
+  await page.close();
+}
+console.log('✓ star counter stays off the things to tap on phones');
+
+{
+  // Real clicks, so a tap that the counter swallowed would leave a lion awake.
+  const page = await freshPage({ width: 832, height: 384 });
+  await page.goto(`${base}#/`);
+  await page.addStyleTag({ content: ':root { --safe-t: 29px; }' });
+  await page.goto(`${base}#/play/daniel`);
+  await page.waitForSelector('.stage-svg .item');
+  for (let i = 0; i < 5; i++) {
+    const at = await page.evaluate(() => {
+      const el = document.querySelector('.stage-svg .item:not(.gone)');
+      const r = el?.getBoundingClientRect();
+      return r && { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    });
+    if (at) await page.mouse.click(at.x, at.y);
+  }
+  await page.waitForFunction(() => location.hash === '#/yay/daniel', null, { timeout: 5000 })
+    .catch(() => fail('Daniel\'s game did not finish on a phone-sized screen'));
+  await page.close();
+
+  // Where the counter still runs across the top (tablets), a tap on it reaches the game.
+  const tablet = await freshPage({ width: 1280, height: 800 });
+  await tablet.goto(`${base}#/play/creation`);
+  await tablet.waitForFunction(() => document.querySelector('.counter')?.children.length > 0);
+  const swallowed = await tablet.evaluate(() => {
+    const c = document.querySelector('.counter').getBoundingClientRect();
+    return !!document.elementFromPoint(c.left + c.width / 2, c.top + c.height / 2)?.closest('.counter');
+  });
+  if (swallowed) fail('the star counter takes taps meant for the game');
+  await tablet.close();
+}
+console.log('✓ Daniel\'s game can be finished on a phone, and the counter never takes a tap');
+
 await browser.close();
 server.close();
 if (errors.length) {
