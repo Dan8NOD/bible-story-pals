@@ -281,6 +281,12 @@ a.big-btn { text-decoration: none; color: var(--ink); }
 .counter { display: flex; gap: 4px; padding: 6px 12px; background: #fffb; border-radius: 30px; }
 .counter svg { width: 34px; height: 34px; transition: transform 0.3s; }
 .counter svg.got { animation: pop-in 0.4s; }
+/* The stars only show progress, so a tap that lands on them goes to the game underneath. */
+.hud > .counter { pointer-events: none; }
+/* A phone on its side: the stars stand in the empty strip beside the picture, under the home
+   button. main.js adds `side` and sets --star and --shift when there is room (see placeCounter). */
+.counter.side { position: absolute; top: calc(100% + 6px); left: var(--shift, 0px); flex-direction: column; padding: 6px; }
+.counter.side svg { width: var(--star, 34px); height: var(--star, 34px); }
 
 .bar {
   display: flex;

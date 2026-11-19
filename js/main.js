@@ -396,6 +396,36 @@ function gameScreen(story) {
   app.querySelector('[data-act=listen]').addEventListener('click', () => replayFn());
   wireSound(app);
 
+  // The picture is 1000 × 600 and is fitted inside the stage, so a wide, short screen (a phone on
+  // its side) leaves an empty strip at each end. The stars stand in the left strip, under the home
+  // button, whenever they fit there: across the top they would sit on things a child has to tap.
+  const stageEl = app.querySelector('.stage');
+  const hudEl = app.querySelector('.hud');
+  const placeCounter = () => {
+    const n = counterEl.children.length;
+    const stage = stageEl.getBoundingClientRect();
+    const hud = hudEl.getBoundingClientRect();
+    const strip = (stage.width - Math.min(stage.width, (stage.height * 1000) / 600)) / 2;
+    // 6 px of padding round the stars, 4 px between them, 6 px clear of the picture and the bar:
+    // the same numbers as `.counter.side` in style.css.
+    const across = strip - (hud.left - stage.left) - 6 - 12;
+    const down = (stage.bottom - hud.bottom - 12 - 12 - (n - 1) * 4) / n;
+    const star = Math.floor(Math.min(34, across, down));
+    // A strip too narrow for a good-sized star (most tablets) keeps the row across the top.
+    const side = n > 0 && across >= 28 && star >= 16;
+    counterEl.classList.toggle('side', side);
+    if (!side) return;
+    // Centred under the home button when the strip is wide enough for that.
+    const button = hudEl.firstElementChild.getBoundingClientRect().width;
+    counterEl.style.setProperty('--star', `${star}px`);
+    counterEl.style.setProperty('--shift', `${Math.max(0, Math.min((button - star - 12) / 2, across - star))}px`);
+  };
+  if (window.ResizeObserver) {
+    const watch = new ResizeObserver(placeCounter);
+    watch.observe(stageEl);
+    cleanups.push(() => watch.disconnect());
+  }
+
   let shown = -1;
   const ctx = {
     svg: app.querySelector('.stage-svg'),
@@ -407,6 +437,7 @@ function gameScreen(story) {
     counter(n, total) {
       if (shown === -1 || counterEl.children.length !== total) {
         counterEl.innerHTML = Array.from({ length: total }, () => starIcon('#d7d0c8')).join('');
+        placeCounter();
       }
       [...counterEl.children].forEach((el, k) => {
         if (k < n && !el.classList.contains('got')) {
