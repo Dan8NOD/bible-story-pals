@@ -131,15 +131,16 @@ in-app purchases don't exist in App Store Connect yet. Set it to `false` for the
 
 **Unlocking stories (App Store build only).** The first three stops on Torah Trail are free: Creation, Noah and
 Abraham. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering that
-story or everything left in its world. The grown-ups area sells the worlds too, and both screens can restore
-purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of
-parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift`
-talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a
-reinstall, follow the family's Apple ID, and lock again after a refund. To try a purchase in the simulator without
-App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
+story, everything left in its world, or the **Everything Pack** ($6.49: every story and prayer, half of the $13 they
+cost one by one). The grown-ups area sells the worlds and the pack too, and both screens can restore purchases.
+Buying sits behind a times-table question written in words and answered on a keypad, the kind of parental gate
+Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift` talks to
+StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a reinstall,
+follow the family's Apple ID, and lock again after a refund. To try a purchase in the simulator without App Store
+Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
 
 In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App
-Purchases → +** and create these 15 **Non-Consumable** products. `npm run storekit -- --table` prints every
+Purchases → +** and create these 16 **Non-Consumable** products. `npm run storekit -- --table` prints every
 product with its English, Spanish and Hebrew display name, and `npm run storekit` rewrites `Unlocks.storekit`
 after stories change.
 
@@ -150,6 +151,7 @@ after stories change.
 | `story.joseph`, `story.moses`, `story.redsea`, `story.manna` | One Torah Trail story | $1.00 |
 | `story.samuel`, `story.david`, `story.elijah`, `story.jonah`, `story.psalm23`, `story.ruth`, `story.esther`, `story.daniel` | One Kings and Prophets story | $1.00 |
 | `prayer.blessing` | The voice-guided prayer Hashem Bless the People I Love | $1.00 |
+| `bundle.everything` | Everything Pack: every story in both worlds and every prayer (half of the $13 they cost one by one) | $6.49 |
 
 The game shows whatever price the App Store reports, so the buttons always match the tier you pick.
 
@@ -223,7 +225,7 @@ js/games.js           mini-game engine (collect / prompt / steer / memory / seek
 js/art.js             SVG characters, animals, props, backgrounds
 js/audio.js           narration (recorded clips, then the device voice) + synthesized sound effects
 js/i18n.js, store.js  UI words, languages, settings & progress
-js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world; 2 free prayers, then $1 a prayer
+js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world; 2 free prayers, then $1 a prayer; $6.49 Everything Pack
 ios/                  Capacitor iOS app (UnlocksPlugin.swift sells stories and worlds)
 tools/                voices.mjs (ElevenLabs), make-icons.mjs, make-storekit.mjs, stage-www.mjs
 tests/                play-through, regressions, voices, native, unlocks, prayers

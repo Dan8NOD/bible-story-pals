@@ -7,7 +7,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WORLDS, byId } from '../js/stories.js';
 import { PRAYERS, FREE_PRAYERS } from '../js/prayers.js';
-import { FREE_STORIES, storyProduct, worldProduct, prayerProduct } from '../js/unlocks.js';
+import { FREE_STORIES, storyProduct, worldProduct, prayerProduct, bundleProduct } from '../js/unlocks.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LOCALES = { en: 'en_US', es: 'es_MX', he: 'he' };
@@ -15,6 +15,7 @@ const WORDS = {
   world: { en: (t) => `All of ${t}`, es: (t) => `Todo: ${t}`, he: (t) => `כל הסיפורים: ${t}` },
   story: { en: (t) => `Story: ${t}`, es: (t) => `Historia: ${t}`, he: (t) => `סיפור: ${t}` },
   prayer: { en: (t) => `Prayer: ${t}`, es: (t) => `Oración: ${t}`, he: (t) => `תפילה: ${t}` },
+  bundle: { en: (t) => t, es: (t) => t, he: (t) => t },
   about: { en: (n) => `Unlocks ${n}. One-time purchase.`, es: (n) => `Desbloquea ${n}. Compra única.`, he: (n) => `${n}. רכישה חד-פעמית.` },
 };
 
@@ -23,6 +24,8 @@ const items = [
   ...WORLDS.flatMap((w) => w.stories).filter((id) => !FREE_STORIES.includes(id))
     .map((id) => ({ id: storyProduct(id), kind: 'story', title: byId(id).title, price: '1.00' })),
   ...PRAYERS.filter((p) => !FREE_PRAYERS.includes(p.id)).map((p) => ({ id: prayerProduct(p.id), kind: 'prayer', title: p.title, price: '1.00' })),
+  // Half of the $13 the paid stories and prayer cost one by one.
+  { id: bundleProduct, kind: 'bundle', title: { en: 'Everything Pack', es: 'Paquete Completo', he: 'החבילה המלאה' }, price: '6.49' },
 ];
 // App Store Connect allows 35 characters for a display name: drop the prefix when it would not fit.
 // The app points a few Hebrew words for the speech voice only; the store shows plain Hebrew.
@@ -37,8 +40,8 @@ const name = (it, l) => {
 };
 // App Store Connect allows 55 characters for a description: fall back to the bare title, then to a generic line.
 const MAX_ABOUT = 55;
-const THIS = { story: { en: 'this story', es: 'esta historia', he: 'סיפור זה' }, prayer: { en: 'this prayer', es: 'esta oración', he: 'תפילה זו' }, world: { en: 'these stories', es: 'estas historias', he: 'הסיפורים האלה' } };
-const about = (it, l) => [name(it, l), plain(it.title[l]), THIS[it.kind][l]].map((n) => WORDS.about[l](n)).find((s) => [...s].length <= MAX_ABOUT)
+const THIS = { story: { en: 'this story', es: 'esta historia', he: 'סיפור זה' }, prayer: { en: 'this prayer', es: 'esta oración', he: 'תפילה זו' }, world: { en: 'these stories', es: 'estas historias', he: 'הסיפורים האלה' }, bundle: { en: 'every story and prayer', es: 'cada historia y oración', he: 'כל הסיפורים והתפילות' } };
+const about = (it, l) => (it.kind === 'bundle' ? [THIS.bundle[l]] : [name(it, l), plain(it.title[l]), THIS[it.kind][l]]).map((n) => WORDS.about[l](n)).find((s) => [...s].length <= MAX_ABOUT)
   ?? (() => { throw new Error(`Description too long for the App Store (${MAX_ABOUT}): ${it.id} ${l}`); })();
 
 if (process.argv.includes('--table')) {

@@ -42,7 +42,7 @@ async function open(hash, shop = {}, saved = {}) {
       nativePromise: async (plugin, method, options) => {
         const s = window.__shop;
         s.calls.push({ method, ...options });
-        if (method === 'products') return { prices: Object.fromEntries(options.ids.map((id) => [id, id.includes('.world.') ? '$1.99' : '$0.99'])) };
+        if (method === 'products') return { prices: Object.fromEntries(options.ids.map((id) => [id, id.includes('.world.') ? '$1.99' : id.includes('.bundle.') ? '$6.49' : '$0.99'])) };
         if (method === 'buy') {
           if (s.buy === 'pending') return { pending: true };
           if (s.buy === 'cancel') return { cancelled: true };
@@ -178,7 +178,46 @@ await page.waitForFunction(() => /Kings and Prophets: 8 of 8/.test(document.quer
 assert.equal(await page.$('.world-offers [data-world=prophets]'), null);
 await page.close();
 
-// 9. The website has nothing to buy with, so nothing is ever locked.
+// 9. The Everything Pack: offered while anything is locked, and one purchase opens every story and prayer.
+page = await open('#/story/jonah/0');
+await page.waitForSelector('.unlock-wall [data-act=bundle]');
+await page.waitForFunction(() => /Everything Pack: every story and prayer · \$6\.49/.test(document.querySelector('[data-act=bundle]').textContent));
+assert.match(await page.textContent('.unlock-wall .bundle-note'), /half of buying every story and prayer one by one/);
+await page.click('[data-act=bundle]');
+await solveGate(page);
+await page.waitForSelector('.caption');
+assert.deepEqual(await bought(page), [`${P}.bundle.everything`]);
+for (const hash of ['#/story/joseph/0', '#/story/ruth/0', '#/pray/blessing/0']) {
+  await page.goto(`${base}${hash}`);
+  await page.waitForSelector('.caption');
+  assert.equal(await page.$('.unlock-wall'), null, `${hash} opens with the Everything Pack`);
+}
+await page.goto(`${base}#/`);
+await page.waitForSelector('.stop');
+assert.equal(await page.locator('.stop.locked').count(), 0, 'no padlocks left on the map');
+await page.close();
+// The prayer's wall offers it too.
+page = await open('#/pray/blessing/0');
+await page.waitForSelector('.unlock-wall [data-act=bundle]');
+await page.close();
+// Once everything is owned some other way, it isn't offered.
+page = await open('#/parents', { owned: [`${P}.world.torah`, `${P}.world.prophets`, `${P}.prayer.blessing`] });
+await page.locator('.gate .hold').dispatchEvent('pointerdown');
+await page.waitForSelector('.world-offers');
+await page.waitForFunction(() => /Kings and Prophets: 8 of 8/.test(document.querySelector('.world-offers').textContent));
+assert.equal(await page.$('.world-offers [data-bundle]'), null);
+await page.close();
+// The grown-ups area sells it while something is locked.
+page = await open('#/parents', { owned: [`${P}.world.torah`] });
+await page.locator('.gate .hold').dispatchEvent('pointerdown');
+await page.waitForSelector('.world-offers [data-bundle]');
+await page.click('.world-offers [data-bundle]');
+await solveGate(page);
+await page.waitForFunction(() => /Kings and Prophets: 8 of 8/.test(document.querySelector('.world-offers').textContent));
+assert.equal(await page.$('.world-offers [data-bundle]'), null);
+await page.close();
+
+// 10. The website has nothing to buy with, so nothing is ever locked.
 page = await open('#/', null);
 await page.waitForSelector('.stop');
 assert.equal(await page.locator('.stop.locked').count(), 0);
@@ -209,6 +248,8 @@ await page.waitForFunction(() => /\$0\.99/.test(document.querySelector('[data-ac
 assert.match(await page.textContent('.unlock-wall h2'), /למבוגר/);
 assert.match(await page.textContent('[data-act=story]'), /הסיפור הזה/);
 assert.match(await page.textContent('[data-act=world]'), /כל 4 הסיפורים שנשארו/);
+assert.match(await page.textContent('[data-act=bundle]'), /החבילה המלאה: כל הסיפורים והתפילות · \$6\.49/);
+assert.match(await page.textContent('.unlock-wall .bundle-note'), /חצי ממחיר/);
 await page.click('[data-act=story]');
 await page.waitForSelector('.gate .keypad');
 {
@@ -222,4 +263,4 @@ await page.close();
 assert.deepEqual(errors, []);
 await browser.close();
 server.close();
-console.log('✓ unlocks: 3 free stories, $1 a story, $2 a world, grown-up gate (also in Hebrew), Ask to Buy, restore, refunds, website stays free');
+console.log('✓ unlocks: 3 free stories, $1 a story, $2 a world, $6.49 Everything Pack, grown-up gate (also in Hebrew), Ask to Buy, restore, refunds, website stays free');
