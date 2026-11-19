@@ -423,16 +423,25 @@ function gameScreen(story) {
     // 6 px of padding round the stars, 4 px between them, 6 px clear of the picture and the bar:
     // the same numbers as `.counter.side` in style.css.
     const across = strip - (hud.left - stage.left) - 6 - 12;
-    const down = (stage.bottom - hud.bottom - 12 - 12 - (n - 1) * 4) / n;
-    const star = Math.floor(Math.min(34, across, down));
+    const down = stage.bottom - hud.bottom - 12 - 12;
+    const fit = (cols) => {
+      const rows = Math.ceil(n / cols);
+      return Math.floor(Math.min(34, (across - (cols - 1) * 4) / cols, (down - (rows - 1) * 4) / rows));
+    };
+    // One column, unless that many stars would come out small (eight in a row down a phone are
+    // 19 px each): then they stand two by two, which keeps them full size.
+    const two = fit(1) < 28 && fit(2) > fit(1);
+    const star = fit(two ? 2 : 1);
     // A strip too narrow for a good-sized star (most tablets) keeps the row across the top.
     const side = n > 0 && across >= 28 && star >= 16;
     counterEl.classList.toggle('side', side);
+    counterEl.classList.toggle('two', side && two);
     if (!side) return;
     // Centred under the home button when the strip is wide enough for that.
     const button = hudEl.firstElementChild.getBoundingClientRect().width;
+    const wide = two ? star * 2 + 4 : star;
     counterEl.style.setProperty('--star', `${star}px`);
-    counterEl.style.setProperty('--shift', `${Math.max(0, Math.min((button - star - 12) / 2, across - star))}px`);
+    counterEl.style.setProperty('--shift', `${Math.max(0, Math.min((button - wide - 12) / 2, across - wide))}px`);
   };
   if (window.ResizeObserver) {
     const watch = new ResizeObserver(placeCounter);
