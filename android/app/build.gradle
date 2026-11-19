@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+// The upload key for Google Play never lives in this repo: GitHub Pages publishes all of it.
+// A release build is signed only when a properties file outside the repo says where the key is.
+// Without that file the bundle comes out unsigned. docs/google-play.md has the steps.
+def keystoreProps = new Properties()
+def keystorePropsFile = file(System.getenv('BSP_KEYSTORE_PROPERTIES') ?: "${System.getProperty('user.home')}/.bible-story-pals/keystore.properties")
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+def hasUploadKey = keystoreProps.getProperty('storeFile') != null
+
 android {
     namespace = "com.dancruz.biblestorypals"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,8 +26,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (hasUploadKey) {
+                // A bare file name means the key sits next to the properties file.
+                def keyFile = new File(keystoreProps.getProperty('storeFile'))
+                storeFile keyFile.isAbsolute() ? keyFile : new File(keystorePropsFile.parentFile, keyFile.path)
+                storePassword keystoreProps.getProperty('storePassword')
+                keyAlias keystoreProps.getProperty('keyAlias')
+                keyPassword keystoreProps.getProperty('keyPassword') ?: keystoreProps.getProperty('storePassword')
+            }
+        }
+    }
     buildTypes {
         release {
+            if (hasUploadKey) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
