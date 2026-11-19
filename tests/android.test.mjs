@@ -113,6 +113,15 @@ await page.waitForSelector('.praying.paused [data-act=pause][aria-pressed=true]'
 await page.close();
 console.log('✓ android background: voice stops, prayer stays paused on its step');
 
+// 4. The Google Play upload key stays out of this repo, which GitHub Pages publishes whole:
+// Gradle reads the key settings from outside it, and git ignores key files.
+const gradle = await readFile(join(root, 'android/app/build.gradle'), 'utf8');
+assert.match(gradle, /BSP_KEYSTORE_PROPERTIES/, 'release signing no longer reads its settings from outside the repo');
+assert.doesNotMatch(gradle, /(storePassword|keyPassword)\s+['"]/, 'a signing password is written into build.gradle');
+const ignored = (await readFile(join(root, '.gitignore'), 'utf8')).split(/\r?\n/);
+for (const rule of ['*.jks', '*.keystore', 'keystore.properties']) assert.ok(ignored.includes(rule), `.gitignore no longer ignores ${rule}`);
+console.log('✓ android release: the upload key and its settings stay outside the repo');
+
 assert.deepEqual(errors, []);
 await browser.close();
 server.close();

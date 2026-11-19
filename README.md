@@ -113,7 +113,19 @@ In App Store Connect: accept the Paid Apps agreement (Business), then under the 
 
 The game shows whatever price the App Store reports, so the buttons always match the tier you pick.
 
-**Google Play:** add Android the same way (`npm i @capacitor/android && npx cap add android`).
+**Android (Google Play):** the Capacitor project lives in `android/` (package `com.dancruz.biblestorypals`,
+landscape only, version in `android/app/build.gradle`). The Android build has no purchases: every story and
+prayer is open. After changing the game:
+
+```bash
+npm install
+npm run android          # copies the game into www/ and syncs it into android/
+npm run android:open     # opens Android Studio, to run it on a device
+npm run android:bundle   # builds the .aab for Google Play and says whether it is signed
+```
+
+The upload key stays outside this repo. [docs/google-play.md](docs/google-play.md) has the key setup, the
+Play Console answers and the listing text.
 
 Before submitting:
 - Google Play: target the **Designed for Families** program, ages 5 & under / 6–8, with content rating "Everyone".

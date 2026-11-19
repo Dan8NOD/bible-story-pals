@@ -13,7 +13,8 @@
     "ios": "node tools/stage-www.mjs && cap sync ios",
     "ios:open": "cap open ios",
     "android": "node tools/stage-www.mjs && cap sync android",
-    "android:open": "cap open android"
+    "android:open": "cap open android",
+    "android:bundle": "node tools/android-bundle.mjs"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",
