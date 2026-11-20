@@ -6,13 +6,15 @@
   "type": "module",
   "scripts": {
     "start": "python3 -m http.server 8080",
-    "test": "node tests/play-through.mjs && node tests/regressions.mjs && node tests/voices.test.mjs && node tests/native.test.mjs && node tests/unlocks.test.mjs && node tests/prayers.test.mjs",
+    "test": "node tests/play-through.mjs && node tests/regressions.mjs && node tests/voices.test.mjs && node tests/native.test.mjs && node tests/android.test.mjs && node tests/unlocks.test.mjs && node tests/prayers.test.mjs",
     "test:voices": "node tests/voices.test.mjs",
     "voices": "node tools/voices.mjs",
     "icons": "node tools/make-icons.mjs",
     "storekit": "node tools/make-storekit.mjs",
     "ios": "node tools/stage-www.mjs && cap sync ios",
-    "ios:open": "cap open ios"
+    "ios:open": "cap open ios",
+    "android": "node tools/stage-www.mjs && cap sync android",
+    "android:open": "cap open android"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",
@@ -20,6 +22,8 @@
   },
   "dependencies": {
     "@capacitor-community/text-to-speech": "^8.0.2",
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.0",
     "@capacitor/ios": "^8.6.0"
   }

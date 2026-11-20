@@ -602,3 +602,27 @@ a.big-btn { text-decoration: none; color: var(--ink); }
   .stop .stars svg { width: 4.6cqw; height: 4.6cqw; }
   .stop .ribbon { font-size: 3.2cqw; padding: 0.6cqw 2.2cqw; border-radius: 2.2cqw; }
 }
+
+/* Landscape phones 780px and wider: the title, languages and tabs move to a column on the left so
+   the whole story map fits beside them. Smaller phones keep the scrolling map, whose stops stay bigger. */
+@media (max-height: 460px) and (min-width: 780px) and (orientation: landscape) {
+  .home {
+    display: grid;
+    grid-template-columns: 270px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 14px;
+    align-content: start;
+    padding-bottom: calc(12px + var(--safe-b));
+  }
+  .home-top { grid-column: 1; grid-row: 1; flex-direction: column; align-items: stretch; gap: 8px; margin: 0 0 8px; }
+  .top-right { gap: 8px; }
+  .chips { width: 100%; justify-content: space-between; }
+  .world-tabs { grid-column: 1; grid-row: 2; flex-direction: column; align-items: stretch; align-self: start; gap: 8px; margin: 0; }
+  .map {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    width: min(100%, calc((100vh - 24px - var(--safe-t) - var(--safe-b)) * var(--wide-r)));
+    width: min(100%, calc((100dvh - 24px - var(--safe-t) - var(--safe-b)) * var(--wide-r)));
+  }
+}

@@ -148,6 +148,32 @@ for (const [width, height, lang] of [[667, 375, 'en+es'], [844, 390, 'en+es'], [
 }
 console.log('✓ reward screen fits short landscape phones');
 
+// 7. On landscape phones the whole story map fits beside the menu column: every stop
+//    is on screen without scrolling, and big enough for small fingers.
+for (const [width, height, lang] of [[800, 360, 'en'], [891, 411, 'en'], [891, 411, 'en+he'], [932, 430, 'es+he']]) {
+  const page = await freshPage({ width, height });
+  await page.goto(`${base}#/`);
+  await page.evaluate((lang) => localStorage.setItem('tsp:v1', JSON.stringify({ ...JSON.parse(localStorage.getItem('tsp:v1') || '{}'), lang })), lang);
+  await page.goto(`${base}#/?fit`);
+  await page.waitForSelector('.map .stop');
+  await page.waitForTimeout(900); // pop-in animation
+  const box = await page.evaluate(() => {
+    const home = document.querySelector('.home');
+    const discs = [...document.querySelectorAll('.map .stop .disc')].map((d) => d.getBoundingClientRect());
+    const tabs = document.querySelector('.world-tabs').getBoundingClientRect();
+    return {
+      scrolls: home.scrollHeight > home.clientHeight + 1,
+      off: discs.filter((r) => r.top < 0 || r.bottom > innerHeight || r.left < 0 || r.right > innerWidth).length,
+      smallest: Math.round(Math.min(...discs.map((r) => r.width))),
+      tabsBottom: Math.round(tabs.bottom),
+      h: innerHeight,
+    };
+  });
+  if (box.scrolls || box.off || box.smallest < 44 || box.tabsBottom > box.h) fail(`home map doesn't fit ${width}x${height} in ${lang}: ${JSON.stringify(box)}`);
+  await page.close();
+}
+console.log('✓ home map fits landscape phones');
+
 await browser.close();
 server.close();
 if (errors.length) {
