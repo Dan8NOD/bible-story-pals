@@ -174,10 +174,36 @@ for (const [width, height, statusBar] of PHONES) {
       }).length;
     });
     if (hidden) fail(`${id} at ${width}x${height}: the star counter covers ${hidden} thing(s) to tap`);
+    // Beside the picture the stars must stay in the strip: clear of the picture, the bar and the edges.
+    const out = await page.evaluate(() => {
+      const el = document.querySelector('.counter');
+      if (!el.classList.contains('side')) return '';
+      const c = el.getBoundingClientRect();
+      const stage = document.querySelector('.stage').getBoundingClientRect();
+      const picture = stage.left + (stage.width - Math.min(stage.width, (stage.height * 1000) / 600)) / 2;
+      const ok = c.left >= 0 && c.right <= picture - 5 && c.bottom <= stage.bottom - 5;
+      return ok ? '' : `${Math.round(c.left)}–${Math.round(c.right)} across, down to ${Math.round(c.bottom)}`;
+    });
+    if (out) fail(`${id} at ${width}x${height}: the star counter leaves its strip (${out})`);
   }
   await page.close();
 }
 console.log('✓ star counter stays off the things to tap on phones');
+
+{
+  // Eight stars in one column down a Galaxy S23+ were 19 px each. They stand two by two instead.
+  const page = await freshPage({ width: 832, height: 384 });
+  await page.goto(`${base}#/`);
+  await page.addStyleTag({ content: ':root { --safe-t: 29px; }' });
+  for (const id of ['creation', 'noah', 'loaves', 'bigcatch']) {
+    await page.goto(`${base}#/play/${id}`);
+    await page.waitForFunction(() => document.querySelector('.counter')?.children.length > 0);
+    const star = await page.evaluate(() => Math.min(...[...document.querySelector('.counter').children].map((s) => s.getBoundingClientRect().width)));
+    if (star < 28) fail(`${id} on a phone: the stars are only ${Math.round(star)} px wide`);
+  }
+  await page.close();
+}
+console.log('✓ stars stay big on a phone when there are many');
 
 {
   // Real clicks, so a tap that the counter swallowed would leave a lion awake.

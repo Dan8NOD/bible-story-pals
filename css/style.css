@@ -287,6 +287,9 @@ a.big-btn { text-decoration: none; color: var(--ink); }
    button. main.js adds `side` and sets --star and --shift when there is room (see placeCounter). */
 .counter.side { position: absolute; top: calc(100% + 6px); left: var(--shift, 0px); flex-direction: column; padding: 6px; }
 .counter.side svg { width: var(--star, 34px); height: var(--star, 34px); }
+/* Many stars (6 to 8 on a phone) stand two by two so each one stays big; an odd last star sits in the middle. */
+.counter.side.two { display: grid; grid-template-columns: repeat(2, var(--star, 34px)); }
+.counter.side.two svg:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; }
 
 .bar {
   display: flex;
