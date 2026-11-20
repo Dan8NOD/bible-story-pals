@@ -83,6 +83,8 @@ button {
 .big-btn svg { width: 36px; height: 36px; }
 a.big-btn { text-decoration: none; color: var(--ink); }
 .big-btn.green { background: #7bd389; box-shadow: 0 6px 0 #43a047; }
+.big-btn.bundle { background: #f8bbd0; box-shadow: 0 6px 0 #ec407a; }
+.bundle-note { font-size: 0.85em; opacity: 0.85; }
 
 /* ---------- Hebrew ---------- */
 /* Hebrew reads right to left. Each piece of Hebrew turns itself around, while the screen

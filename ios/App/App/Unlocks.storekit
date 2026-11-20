@@ -376,6 +376,31 @@
       "productID": "com.dancruz.torahstorypals.prayer.blessing",
       "referenceName": "Hashem Bless the People I Love",
       "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "6.49",
+      "familyShareable": true,
+      "internalID": "6770000115",
+      "localizations": [
+        {
+          "description": "Unlocks every story and prayer. One-time purchase.",
+          "displayName": "Everything Pack",
+          "locale": "en_US"
+        },
+        {
+          "description": "Desbloquea cada historia y oración. Compra única.",
+          "displayName": "Paquete Completo",
+          "locale": "es_MX"
+        },
+        {
+          "description": "כל הסיפורים והתפילות. רכישה חד-פעמית.",
+          "displayName": "החבילה המלאה",
+          "locale": "he"
+        }
+      ],
+      "productID": "com.dancruz.torahstorypals.bundle.everything",
+      "referenceName": "Everything Pack",
+      "type": "NonConsumable"
     }
   ],
   "settings": {
