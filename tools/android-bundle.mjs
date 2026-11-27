@@ -25,6 +25,9 @@ const bundle = join(android, 'app', 'build', 'outputs', 'bundle', 'release', 'ap
 const gradle = await readFile(join(android, 'app', 'build.gradle'), 'utf8');
 const versionCode = gradle.match(/versionCode\s+(\d+)/)?.[1];
 const versionName = gradle.match(/versionName\s+"([^"]+)"/)?.[1];
+// The shop is on only when the build was given the Play licensing key (android/app/build.gradle).
+const keyFile = await readFile(join(android, 'app', 'play-licensing-key.txt'), 'utf8').catch(() => '');
+const shopOn = !!(process.env.BSP_PLAY_LICENSING_KEY || keyFile).trim();
 const megabytes = ((await stat(bundle)).size / 1e6).toFixed(1);
 // A signed bundle carries a signature block (META-INF/<alias>.RSA or .EC). File names sit in the zip
 // as plain text, so looking for one is enough to tell.
@@ -32,6 +35,9 @@ const signed = /META-INF\/[\w.-]+\.(RSA|EC|DSA)/.test((await readFile(bundle)).t
 
 console.log(`\nBundle: ${bundle}`);
 console.log(`Version ${versionName} (versionCode ${versionCode}), ${megabytes} MB.`);
+console.log(shopOn
+  ? 'SHOP ON: this build locks the paid stories and sells them through Google Play.'
+  : 'SHOP OFF: no Play licensing key, so this build sells nothing and EVERY STORY IS FREE. Internal testing only (docs/google-play.md).');
 if (signed) {
   console.log('Signed. Google Play takes each versionCode once: raise it in android/app/build.gradle before the next upload.');
 } else {

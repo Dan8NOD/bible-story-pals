@@ -1,8 +1,8 @@
 // Voice-guided prayers a family says together. The voice reads a line, then waits
 // while everyone says it back ("echo" steps). Guide steps are spoken only.
 // Scenes use the same [art, x, y, scale, opts, anim] items as story pages.
-// In the App Store build the first two are free and the third is a one-time
-// purchase at the same price as one story (see unlocks.js).
+// In the store builds the first two are free and the third is a one-time
+// purchase (see unlocks.js and docs/product-sheet.md).
 
 const PARENT = { robe: '#7986cb', sash: '#ffd54f', hair: '#4e342e', beard: '#4e342e', arms: 'pray' };
 const MAMA = { scarf: '#ab47bc', robe: '#ce93d8', arms: 'pray' };
