@@ -1,6 +1,6 @@
 # App Store listing: Bilingual Bible Story Pals 1.0 (draft for Dan to check)
 
-Replaces the earlier draft, which described a free 1.0 with no in-app purchases. Version 1.0 now has **3 free stories and 2 free prayers, then 16 one-time purchases**: 12 stories and 1 prayer at $1.00 each, 2 worlds at $2.00, and the Everything Pack at $6.49.
+Replaces the earlier draft, which described a free 1.0 with no in-app purchases. Version 1.0 is **free to download with 3 free stories and 2 free prayers, then 4 one-time purchases** (proposed 2026-11-26, see `docs/product-sheet.md` in the free-to-play PR; Dan has not approved the prices yet): all of Friendship Sea $2.99, all of Story Island $4.99, the third prayer $2.00, and the Everything Pack $6.49. Single stories ($1.00) are no longer offered.
 
 Paste these into App Store Connect. This repo is public, so keep your reviewer phone number out of this file and enter it only in App Store Connect.
 
@@ -14,7 +14,7 @@ Paste these into App Store Connect. This repo is public, so keep your reviewer p
 
 ## Before submitting
 
-- **Submit build 9 or later.** Build 9 is the first with the Everything Pack, and the first where every line is recorded. The review notes below describe both. Build 4 also lacks the Nov 1 fixes from `main`, and on its code the regression test fails with "memory game got stuck after fast taps". Build 5 has those fixes and shows the full privacy policy in the grown-ups area, as guideline 5.1.1(i) asks, with no link out of the app.
+- **Submit build 10 or later.** Build 10 is the first with the free-to-play prices and without single-story purchases (build 9 still offers stories at $1). Build 9 was the first with the Everything Pack, and the first where every line is recorded. The review notes below describe both. Build 4 also lacks the Nov 1 fixes from `main`, and on its code the regression test fails with "memory game got stuck after fast taps". Build 5 has those fixes and shows the full privacy policy in the grown-ups area, as guideline 5.1.1(i) asks, with no link out of the app.
 - **Publish the new pages first:** the live privacy page still says "No in-app purchases in version 1.0", and App Review will read it.
 
 ## App Information
@@ -68,7 +68,7 @@ Answering "Infrequent" for Cartoon or Fantasy Violence would make the app 9+. Ap
 
 **Promotional text:**
 ```
-Fifteen Bible stories read aloud in English, Spanish or both, for ages 3 to 6. The first 3 are free. No ads. Buy a story once and share it with your whole family.
+Fifteen Bible stories read aloud in English, Spanish or both, for ages 3 to 6. The first 3 are free. No ads. Buy once and share with your whole family.
 ```
 
 **Keywords:**
@@ -109,10 +109,10 @@ MADE FOR FAMILIES
 • A grown-ups area with Bible references for each story and tips for talking together
 
 THE FIRST 3 STORIES ARE FREE
-God Made the World, Noah's Big Boat and Baby Moses are free. A grown-up can unlock any other story, or everything left in a world, with a one-time in-app purchase. There are no subscriptions. Purchases sit behind a question for grown-ups and can be restored at any time.
+God Made the World, Noah's Big Boat and Baby Moses are free. A grown-up can unlock all of Story Island, all of Friendship Sea, or everything at once with a one-time in-app purchase. There are no subscriptions. Purchases sit behind a question for grown-ups and can be restored at any time.
 
 SHARE WITH THE ONES YOU LOVE
-Every purchase works with Apple's Family Sharing. Buy a story once, and you and up to five family members can enjoy it on your own devices at no extra cost. Be a giver: one gift of a story can reach every child in your family.
+Every purchase works with Apple's Family Sharing. Buy once, and you and up to five family members can enjoy it on your own devices at no extra cost. Be a giver: one gift of stories can reach every child in your family.
 
 SAFE BY DESIGN
 No ads. No accounts. No tracking. No data collected. Nothing your child does leaves the device.
@@ -169,10 +169,10 @@ HECHO PARA LAS FAMILIAS
 • Un área para adultos con las citas bíblicas de cada historia y consejos para conversar juntos
 
 LAS PRIMERAS 3 HISTORIAS SON GRATIS
-Dios Creó el Mundo, El Gran Barco de Noé y El Bebé Moisés son gratis. Un adulto puede desbloquear cualquier otra historia, o todas las que quedan en un mundo, con una sola compra dentro de la app. No hay suscripciones. Las compras están protegidas con una pregunta para adultos y se pueden restaurar en cualquier momento.
+Dios Creó el Mundo, El Gran Barco de Noé y El Bebé Moisés son gratis. Un adulto puede desbloquear toda la Isla de las Historias, todo el Mar de la Amistad, o todo de una vez con una sola compra dentro de la app. No hay suscripciones. Las compras están protegidas con una pregunta para adultos y se pueden restaurar en cualquier momento.
 
 COMPARTE CON QUIENES MÁS QUIERES
-Cada compra funciona con Compartir en familia de Apple. Compre una historia una sola vez, y usted y hasta cinco familiares pueden disfrutarla en sus propios dispositivos sin costo adicional. Sea generoso: el regalo de una historia puede llegar a cada niño de su familia.
+Cada compra funciona con Compartir en familia de Apple. Compre una sola vez, y usted y hasta cinco familiares pueden disfrutarlo en sus propios dispositivos sin costo adicional. Sea generoso: un regalo de historias puede llegar a cada niño de su familia.
 
 SEGURO DESDE EL PRINCIPIO
 Sin anuncios. Sin cuentas. Sin rastreo. No se recopilan datos. Nada de lo que hace su hijo sale del dispositivo.
@@ -204,7 +204,7 @@ God Made the World, Noah's Big Boat and Baby Moses open right away from the Stor
 
 IN-APP PURCHASES (all non-consumable, with Family Sharing on)
 1. Tap any stop with a padlock, for example David the Brave.
-2. "Time to ask a grown-up!" offers that story, every story left in that world, or the Everything Pack (every story and prayer).
+2. "Time to ask a grown-up!" offers every story left in that world, or the Everything Pack (every story and prayer).
 3. Choosing one opens the parental gate: a multiplication question written in words, such as "What is seven times four?", answered on a keypad. A wrong answer does not continue.
 4. The App Store sheet then appears, and the story opens after the purchase.
 
@@ -225,4 +225,13 @@ In Jesus Is Baptized, God the Father appears only as light and a voice, never as
 
 ## In-app purchases
 
-There are **16**: the 14 set up on Nov 7, plus `com.dancruz.biblestorypals.prayer.blessing` ($1.00) and `com.dancruz.biblestorypals.bundle.everything` ($6.49), which were added later. Check that both exist in App Store Connect like the others: English and Spanish (Mexico) names, 175 regions, a review screenshot, and Family Sharing on (Apple does not allow turning it off). Add all 16 to this version's submission, since a first purchase can only be reviewed with an app version. `ios/App/App/Unlocks.storekit` lists the same 16 for testing in Xcode.
+All 16 products exist in App Store Connect as Drafts (issue #25). **Only four are submitted with this version**, at these prices once Dan approves the product sheet:
+
+| Product ID (`com.dancruz.biblestorypals.` + …) | Price today in App Store Connect | Price to set |
+|---|---|---|
+| `world.sea` | $2.00 | $2.99 |
+| `world.island` | $2.00 | $4.99 |
+| `prayer.blessing` | $1.00 | $2.00 |
+| `bundle.everything` | $6.49 | $6.49 |
+
+The 12 `story.*` products ($1.00) stay as Drafts: do not submit them and do not delete them, because a product id can never be reused. Check the four have English and Spanish (Mexico) names, 175 regions, Family Sharing on (Apple does not allow turning it off), and a **new** review screenshot: the unlock screen no longer has a "This story" button. A first purchase can only be reviewed with an app version, so add the four to this version's submission. `ios/App/App/Unlocks.storekit` lists all 16 for testing in Xcode.
