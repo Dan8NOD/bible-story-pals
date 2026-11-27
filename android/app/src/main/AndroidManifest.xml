@@ -41,4 +41,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Google Play Billing. Play Console only lets products be created once a build with this has been uploaded. -->
+    <uses-permission android:name="com.android.vending.BILLING" />
 </manifest>

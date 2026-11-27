@@ -37,11 +37,11 @@ back, then moves on by itself. Pause holds the current step, the arrows step thr
 line over. Every step has its own animated scene. With narration off, each line waits long enough for a grown-up to
 read it aloud.
 
-| Prayer | Passage | App Store build |
+| Prayer | Passage | Store builds |
 |---|---|---|
 | Thank You, God · Gracias, Dios | Psalm 100:4 | Free |
 | Goodnight, God · Buenas noches, Dios | Psalm 4:8 | Free |
-| God Bless the People I Love · Dios bendiga a quienes amo (includes a pause to say the names of people you love) | Numbers 6:24 | $1, the price of one story |
+| God Bless the People I Love · Dios bendiga a quienes amo (includes a pause to say the names of people you love) | Numbers 6:24 | $2.00 |
 
 The prayers are data in `js/prayers.js`. They don't earn stars, and on the website all three are open.
 
@@ -50,7 +50,7 @@ The prayers are data in `js/prayers.js`. They don't earn stars, and on the websi
 - **Three language modes:** English, Español, or **EN + ES**, which reads every page in both languages. That's great for bilingual homes and dual-language classrooms. On first launch it picks the device language.
 - **Read-aloud narration** uses the device's built-in text-to-speech (`es-MX`/`es-US` preferred for Spanish), so there are no audio files and the whole app is **under 250 KB**.
 - **Works offline** after the first visit (service worker). Installable as an app (PWA manifest + icons).
-- **No ads, no accounts, no tracking, no network calls.** Progress is stored only on the device. This makes COPPA / Google Play "Designed for Families" / Apple Kids Category review straightforward. The website is free. In the App Store build the first **3 stories are free**, then a grown-up can buy any story for **$1** or everything left in a world for **$2** (see below).
+- **No ads, no accounts, no tracking, no network calls.** Progress is stored only on the device. This makes COPPA / Google Play "Designed for Families" / Apple Kids Category review straightforward. The website is free. The store apps are free to download: the first **3 stories are free**, then a grown-up can buy a world's stories as a pack (**$2.99** or **$4.99**) or the **$6.49** Everything Pack (see below).
 - **Grown-ups area** sits behind a 3-second press-and-hold gate. It has narration and sound toggles, the language setting, Bible references for each story, parent tips, and a star reset.
 - Big touch targets, swipe between pages, honors "reduce motion", and works on phones (portrait and landscape), tablets, Chromebooks and desktops.
 - All art is hand-built SVG in `js/art.js`, with no emoji or stock images, so there are no licensing questions. The font (Baloo 2) is OFL-licensed and bundled.
@@ -98,24 +98,29 @@ voice) instead of the WebView's speech API, the Donate button stays hidden, and 
 `ios/App/App/PrivacyInfo.xcprivacy` declares no tracking and no data collected. `npm run icons` also redraws the
 1024×1024 app icon and the launch image from the game art.
 
-**Unlocking stories (App Store build only).** God Made the World, Noah and Baby Moses are free. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering that story, everything left in its world, or the **Everything Pack** ($6.49: every story and prayer, half of buying each one at $1). The grown-ups area sells the worlds and the pack too, and both screens can restore purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift` talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a reinstall, follow the family's Apple ID, and lock again after a refund. Ask to Buy approvals open the story as soon as they arrive. To try a purchase in the simulator without App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
+**Unlocking stories (store builds).** [docs/product-sheet.md](docs/product-sheet.md) is the product sheet: four one-time products from $2.00 to $6.49, the same ids on both stores. God Made the World, Noah and Baby Moses are free. A locked story shows a padlock on the map and opens to a "Time to ask a grown-up!" screen offering everything left in its world, or the **Everything Pack** ($6.49: every story and prayer). Single stories used to be $1 each; they are no longer offered (`SELL_SINGLE_STORIES` in `js/unlocks.js`), but a story someone already owns stays open. The grown-ups area sells the worlds and the pack too, and both screens can restore purchases. Buying sits behind a times-table question written in words and answered on a keypad, the kind of parental gate Apple's Kids Category asks for. `js/unlocks.js` holds the rules and `ios/App/App/UnlocksPlugin.swift` talks to StoreKit 2. What a family owns comes from the App Store's signed transactions, so purchases survive a reinstall, follow the family's Apple ID, and lock again after a refund. Ask to Buy approvals open the story as soon as they arrive. To try a purchase in the simulator without App Store Connect, run from Xcode: the shared `App` scheme uses `ios/App/App/Unlocks.storekit`.
 
-In App Store Connect: accept the Paid Apps agreement (Business), then under the app go to **Monetization → In-App Purchases → +** and create these 16 **Non-Consumable** products, each with English and Spanish display names and a review screenshot of the unlock screen. Submit them with the app version.
+In App Store Connect all 16 **Non-Consumable** products below already exist as Drafts (issue #25), at their old prices. Only the four on the product sheet are submitted with the app version, at the sheet's prices; the 12 single stories stay as Drafts and are never deleted, because a product id can't be reused.
 
 | Product ID (`com.dancruz.biblestorypals.` + …) | Unlocks | Price |
 |---|---|---|
-| `world.island` | Everything on Story Island (9 paid stories) | $2.00 |
-| `world.sea` | Everything on Friendship Sea (3 stories) | $2.00 |
-| `story.david`, `story.psalm23`, `story.jonah`, `story.daniel`, `story.nativity`, `story.baptism`, `story.storm`, `story.loaves`, `story.sheep` | One Story Island story | $1.00 |
-| `story.bigcatch`, `story.samaritan`, `story.zacchaeus` | One Friendship Sea story | $1.00 |
-| `prayer.blessing` | The voice-guided prayer God Bless the People I Love | $1.00 |
-| `bundle.everything` | Everything Pack: every story in both worlds and every prayer (half of the $13 they cost one by one) | $6.49 |
+| `world.island` | Everything on Story Island (9 paid stories) | $4.99 |
+| `world.sea` | Everything on Friendship Sea (3 stories) | $2.99 |
+| `story.david`, `story.psalm23`, `story.jonah`, `story.daniel`, `story.nativity`, `story.baptism`, `story.storm`, `story.loaves`, `story.sheep` | One Story Island story | Not offered (was $1.00) |
+| `story.bigcatch`, `story.samaritan`, `story.zacchaeus` | One Friendship Sea story | Not offered (was $1.00) |
+| `prayer.blessing` | The voice-guided prayer God Bless the People I Love | $2.00 |
+| `bundle.everything` | Everything Pack: every story in both worlds and every prayer ($9.98 bought separately) | $6.49 |
 
 The game shows whatever price the App Store reports, so the buttons always match the tier you pick.
 
 **Android (Google Play):** the Capacitor project lives in `android/` (package `com.dancruz.biblestorypals`,
-landscape only, version in `android/app/build.gradle`). The Android build has no purchases: every story and
-prayer is open. After changing the game:
+landscape only, version in `android/app/build.gradle`). It sells the same four products through Google Play Billing
+(`android/app/src/main/java/com/dancruz/biblestorypals/UnlocksPlugin.java`): every purchase is checked against the
+app's Play licensing key, a pending payment opens nothing, what a family owns is saved before the purchase is
+acknowledged, and it is read back from Google Play after a reinstall. **The shop is on only in a build that has the
+licensing key** (`android/app/play-licensing-key.txt`); without it nothing is locked and nothing is sold, and
+`npm run android:bundle` says which kind it built. The Google Play shop has not been tried with a real purchase yet.
+After changing the game:
 
 ```bash
 npm install
@@ -209,8 +214,10 @@ js/games.js           mini-game engine (collect / prompt / steer / memory / seek
 js/art.js             SVG characters, animals, props, backgrounds
 js/audio.js           narration (Web Speech) + synthesized sound effects (Web Audio)
 js/i18n.js, store.js  UI words, settings & progress
-js/unlocks.js         App Store build: 3 free stories, then $1 a story or $2 a world; 2 free prayers, then $1 a prayer; $6.49 Everything Pack
-ios/                  Capacitor iOS app (UnlocksPlugin.swift sells stories and worlds)
+js/unlocks.js         store builds: 3 free stories and 2 free prayers, then world packs, the third prayer and the $6.49 Everything Pack
+docs/product-sheet.md the products and prices, the same on both stores
+ios/                  Capacitor iOS app (UnlocksPlugin.swift sells them with StoreKit 2)
+android/              Capacitor Android app (UnlocksPlugin.java sells them with Google Play Billing)
 sw.js, manifest.webmanifest, icons/   offline + install
 tests/play-through.mjs                end-to-end test
 tools/make-icons.mjs                  regenerates the app icons from the art

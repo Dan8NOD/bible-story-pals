@@ -1,6 +1,7 @@
-// What's open in the App Store build: three free stories, then $1 a story or $2 a world,
-// bought by a grown-up behind a times-table gate. Runs against a stand-in for the native
-// Unlocks plugin, so no App Store is involved. The website stays free.
+// What's open in the store builds: three free stories, then a world's stories as a pack or the
+// Everything Pack, bought by a grown-up behind a times-table gate (docs/product-sheet.md).
+// Runs against a stand-in for the native Unlocks plugin, so no store is involved. The website
+// stays free.
 // Run: node tests/unlocks.test.mjs
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -25,9 +26,9 @@ const browser = await chromium.launch();
 const errors = [];
 const P = 'com.dancruz.biblestorypals';
 
-// shop: { owned, buy: 'ok' | 'pending' | 'cancel' | 'fail' }, or null for the website.
-async function open(hash, shop = {}, saved = {}) {
-  const page = await browser.newPage({ viewport: { width: 1180, height: 760 } });
+// shop: { owned, buy: 'ok' | 'pending' | 'cancel' | 'fail', platform: 'ios' | 'android' }, or null for the website.
+async function open(hash, shop = {}, saved = {}, viewport = { width: 1180, height: 760 }) {
+  const page = await browser.newPage({ viewport });
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.addInitScript(([shop, saved]) => {
     if (!sessionStorage.getItem('seeded')) {
@@ -38,11 +39,12 @@ async function open(hash, shop = {}, saved = {}) {
     window.__shop = { calls: [], owned: shop.owned || [], buy: shop.buy || 'ok' };
     window.Capacitor = {
       isNativePlatform: () => true,
+      getPlatform: () => shop.platform || 'ios',
       PluginHeaders: [{ name: 'Unlocks', methods: ['status', 'products', 'buy', 'restore'].map((name) => ({ name, rtype: 'promise' })) }],
       nativePromise: async (plugin, method, options) => {
         const s = window.__shop;
         s.calls.push({ method, ...options });
-        if (method === 'products') return { prices: Object.fromEntries(options.ids.map((id) => [id, id.includes('.world.') ? '$1.99' : id.includes('.bundle.') ? '$6.49' : '$0.99'])) };
+        if (method === 'products') return { prices: Object.fromEntries(options.ids.map((id) => [id, { 'world.island': '$4.99', 'world.sea': '$2.99', 'bundle.everything': '$6.49' }[id.split('.').slice(3).join('.')] || '$2.00'])) };
         if (method === 'buy') {
           if (s.buy === 'pending') return { pending: true };
           if (s.buy === 'cancel') return { cancelled: true };
@@ -81,68 +83,64 @@ await page.click('.stop[data-id="noah"]');
 await page.waitForSelector('.caption');
 await page.close();
 
-// 2. A locked story asks for a grown-up with both prices. The gate guards the purchase, and $1 opens that one story only.
+// 2. A locked story asks for a grown-up and offers its world as a pack. Single stories are not
+// sold. The gate guards the purchase, and the pack opens that world only.
 page = await open('#/');
 await page.click('.stop[data-id="daniel"]');
 await page.waitForSelector('.unlock-wall');
-await page.waitForFunction(() => /\$0\.99/.test(document.querySelector('[data-act=story]').textContent));
-assert.match(await page.textContent('[data-act=world]'), /All 9 stories left in Story Island · \$1\.99/);
-await page.click('[data-act=story]');
+await page.waitForFunction(() => /\$4\.99/.test(document.querySelector('[data-act=world]').textContent));
+assert.match(await page.textContent('[data-act=world]'), /All 9 stories left in Story Island · \$4\.99/);
+assert.equal(await page.$('[data-act=story]'), null, 'single stories are below the $2 floor and are not offered');
+assert.deepEqual(await page.evaluate(() => window.__shop.calls.filter((c) => c.method === 'products').flatMap((c) => c.ids).filter((id) => id.includes('.story.'))), [], 'no single-story price is asked for');
+await page.click('[data-act=world]');
 await page.click('.keypad [data-act=cancel]');
 assert.equal(await page.$('.gate'), null, 'the gate can be closed');
 assert.deepEqual(await bought(page), [], 'closing the gate must not buy');
-await page.click('[data-act=story]');
+await page.click('[data-act=world]');
 await solveGate(page, true);
 await page.waitForSelector('.caption');
 assert.equal(await page.evaluate(() => location.hash), '#/story/daniel/0');
-assert.deepEqual(await bought(page), [`${P}.story.daniel`]);
-await page.goto(`${base}#/story/jonah/0`);
-await page.waitForSelector('.unlock-wall');
-await page.close();
-
-// 3. $2 opens everything left in that world, and nothing in the other one.
-page = await open('#/story/david/0');
-await page.waitForSelector('.unlock-wall');
-await page.click('[data-act=world]');
-await solveGate(page);
-await page.waitForSelector('.caption');
 assert.deepEqual(await bought(page), [`${P}.world.island`]);
 await page.goto(`${base}#/story/sheep/0`);
 await page.waitForSelector('.caption');
+
+// 3. The island pack opens nothing in the other world, which has its own pack.
 await page.goto(`${base}#/story/samaritan/0`);
 await page.waitForSelector('.unlock-wall');
-assert.match(await page.textContent('[data-act=world]'), /All 3 stories left in Friendship Sea/);
+await page.waitForFunction(() => /All 3 stories left in Friendship Sea · \$2\.99/.test(document.querySelector('[data-act=world]').textContent));
 await page.close();
 
-// 4. World 2 has exactly three ports, all locked; the world price drops out when only one story is left.
+// 4. World 2 has exactly three ports. A single story bought before they were withdrawn stays
+// open (product ids are permanent), and the pack is still offered for the one that is left.
 page = await open('#/', { owned: [`${P}.story.bigcatch`, `${P}.story.samaritan`] }, { world: 'sea' });
 await page.waitForSelector('.map.sea');
 assert.deepEqual(await page.$$eval('.stop', (s) => s.map((x) => x.dataset.id)), ['bigcatch', 'samaritan', 'zacchaeus']);
 assert.equal(await page.locator('.stop.locked').count(), 1);
 await page.click('.stop[data-id="zacchaeus"]');
 await page.waitForSelector('.unlock-wall');
-assert.equal(await page.$('[data-act=world]'), null);
+assert.match(await page.textContent('[data-act=world]'), /The story left in Friendship Sea/);
 await page.close();
 
-// 5. Ask to Buy: the story opens by itself once a parent approves.
+// 5. Ask to Buy: the story opens by itself once a parent approves, and not before.
 page = await open('#/story/jonah/0', { buy: 'pending' });
-await page.click('[data-act=story]');
+await page.click('[data-act=world]');
 await solveGate(page);
 await page.waitForFunction(() => /Waiting for a parent/.test(document.querySelector('.unlock-note').textContent));
-await page.evaluate((id) => { window.__shop.owned = [id]; }, `${P}.story.jonah`);
+assert.ok(await page.$('.unlock-wall'), 'a pending purchase opens nothing');
+await page.evaluate((id) => { window.__shop.owned = [id]; }, `${P}.world.island`);
 await page.waitForSelector('.caption', { timeout: 8000 });
 await page.close();
 
 // 6. A cancelled sheet says nothing; a store that can't sell says so.
 page = await open('#/story/jonah/0', { buy: 'cancel' });
-await page.click('[data-act=story]');
+await page.click('[data-act=world]');
 await solveGate(page);
 await page.waitForFunction(() => window.__shop.calls.some((c) => c.method === 'buy'));
 assert.equal((await page.textContent('.unlock-note')).trim(), '');
 await page.evaluate(() => { window.__shop.buy = 'fail'; });
-await page.click('[data-act=story]');
+await page.click('[data-act=world]');
 await solveGate(page);
-await page.waitForFunction(() => /isn’t available/.test(document.querySelector('.unlock-note').textContent));
+await page.waitForFunction(() => /The App Store isn’t available/.test(document.querySelector('.unlock-note').textContent));
 assert.ok(await page.$('.unlock-wall'));
 await page.close();
 
@@ -178,7 +176,7 @@ await page.close();
 page = await open('#/story/jonah/0');
 await page.waitForSelector('.unlock-wall [data-act=bundle]');
 await page.waitForFunction(() => /Everything Pack: every story and prayer · \$6\.49/.test(document.querySelector('[data-act=bundle]').textContent));
-assert.match(await page.textContent('.unlock-wall .bundle-note'), /half of buying every story and prayer one by one/);
+assert.match(await page.textContent('.unlock-wall .bundle-note'), /both worlds and every prayer, for less than buying them separately/);
 await page.click('[data-act=bundle]');
 await solveGate(page);
 await page.waitForSelector('.caption');
@@ -213,7 +211,44 @@ await page.waitForFunction(() => /Friendship Sea: 3 of 3/.test(document.querySel
 assert.equal(await page.$('.world-offers [data-bundle]'), null);
 await page.close();
 
-// 10. The website has nothing to buy with, so nothing is ever locked.
+// 10. Google Play build: the same products, worded for Google Play. A payment Google is still
+// waiting for (cash, pay later) opens nothing until it goes through.
+page = await open('#/story/jonah/0', { platform: 'android', buy: 'pending' });
+await page.waitForSelector('.unlock-wall [data-act=bundle]');
+await page.click('[data-act=world]');
+await solveGate(page);
+await page.waitForFunction(() => /Google Play is still waiting for this payment\. Nothing is unlocked yet/.test(document.querySelector('.unlock-note').textContent));
+assert.ok(await page.$('.unlock-wall'), 'a pending Google Play payment opens nothing');
+assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('bsp:v1')).owned || []), [], 'a pending payment is not saved as owned');
+await page.evaluate(() => { window.__shop.buy = 'fail'; });
+await page.click('[data-act=world]');
+await solveGate(page);
+await page.waitForFunction(() => /Google Play isn’t available/.test(document.querySelector('.unlock-note').textContent));
+await page.close();
+page = await open('#/parents', { platform: 'android' });
+await page.locator('.gate .hold').dispatchEvent('pointerdown');
+await page.waitForSelector('.world-offers [data-world=sea]');
+assert.match(await page.textContent('.parents'), /one-time purchases made by a grown-up through Google Play/);
+await page.locator('.policy summary').click();
+assert.match(await page.textContent('.policy'), /collects no data[\s\S]*Google handles every purchase[\s\S]*support\.google\.com\/googleplay/);
+assert.doesNotMatch(await page.textContent('.parents'), /Apple|App Store|Family Sharing/);
+await page.close();
+
+// 11. On phones the buy buttons sit fully on screen without scrolling, in both languages and
+// both stores (Spanish and "Google Play" make the longest lines).
+for (const [width, height] of [[667, 375], [832, 384], [932, 430]]) for (const lang of ['en', 'es']) for (const platform of ['ios', 'android']) for (const hash of ['#/story/jonah/0', '#/pray/blessing/0']) {
+  page = await open(hash, { platform }, { lang }, { width, height });
+  await page.waitForSelector('.unlock-wall .big-btn');
+  await page.waitForTimeout(150);
+  const off = await page.evaluate(() => [...document.querySelectorAll('.unlock-wall .big-btn, .unlock-wall [data-act=home]')]
+    .map((b) => ({ what: b.dataset.act, ...b.getBoundingClientRect().toJSON() }))
+    .filter((b) => b.left < 0 || b.top < 0 || b.right > innerWidth + 0.5 || b.bottom > innerHeight + 0.5)
+    .map((b) => `${b.what} ${Math.round(b.left)},${Math.round(b.top)}-${Math.round(b.right)},${Math.round(b.bottom)}`));
+  assert.deepEqual(off, [], `buy buttons off screen at ${width}x${height} ${lang} ${platform} ${hash}`);
+  await page.close();
+}
+
+// 11. The website has nothing to buy with, so nothing is ever locked.
 page = await open('#/', null);
 await page.waitForSelector('.stop');
 assert.equal(await page.locator('.stop.locked').count(), 0);
@@ -225,4 +260,4 @@ await page.close();
 assert.deepEqual(errors, []);
 await browser.close();
 server.close();
-console.log('✓ unlocks: 3 free stories, $1 a story, $2 a world, $6.49 Everything Pack, grown-up gate, Ask to Buy, restore, refunds, website stays free');
+console.log('✓ unlocks: 3 free stories, $4.99 and $2.99 world packs, $6.49 Everything Pack, no single stories, grown-up gate, Ask to Buy, pending Google Play payments, restore, refunds, website stays free');

@@ -5,7 +5,7 @@ import { store, langs } from './store.js';
 import { UI, PRAISE, COUNT, pick } from './i18n.js';
 import { startGame } from './games.js';
 import { DONATE_URL } from './config.js';
-import { paywalled, isOpen, lockedIn, storyProduct, worldProduct, priceOf, refresh, loadPrices, buy, restore, FREE_STORIES, prayerProduct, prayerOpen, bundleProduct, offerBundle } from './unlocks.js';
+import { paywalled, isOpen, lockedIn, storyProduct, worldProduct, priceOf, refresh, loadPrices, buy, restore, FREE_STORIES, prayerProduct, prayerOpen, bundleProduct, offerBundle, STORE, SELL_SINGLE_STORIES } from './unlocks.js';
 import { PRAYERS, FREE_PRAYERS, prayerById } from './prayers.js';
 
 const app = document.getElementById('app');
@@ -649,19 +649,26 @@ function amenScreen(prayer) {
   speak(prayer.closing);
 }
 
-/* ---------------- unlocking stories (App Store build) ---------------- */
+/* ---------------- unlocking stories (App Store and Google Play builds) ---------------- */
+// The store that sells here, as each language names it.
+const SHOP = { apple: { en: 'the App Store', es: 'el App Store' }, play: { en: 'Google Play', es: 'Google Play' } }[STORE];
+const Shop = { en: SHOP.en.replace(/^t/, 'T'), es: SHOP.es.replace(/^e/, 'E') };
 const BUY_TEXT = {
   en: {
-    wall: (n) => `The first ${n} stories are free. Grown-ups can unlock this one, or every story left in this world. It's a one-time purchase and it's yours to keep.`,
+    wall: (n) => (SELL_SINGLE_STORIES
+      ? `The first ${n} stories are free. Grown-ups can unlock this one, or every story left in this world. It's a one-time purchase and it's yours to keep.`
+      : `The first ${n} stories are free. Grown-ups can unlock every story left in this world, or everything at once. It's a one-time purchase and it's yours to keep.`),
     story: (p) => `This story · ${p}`,
-    prayerWall: (n) => `${n} prayers are free. Grown-ups can unlock this one for the same price as one story. It's a one-time purchase and it's yours to keep.`,
+    prayerWall: (n) => `${n} prayers are free. Grown-ups can unlock this one, or everything at once. It's a one-time purchase and it's yours to keep.`,
     prayer: (p) => `This prayer · ${p}`,
     bundle: (p) => `Everything Pack: every story and prayer · ${p}`,
-    bundleNote: 'The Everything Pack costs half of buying every story and prayer one by one.',
+    bundleNote: 'The Everything Pack opens both worlds and every prayer, for less than buying them separately.',
     world: (name, n, p) => `${n === 1 ? 'The story' : `All ${n} stories`} left in ${name} · ${p}`,
-    buying: 'Opening the App Store…',
-    pending: 'Waiting for a parent to approve the purchase. The story opens as soon as it’s approved.',
-    failed: 'The App Store isn’t available right now. Please try again later.',
+    buying: `Opening ${SHOP.en}…`,
+    pending: STORE === 'play'
+      ? 'Google Play is still waiting for this payment. Nothing is unlocked yet: it opens here as soon as the payment goes through.'
+      : 'Waiting for a parent to approve the purchase. The story opens as soon as it’s approved.',
+    failed: `${Shop.en} isn’t available right now. Please try again later.`,
     restore: 'Restore purchases',
     restored: 'Purchases checked.',
     title: 'Stories',
@@ -673,16 +680,20 @@ const BUY_TEXT = {
     cancel: 'Cancel',
   },
   es: {
-    wall: (n) => `Las primeras ${n} historias son gratis. Los adultos pueden desbloquear esta, o todas las que quedan en este mundo. Es una sola compra y es suya para siempre.`,
+    wall: (n) => (SELL_SINGLE_STORIES
+      ? `Las primeras ${n} historias son gratis. Los adultos pueden desbloquear esta, o todas las que quedan en este mundo. Es una sola compra y es suya para siempre.`
+      : `Las primeras ${n} historias son gratis. Los adultos pueden desbloquear todas las que quedan en este mundo, o todo de una vez. Es una sola compra y es suya para siempre.`),
     story: (p) => `Esta historia · ${p}`,
-    prayerWall: (n) => `${n} oraciones son gratis. Los adultos pueden desbloquear esta por el mismo precio que una historia. Es una sola compra y es suya para siempre.`,
+    prayerWall: (n) => `${n} oraciones son gratis. Los adultos pueden desbloquear esta, o todo de una vez. Es una sola compra y es suya para siempre.`,
     prayer: (p) => `Esta oración · ${p}`,
     bundle: (p) => `Paquete Completo: todas las historias y oraciones · ${p}`,
-    bundleNote: 'El Paquete Completo cuesta la mitad de comprar cada historia y oración por separado.',
+    bundleNote: 'El Paquete Completo abre los dos mundos y todas las oraciones, por menos que comprarlos por separado.',
     world: (name, n, p) => `${n === 1 ? 'La historia que queda' : `Las ${n} historias que quedan`} en ${name} · ${p}`,
-    buying: 'Abriendo el App Store…',
-    pending: 'Esperando que un padre apruebe la compra. La historia se abre en cuanto se apruebe.',
-    failed: 'El App Store no está disponible ahora. Inténtelo más tarde.',
+    buying: `Abriendo ${SHOP.es}…`,
+    pending: STORE === 'play'
+      ? 'Google Play todavía espera este pago. Aún no se desbloquea nada: se abrirá aquí en cuanto el pago se complete.'
+      : 'Esperando que un padre apruebe la compra. La historia se abre en cuanto se apruebe.',
+    failed: `${Shop.es} no está disponible ahora. Inténtelo más tarde.`,
     restore: 'Restaurar compras',
     restored: 'Compras revisadas.',
     title: 'Historias',
@@ -725,15 +736,15 @@ function unlockScreen(story) {
   const P = BUY_TEXT[langs()[0]];
   const world = worldOf(story.id);
   const left = lockedIn(world).length;
-  // With one story left, the world price would only cost more.
-  const offerWorld = left > 1;
+  // While single stories are sold, a world with one story left would only cost more.
+  const offerWorld = left > (SELL_SINGLE_STORIES ? 1 : 0);
   app.innerHTML = `<section class="unlock-wall">
     <svg class="unlock-art" viewBox="-62 -62 124 124" aria-hidden="true"><circle r="58" fill="#ffd54f" stroke="${INK}" stroke-width="4"/>${place('sheep', 0, -2, 0.95, {}, 'bob')}</svg>
     <h2>${titleHTML(UI.askGrownup)}</h2>
     <p>${esc(P.wall(FREE_STORIES.length))}</p>
     <div class="row">
       <button class="icon-btn" data-act="home" aria-label="${esc(t(UI.home))}">${ICON.home}</button>
-      <button class="big-btn" data-act="story">${ICON.lock}<span></span></button>
+      ${SELL_SINGLE_STORIES ? `<button class="big-btn" data-act="story">${ICON.lock}<span></span></button>` : ''}
       ${offerWorld ? `<button class="big-btn green" data-act="world">${ICON.lock}<span></span></button>` : ''}
       ${offerBundle() ? `<button class="big-btn bundle" data-act="bundle">${ICON.lock}<span></span></button>` : ''}
     </div>
@@ -747,7 +758,7 @@ function unlockScreen(story) {
   const note = app.querySelector('.unlock-note');
   const btns = [storyBtn, worldBtn, bundleBtn].filter(Boolean);
   const showPrices = () => {
-    storyBtn.querySelector('span').textContent = P.story(priceOf(storyProduct(story.id)));
+    if (storyBtn) storyBtn.querySelector('span').textContent = P.story(priceOf(storyProduct(story.id)));
     if (worldBtn) worldBtn.querySelector('span').textContent = P.world(t(world.title), left, priceOf(worldProduct(world.id)));
     if (bundleBtn) bundleBtn.querySelector('span').textContent = P.bundle(priceOf(bundleProduct));
   };
@@ -756,7 +767,7 @@ function unlockScreen(story) {
   loadPrices().then(() => { if (gen === generation) showPrices(); });
   const paid = () => isOpen(story.id);
   app.querySelector('[data-act=home]').addEventListener('click', () => go('#/'));
-  storyBtn.addEventListener('click', () => unlockFlow(storyProduct(story.id), btns, note, paid, route));
+  storyBtn?.addEventListener('click', () => unlockFlow(storyProduct(story.id), btns, note, paid, route));
   worldBtn?.addEventListener('click', () => unlockFlow(worldProduct(world.id), btns, note, paid, route));
   bundleBtn?.addEventListener('click', () => unlockFlow(bundleProduct, btns, note, paid, route));
   app.querySelector('[data-act=restore]').addEventListener('click', async () => {
@@ -915,7 +926,7 @@ const PARENT_TEXT = {
     title: 'For grown-ups',
     about: 'Bible Story Pals is a bilingual (English & Spanish) Bible story game for children ages 3–6. Every story is read aloud, so no reading is needed. Each story ends with a gentle mini-game that practices counting, colors, numbers and new words.',
     privacy: 'Privacy: no ads, no in-app purchases, no accounts, no tracking. Nothing your child does leaves this device. After the first visit it works offline.',
-    privacyApp: 'Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The first stories and two voice-guided prayers are free. Others are one-time purchases made by a grown-up through the App Store.',
+    privacyApp: `Privacy: no ads, no accounts, no tracking. Nothing your child does leaves this device, and it works offline. The first stories and two voice-guided prayers are free. Others are one-time purchases made by a grown-up through ${SHOP.en}.`,
     privacyAppFree: 'Privacy: no ads, no purchases, no accounts, no tracking. Nothing your child does leaves this device, and it works offline.',
     supportTitle: 'Support Bible Story Pals',
     support: 'This game is free with no ads. If it blesses your family, a gift helps us make more stories.',
@@ -935,7 +946,7 @@ const PARENT_TEXT = {
     title: 'Para adultos',
     about: 'Amiguitos de la Biblia es un juego bilingüe (español e inglés) de historias bíblicas para niños de 3 a 6 años. Todas las historias se leen en voz alta, así que no hace falta saber leer. Cada historia termina con un minijuego que practica contar, los colores, los números y palabras nuevas.',
     privacy: 'Privacidad: sin anuncios, sin compras dentro de la app, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo. Después de la primera visita funciona sin internet.',
-    privacyApp: 'Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. Las primeras historias y dos oraciones guiadas son gratis. Las demás son compras únicas que hace un adulto en el App Store.',
+    privacyApp: `Privacidad: sin anuncios, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet. Las primeras historias y dos oraciones guiadas son gratis. Las demás son compras únicas que hace un adulto en ${SHOP.es}.`,
     privacyAppFree: 'Privacidad: sin anuncios, sin compras, sin cuentas y sin rastreo. Nada de lo que hace su hijo sale de este dispositivo, y funciona sin internet.',
     supportTitle: 'Apoye a Amiguitos de la Biblia',
     support: 'Este juego es gratis y sin anuncios. Si bendice a su familia, una ofrenda nos ayuda a crear más historias.',
@@ -968,10 +979,14 @@ const POLICY = {
         'Stories play offline. Nothing your child does in the game is sent anywhere.',
       ]],
       ['In-app purchases', 'paid', [
-        "The first three stories and two voice-guided prayers are free. A grown-up can buy other stories and prayers through Apple's App Store, after answering a question meant for grown-ups.",
-        "Apple handles every purchase, under Apple's privacy policy (apple.com/legal/privacy). We never see your name, Apple Account or payment details. Apple gives us sales totals that don't identify you.",
-        'To show prices and check what your family owns, the app asks the App Store. These requests go only to Apple, and the app adds no information about your child to them.',
-        'What you buy stays with your Apple Account, so you can restore it after deleting the app. With Apple\'s Family Sharing, people in your family group can use it too; Apple manages that group, and we never see who is in it. For a refund, ask Apple at reportaproblem.apple.com.',
+        { apple: "The first three stories and two voice-guided prayers are free. A grown-up can buy other stories and prayers through Apple's App Store, after answering a question meant for grown-ups.",
+          play: 'The first three stories and two voice-guided prayers are free. A grown-up can buy other stories and prayers through Google Play, after answering a question meant for grown-ups.' },
+        { apple: "Apple handles every purchase, under Apple's privacy policy (apple.com/legal/privacy). We never see your name, Apple Account or payment details. Apple gives us sales totals that don't identify you.",
+          play: "Google handles every purchase, under Google's privacy policy (policies.google.com/privacy). We never see your name, Google Account or payment details. Google gives us sales totals that don't identify you." },
+        { apple: 'To show prices and check what your family owns, the app asks the App Store. These requests go only to Apple, and the app adds no information about your child to them.',
+          play: 'To show prices and check what your family owns, the app asks Google Play. These requests go only to Google, and the app adds no information about your child to them.' },
+        { apple: 'What you buy stays with your Apple Account, so you can restore it after deleting the app. With Apple\'s Family Sharing, people in your family group can use it too; Apple manages that group, and we never see who is in it. For a refund, ask Apple at reportaproblem.apple.com.',
+          play: 'What you buy stays with your Google Account, so you can restore it after deleting the app. For a refund, ask Google at support.google.com/googleplay.' },
       ]],
       ['Purchases', 'free', [
         'This version of the app has no purchases. Every story and prayer is included.',
@@ -998,10 +1013,14 @@ const POLICY = {
         'Las historias funcionan sin internet. Nada de lo que hace su hijo en el juego se envía a ningún lugar.',
       ]],
       ['Compras dentro de la app', 'paid', [
-        'Las primeras tres historias y dos oraciones guiadas son gratis. Un adulto puede comprar otras historias y oraciones en el App Store de Apple, después de responder una pregunta para adultos.',
-        'Apple se encarga de cada compra, según su política de privacidad (apple.com/legal/privacy). Nunca vemos su nombre, su Cuenta de Apple ni sus datos de pago. Apple nos da totales de ventas que no lo identifican.',
-        'Para mostrar los precios y revisar lo que su familia ya tiene, la app le pregunta al App Store. Estas solicitudes van solo a Apple, y la app no les agrega información sobre su hijo.',
-        'Lo que compra queda en su Cuenta de Apple, así que puede restaurarlo después de borrar la app. Con Compartir en familia de Apple, las personas de su grupo familiar también pueden usarlo; Apple administra ese grupo y nunca vemos quién lo forma. Para pedir un reembolso, escriba a Apple en reportaproblem.apple.com.',
+        { apple: 'Las primeras tres historias y dos oraciones guiadas son gratis. Un adulto puede comprar otras historias y oraciones en el App Store de Apple, después de responder una pregunta para adultos.',
+          play: 'Las primeras tres historias y dos oraciones guiadas son gratis. Un adulto puede comprar otras historias y oraciones en Google Play, después de responder una pregunta para adultos.' },
+        { apple: 'Apple se encarga de cada compra, según su política de privacidad (apple.com/legal/privacy). Nunca vemos su nombre, su Cuenta de Apple ni sus datos de pago. Apple nos da totales de ventas que no lo identifican.',
+          play: 'Google se encarga de cada compra, según su política de privacidad (policies.google.com/privacy). Nunca vemos su nombre, su Cuenta de Google ni sus datos de pago. Google nos da totales de ventas que no lo identifican.' },
+        { apple: 'Para mostrar los precios y revisar lo que su familia ya tiene, la app le pregunta al App Store. Estas solicitudes van solo a Apple, y la app no les agrega información sobre su hijo.',
+          play: 'Para mostrar los precios y revisar lo que su familia ya tiene, la app le pregunta a Google Play. Estas solicitudes van solo a Google, y la app no les agrega información sobre su hijo.' },
+        { apple: 'Lo que compra queda en su Cuenta de Apple, así que puede restaurarlo después de borrar la app. Con Compartir en familia de Apple, las personas de su grupo familiar también pueden usarlo; Apple administra ese grupo y nunca vemos quién lo forma. Para pedir un reembolso, escriba a Apple en reportaproblem.apple.com.',
+          play: 'Lo que compra queda en su Cuenta de Google, así que puede restaurarlo después de borrar la app. Para pedir un reembolso, escriba a Google en support.google.com/googleplay.' },
       ]],
       ['Compras', 'free', [
         'Esta versión de la app no tiene compras. Incluye todas las historias y oraciones.',
@@ -1017,14 +1036,15 @@ const POLICY = {
   },
 };
 
-// A section or line marked 'paid'/'free' applies only to the build with (iOS) or without (Android) purchases.
+// A section or line marked 'paid'/'free' applies only to a build with or without purchases; a line
+// marked 'apple'/'play' is worded for that store.
 const policyHtml = () => langs().map((l) => {
   const p = POLICY[l];
   const build = paywalled ? 'paid' : 'free';
   const sections = p.sections
     .map((s) => (s.length === 3 ? s : [s[0], null, s[1]]))
     .filter(([, only]) => !only || only === build)
-    .map(([h, , items]) => [h, items.map((x) => (typeof x === 'string' ? x : x[build]))]);
+    .map(([h, , items]) => [h, items.map((x) => (typeof x === 'string' ? x : x[build] ?? x[STORE]))]);
   return `<details class="policy" lang="${l}"><summary>${esc(p.title)}</summary>
     <p class="policy-date">${esc(p.effective)}</p>
     <p><strong>${esc(p.intro)}</strong></p>
@@ -1105,7 +1125,7 @@ function wireUnlockSettings(T) {
       : '') + WORLDS.map((w) => {
       const left = lockedIn(w).length;
       return `<p><strong>${esc(t(w.title))}:</strong> ${esc(T.open(w.stories.length - left, w.stories.length))}</p>
-        ${left > 1 ? `<p><button class="big-btn green" data-world="${w.id}">${ICON.lock}<span>${esc(T.world(t(w.title), left, priceOf(worldProduct(w.id))))}</span></button></p>` : ''}`;
+        ${left > (SELL_SINGLE_STORIES ? 1 : 0) ? `<p><button class="big-btn green" data-world="${w.id}">${ICON.lock}<span>${esc(T.world(t(w.title), left, priceOf(worldProduct(w.id))))}</span></button></p>` : ''}`;
     }).join('');
     const btns = [...box.querySelectorAll('[data-world], [data-bundle]')];
     btns.forEach((b) => b.addEventListener('click', () => {

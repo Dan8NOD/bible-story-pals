@@ -44,7 +44,7 @@ async function open(hash, shop = null) {
       nativePromise: async (plugin, method, options) => {
         const s = window.__shop;
         s.calls.push({ method, ...options });
-        if (method === 'products') return { prices: Object.fromEntries(options.ids.map((id) => [id, id.includes('.world.') ? '$1.99' : '$0.99'])) };
+        if (method === 'products') return { prices: Object.fromEntries(options.ids.map((id) => [id, id.includes('.world.') ? '$4.99' : '$2.00'])) };
         if (method === 'buy') s.owned = [...s.owned, options.id];
         return { owned: s.owned };
       },
@@ -115,7 +115,7 @@ await page.waitForSelector('.praying.turn', { timeout: 8000 });
 assert.match(await page.textContent('.your-turn'), /Say their names!/);
 await page.close();
 
-// 6. App Store build: two free prayers, the third is $1 (the price of one story) behind the gate.
+// 6. Store builds: two free prayers, the third is a one-time purchase ($2.00) behind the gate.
 page = await open('#/prayers', {});
 await page.waitForSelector('.prayer-card');
 assert.equal(await page.$('.prayer-card[data-id="thanks"].locked'), null);
@@ -126,7 +126,7 @@ await page.waitForSelector('.praying');
 await page.goto(`${base}#/prayers`);
 await page.click('.prayer-card[data-id="blessing"]');
 await page.waitForSelector('.unlock-wall [data-act=prayer]');
-await page.waitForFunction(() => document.querySelector('[data-act=prayer]').textContent.includes('$0.99'));
+await page.waitForFunction(() => document.querySelector('[data-act=prayer]').textContent.includes('$2.00'));
 assert.match(await page.textContent('.unlock-wall'), /2 prayers are free/);
 await page.click('[data-act=prayer]');
 await solveGate(page);
@@ -148,4 +148,4 @@ await page.close();
 await browser.close();
 server.close();
 assert.deepEqual(errors, [], `page errors: ${errors.join('\n')}`);
-console.log('✓ prayers: 3 voice-guided prayers, your-turn pauses, pause and listen again, 2 free + 1 at the story price, gate, restore, website open');
+console.log('✓ prayers: 3 voice-guided prayers, your-turn pauses, pause and listen again, 2 free + 1 to buy, gate, restore, website open');
